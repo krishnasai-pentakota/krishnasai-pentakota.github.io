@@ -1,6 +1,8 @@
 # The five tiles on the opening screen, in the order they appear.
 # Each one opens its own page: factory.html, hire.html, client.html, lab.html, studio.html.
-# icon: loom | badge | briefcase | flask | clapper      color: the tile's ribbon colour
+# icon: loom | badge | briefcase | flask | clapper      color: the tile's colour
+# photo: the front of the role's cube (under static/), with the photographer's name and the
+#        photo's page. All five are free to use under the Unsplash License.
 
 - id: factory
   name: Factory
@@ -11,6 +13,9 @@
     numbers behind them.
   icon: loom
   color: "#C6F36B"
+  photo: img/roles/factory.webp
+  photo_credit: Geoff Oliver
+  photo_link: https://unsplash.com/photos/a-room-full-of-machinery-D16BDmKILsc
 
 - id: hire
   name: Hire me
@@ -20,6 +25,9 @@
     for your role, and where to find my code.
   icon: badge
   color: "#8AB4F8"
+  photo: img/roles/hire.webp
+  photo_credit: Hunters Race
+  photo_link: https://unsplash.com/photos/person-standing-near-the-stairs-MYbhN8KaaEc
 
 - id: client
   name: Client work
@@ -29,6 +37,9 @@
     service businesses near Visakhapatnam.
   icon: briefcase
   color: "#F2C46D"
+  photo: img/roles/client.webp
+  photo_credit: Saad Ahmad
+  photo_link: https://unsplash.com/photos/a-man-sells-snacks-and-drinks-at-a-small-shop-BYQrA_uhX2Y
 
 - id: lab
   name: FDE Lab
@@ -38,6 +49,9 @@
     projects in my Forward Deployed Engineer program. Code, tests and write-ups you can read.
   icon: flask
   color: "#B9A2FF"
+  photo: img/roles/lab.webp
+  photo_credit: Luke Chesser
+  photo_link: https://unsplash.com/photos/graphs-of-performance-analytics-on-a-laptop-screen-JKUTrJ4vK00
 
 - id: studio
   name: Studio
@@ -47,3 +61,6 @@
     events. Available as a paid service.
   icon: clapper
   color: "#FF8D7A"
+  photo: img/roles/studio.webp
+  photo_credit: Marcos Rocha
+  photo_link: https://unsplash.com/photos/black-video-camera-on-black-tripod--5ZpILiiOgM

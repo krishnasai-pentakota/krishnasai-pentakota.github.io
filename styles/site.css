@@ -54,7 +54,7 @@
       --color-bg: #fff; --color-surface: #fff; --color-surface-2: #f2f3f5; --color-ink: #111; --color-soft: #222;
       --color-muted: #4a5260; --color-line: #d5d8de; color-scheme: light;
     }
-    .site-header, .site-footer, .skip, .quick-look, .letter-form, .resume-toolbar { display: none !important; }
+    .site-header, .site-footer, .skip, .intro, .intro-controls, .quick-look, .letter-form, .resume-toolbar { display: none !important; }
   }
 }
 
@@ -165,45 +165,128 @@
     font-size: clamp(2.8rem, 6.4vw, 5rem); line-height: .95; letter-spacing: .005em;
   }
   .picker-grid {
+    /* --cube is the edge length of every role cube; the faces sit half of it out from the centre. */
+    --cube: clamp(136px, 15vw, 196px);
     display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(18px, 2.6vw, 36px);
-    list-style: none; margin: 0; padding: 0; perspective: 1200px;
+    list-style: none; margin: 0; padding: 0;
   }
-  .picker-grid > li { width: clamp(136px, 15vw, 196px); }
-  @media (max-width: 520px) { .picker-grid { gap: 18px 14px; } .picker-grid > li { width: calc(50% - 7px); max-width: 168px; } }
+  .picker-grid > li { width: var(--cube); }
+  @media (max-width: 520px) {
+    .picker-grid { --cube: min(160px, calc((100vw - 2 * var(--gutter) - 14px) / 2)); gap: 22px 14px; }
+  }
 
-  .picker-tile { display: grid; justify-items: center; gap: 10px; color: var(--color-muted); text-decoration: none; }
+  .picker-tile { display: grid; justify-items: center; gap: 12px; color: var(--color-muted); text-decoration: none; }
   .picker-tile:focus-visible { outline: none; }
-  /* The avatar: a square of satin in the role's colour, with its icon pressed in. */
-  .picker-avatar {
-    position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 10px;
-    overflow: hidden; color: #0B0D12;
-    background:
-      linear-gradient(135deg, color-mix(in oklab, var(--role) 62%, white) 0%, var(--role) 42%, color-mix(in oklab, var(--role) 58%, black) 100%);
-    box-shadow: 0 18px 40px -22px rgb(0 0 0 / 0.9), inset 0 1px 0 rgb(255 255 255 / 0.35);
-    transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .25s;
-  }
-  .picker-avatar svg { position: relative; width: 46%; height: auto; filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.35)); }
-  /* Two folded bands of lighter satin, plus a sheen that sweeps across on hover. */
-  .picker-satin {
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      linear-gradient(118deg, transparent 0 18%, rgb(255 255 255 / 0.22) 26%, transparent 34%),
-      linear-gradient(118deg, transparent 0 58%, rgb(0 0 0 / 0.16) 66%, transparent 76%);
-  }
-  .picker-satin::after {
-    content: ""; position: absolute; inset: -10%;
-    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.5) 48%, transparent 60%);
-    transform: translateX(-120%); transition: transform .8s ease;
-  }
   .picker-label { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.3rem, 2vw, 1.6rem); line-height: 1; color: var(--color-soft); transition: color .2s; text-transform: uppercase; letter-spacing: .02em; }
   .picker-sub { font-size: 13.5px; line-height: 1.4; max-width: 22ch; }
-  .picker-tile:hover .picker-avatar, .picker-tile:focus-visible .picker-avatar {
-    transform: translateY(-6px) scale(1.04);
-    box-shadow: 0 0 0 3px var(--color-ink), 0 26px 50px -20px color-mix(in oklab, var(--role) 55%, transparent);
-  }
-  .picker-tile:hover .picker-satin::after, .picker-tile:focus-visible .picker-satin::after { transform: translateX(120%); }
   .picker-tile:hover .picker-label, .picker-tile:focus-visible .picker-label { color: var(--color-ink); }
   .picker-foot { margin: clamp(32px, 5vw, 56px) 0 0; font-size: 14.5px; color: var(--color-soft); }
+  .picker-credits { margin: 10px 0 0; max-width: 72ch; font-size: 12.5px; line-height: 1.5; color: var(--color-muted); }
+  .picker-credits a { color: inherit; text-decoration: underline; text-decoration-color: rgb(255 255 255 / 0.25); text-underline-offset: 3px; }
+
+  /* ================================================================ the role cubes
+     Each role is a real 3D cube: six faces folded around a centre point. The front
+     face carries the role's photo; the other five are satin in the role's colour.
+     On arrival the cubes tumble in one after another and settle on their photo. */
+  .cube-stage { display: block; width: var(--cube); height: var(--cube); perspective: 760px; }
+  .cube {
+    position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d;
+    transform: translateZ(calc(var(--cube) / -2)); /* pushed back half a cube, so the front face sits at its natural size */
+    transition: transform .55s cubic-bezier(.2,.7,.2,1);
+  }
+  .cube-face {
+    position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: 10px;
+    color: #0B0D12; backface-visibility: hidden;
+    background:
+      linear-gradient(118deg, transparent 0 18%, rgb(255 255 255 / 0.22) 26%, transparent 34%),
+      linear-gradient(135deg, color-mix(in oklab, var(--role) 62%, white) 0%, var(--role) 42%, color-mix(in oklab, var(--role) 58%, black) 100%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35);
+  }
+  .cube-face svg { width: 42%; height: auto; }
+  .cube-front  { transform: translateZ(calc(var(--cube) / 2)); background: #0C0E13; box-shadow: 0 22px 44px -24px rgb(0 0 0 / 0.95); }
+  .cube-right  { transform: rotateY(90deg) translateZ(calc(var(--cube) / 2)); }
+  .cube-back   { transform: rotateY(180deg) translateZ(calc(var(--cube) / 2)); }
+  .cube-left   { transform: rotateY(-90deg) translateZ(calc(var(--cube) / 2)); }
+  .cube-top    { transform: rotateX(90deg) translateZ(calc(var(--cube) / 2)); filter: brightness(.8); }
+  .cube-bottom { transform: rotateX(-90deg) translateZ(calc(var(--cube) / 2)); filter: brightness(.55); }
+
+  .cube-front img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* Darken the photo toward the bottom and wash a little role colour in from the corner. */
+  .cube-shade {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgb(6 7 10 / 0) 38%, rgb(6 7 10 / 0.62) 100%),
+      linear-gradient(135deg, color-mix(in oklab, var(--role) 38%, transparent) 0%, transparent 55%);
+  }
+  .cube-front::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12), inset 0 -3px 0 var(--role);
+    transition: box-shadow .2s;
+  }
+  .cube-badge {
+    position: absolute; left: 10px; bottom: 10px; display: grid; place-items: center; width: 38px; height: 38px;
+    border-radius: 9px; background: var(--role); color: #0B0D12; box-shadow: 0 6px 16px rgb(0 0 0 / 0.5);
+  }
+  .cube-badge svg { width: 22px; }
+  .picker-tile:focus-visible .cube-front::after { box-shadow: inset 0 0 0 3px var(--color-ink), inset 0 -3px 0 var(--role); }
+
+  /* Hover or keyboard focus turns the cube a little, so you see its satin side. */
+  @media (prefers-reduced-motion: no-preference) {
+    .picker-tile:hover .cube, .picker-tile:focus-visible .cube {
+      transform: translateZ(calc(var(--cube) / -2)) rotateX(-8deg) rotateY(-24deg);
+    }
+  }
+
+  /* Arrival: each cube drops in tumbling, overshoots a touch, and settles on its photo.
+     "backwards" fill only holds the first frame during the delay; afterwards the cube's
+     own resting transform takes over again, so hover still works. Every keyframe lists
+     the same functions in the same order, so the angles animate smoothly. */
+  @keyframes cube-in {
+    0%   { opacity: 0; transform: translateZ(calc(var(--cube) / -2)) translateY(-70px) rotateX(-140deg) rotateY(-220deg) scale(.45); }
+    18%  { opacity: 1; }
+    72%  { transform: translateZ(calc(var(--cube) / -2)) translateY(6px) rotateX(10deg) rotateY(14deg) scale(1.03); }
+    100% { opacity: 1; transform: translateZ(calc(var(--cube) / -2)) translateY(0) rotateX(0deg) rotateY(0deg) scale(1); }
+  }
+  @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } }
+  .cubes-go:not(.intro-pending) .cube {
+    animation: cube-in 1.5s cubic-bezier(.2,.75,.25,1) backwards;
+    animation-delay: calc(var(--i, 0) * 130ms + 120ms);
+  }
+  .cubes-go:not(.intro-pending) .picker-label,
+  .cubes-go:not(.intro-pending) .picker-sub {
+    animation: rise-in .6s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 130ms + 900ms);
+  }
+  .cubes-go:not(.intro-pending) .picker-name,
+  .cubes-go:not(.intro-pending) .picker-title { animation: rise-in .8s ease-out backwards; }
+
+  /* ================================================================ the intro film
+     opening.js only plays it when index.html set "intro-pending". While it plays, the
+     picker waits underneath, hidden; then the film fades away as the cubes tumble in. */
+  .intro, .intro-controls { display: none; }
+  .intro-pending .intro, .intro-leaving .intro { display: block; }
+  .intro-pending .intro-controls { display: flex; }
+  .intro-pending body { overflow: hidden; }
+  .intro-pending .picker { visibility: hidden; }
+  .intro { position: fixed; inset: 0; z-index: 100; overflow: hidden; background: #06070A; transition: opacity .8s ease; }
+  .intro-leaving .intro { opacity: 0; pointer-events: none; }
+  .intro-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #06070A; }
+  /* Upright phones: show the middle of the film large, and fade its top and bottom edges into the dark. */
+  @media (orientation: portrait) {
+    .intro-video {
+      inset: auto; left: 50%; top: 46%; width: 165%; height: auto; object-fit: contain; transform: translate(-50%, -50%);
+      -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+      mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+    }
+  }
+  .intro-controls { position: fixed; right: 20px; bottom: 20px; z-index: 101; gap: 8px; }
+  .intro-button {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; cursor: pointer;
+    border: 1px solid rgb(255 255 255 / 0.3); border-radius: 999px; background: rgb(6 7 10 / 0.5);
+    color: var(--color-ink); font: inherit; font-size: 14px; letter-spacing: .02em; backdrop-filter: blur(6px);
+  }
+  .intro-button:hover { background: rgb(6 7 10 / 0.8); }
+  .intro-button[aria-pressed="true"] { border-color: rgb(255 255 255 / 0.75); }
 
   /* ================================================================ artwork
      A project's cover image, or a satin pattern in its role colour. */

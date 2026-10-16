@@ -38,6 +38,8 @@ git push
 | You have a number to show | add under `metrics:`, with `evidence:` saying where you can open and show it |
 | You took a screenshot | save it as `static/img/<project>/<name>.webp`, add it under `screenshots:` with `alt:` |
 | There's a public link | add under `links:` with `type: live` (dashboard), `code` (repo), `video` or `doc` |
+| You made a new intro film | save it as `static/media/intro.webm` and `intro.mp4` (ask Claude to convert and blend out any watermark) |
+| A role needs a different cube photo | save it as `static/img/roles/<role>.webp`, then set `photo_credit` and `photo_link` in `content/roles.yaml` |
 | A brand new project | copy a similar file in `content/projects/`, rename it, pick `kind:` (factory, client, lab or studio) |
 
 Statuses that can show results (`metrics`): implemented, delivered, prototype.

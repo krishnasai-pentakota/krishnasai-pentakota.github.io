@@ -212,6 +212,18 @@ def test_roles_must_be_exactly_the_five():
     assert [r.page for r in site([]).roles] == [f"{r}.html" for r in ROLE_IDS]
 
 
+def test_role_photo_must_be_credited_and_local():
+    base = roles()[0].model_dump()
+    with pytest.raises(ValidationError, match="photo_credit and photo_link"):
+        Role.model_validate({**base, "photo": "img/roles/factory.webp"})          # whose photo is it?
+    with pytest.raises(ValidationError, match="inside static"):
+        Role.model_validate({**base, "photo": "https://images.example.com/x.jpg",  # hotlinked, not ours to serve
+                             "photo_credit": "Someone", "photo_link": "https://unsplash.com/photos/x"})
+    ok = Role.model_validate({**base, "photo": "img/roles/factory.webp", "photo_credit": "Geoff Oliver",
+                              "photo_link": "https://unsplash.com/photos/a-room-full-of-machinery-D16BDmKILsc"})
+    assert ok.photo == "img/roles/factory.webp"
+
+
 def test_one_banner_per_role():
     with pytest.raises(ValidationError, match="one project per role gets the banner"):
         site([project(id="a", featured=True), project(id="b", featured=True)])

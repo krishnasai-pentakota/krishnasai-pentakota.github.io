@@ -69,6 +69,9 @@ def check_assets(site: Site, static_dir: Path) -> list[str]:
     wanted: list[tuple[str, str]] = []
     if site.profile.resume_pdf:
         wanted.append(("profile.yaml: resume_pdf", site.profile.resume_pdf))
+    for r in site.roles:
+        if r.photo:
+            wanted.append((f"roles.yaml: {r.id}.photo", r.photo))
     for p in site.projects:
         where = f"projects/{p.id}.yaml"
         if p.media:

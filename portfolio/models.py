@@ -399,6 +399,19 @@ class Role(Strict):
     intro: str = Field(min_length=20, max_length=320)
     icon: Icon
     color: str = Field(pattern=r"^#[0-9A-Fa-f]{6}$")
+    # The photo on the front of the role's cube, and who took it.
+    photo: str | None = None  # image under static/, e.g. img/roles/factory.webp
+    photo_credit: str | None = Field(default=None, max_length=40)  # photographer's name
+    photo_link: HttpUrl | None = None  # the photo's page, e.g. on Unsplash
+
+    _path = field_validator("photo")(_relative_asset)
+    _https = field_validator("photo_link")(_https_only)
+
+    @model_validator(mode="after")
+    def _photos_are_credited(self) -> Role:
+        if self.photo and not (self.photo_credit and self.photo_link):
+            raise ValueError("a role photo needs photo_credit and photo_link (whose photo it is, and where it came from)")
+        return self
 
     @property
     def page(self) -> str:

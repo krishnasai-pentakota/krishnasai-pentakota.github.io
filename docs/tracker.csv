@@ -37,5 +37,7 @@ id,layer,task,est_hours,actual_hours,status,done_when,notes
 36,L3,You: LinkedIn profile URL in profile.yaml,0.1,,Not started,LinkedIn card + resume link appear,
 37,L3,You: Layer 3 exercises in docs/layer-3-notes.md,0.5,,Not started,All three done,
 38,L3,Sri Veda film on YouTube (unlisted) + poster,1,,Not started,Client OK received; video link in sri-veda-promo.yaml,
-39,L5,Intro video: you walk out of a computer screen with a suitcase,3,,Not started,Plays once per visit; Skip works; still image for reduced motion; fades into the picker,Waiting on: full-body photo + clip (Google Flow or Weave)
+39,L5,Intro video: you walk out of a computer screen with a suitcase,3,,Done,Plays once per visit; Skip works; still image for reduced motion; fades into the picker,"Gemini mark blended out (delogo); WebM 0.5 MB + MP4 0.8 MB; credited as AI-made"
 40,L4,Phone layout check in a real browser,0.5,,Done,Every page fits 390 px and Pixel 7 screens,tools/check_layout.py; fixed 80 px overflow on Factory and FDE Lab
+41,L5,Role cubes: 3D CSS cubes that tumble in and settle on a photo,2,,Done,Five cubes animate in order; hover tilts; still with reduced motion,Pure CSS; Unsplash photos credited in roles.yaml
+42,L5,You: Layer 5 exercises in docs/layer-5-notes.md,0.5,,Not started,All three done,

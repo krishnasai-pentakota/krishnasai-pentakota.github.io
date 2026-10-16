@@ -122,8 +122,9 @@ def test_scripts_are_safe(built):
         root = "../" * len(page.relative_to(built).parent.parts)
         assert f'<script src="{root}static/js/site.js" defer></script>' in html, page.name
         assert 'type="module"' not in html, f"{page.name}: module scripts don't run from file://"
-    code = (built / "static" / "js" / "site.js").read_text(encoding="utf-8")
-    assert not re.search(r"\.(innerHTML|outerHTML)\s*\+?=", code), "site.js: build DOM with textContent, never innerHTML"
+    for js in ("site.js", "opening.js"):
+        code = (built / "static" / "js" / js).read_text(encoding="utf-8")
+        assert not re.search(r"\.(innerHTML|outerHTML)\s*\+?=", code), f"{js}: build DOM with textContent, never innerHTML"
 
 
 # ---------------------------------------------------------------- the opening screen
@@ -136,14 +137,57 @@ def test_picker_shows_the_five_roles(built, site):
         assert (built / r.page).is_file()
 
 
-def test_opening_screen_has_no_ribbon_intro(built):
-    """Decision, 16 Oct: the ribbon intro is gone. The site opens straight on the
-    picker until the video intro (Krishna walking out of a screen) is made."""
+def test_no_ribbon_intro_or_3d_libraries(built):
+    """Decision, 16 Oct: the ribbon intro is gone for good, with Three.js and GSAP."""
     html = read(built, "index.html")
-    for leftover in ("data-intro", "intro-pending", "Skip intro", "Replay intro", "gsap", "three"):
-        assert leftover not in html, f"index.html still has the old intro: '{leftover}'"
+    for leftover in ("gsap", "three", "Replay intro", "data-intro-canvas"):
+        assert leftover not in html, f"index.html still has the old ribbon intro: '{leftover}'"
     for gone in ("js/intro.js", "vendor/three-lite.module.js", "vendor/gsap.min.js"):
         assert not (built / "static" / gone).exists(), f"{gone} should no longer ship"
+
+
+def test_intro_film_has_every_way_out(built):
+    """The film must never trap anyone or waste their data."""
+    html = read(built, "index.html")
+    # Decided before paint: not with reduced motion, once per session, not on Data Saver,
+    # and a 3 s rescue if the script never starts.
+    assert "prefers-reduced-motion: reduce" in html and 'sessionStorage.getItem("ks-intro")' in html
+    assert "saveData" in html
+    assert re.search(r'if \(!d\.classList\.contains\("intro-playing"\)\) d\.classList\.remove\("intro-pending"\);\s*\}, 3000\)', html)
+    # Plays muted and inline (the only way browsers allow autoplay), downloads nothing unless it plays.
+    video = re.search(r"<video[^>]*data-intro-video[^>]*>", html).group(0)
+    for attr in ("muted", "playsinline", 'preload="none"'):
+        assert attr in video, f"intro video needs {attr}"
+    assert '<button type="button" class="intro-button" data-intro-skip>Skip intro</button>' in html
+    js = (built / "static" / "js" / "opening.js").read_text(encoding="utf-8")
+    assert "playing.catch(finish)" in js            # autoplay blocked -> straight to the roles
+    assert '"ended", finish' in js                  # film over -> roles
+    assert "addEventListener(\"error\", finish)" in js  # no playable format -> roles
+    assert "if (!started) finish(); }, 4000)" in js  # slow connection -> roles
+    assert 'e.key === "Escape"' in js
+
+
+def test_intro_film_files_are_small_and_clean(built):
+    media = built / "static" / "media"
+    for name, limit_kb in (("intro.webm", 1500), ("intro.mp4", 1800), ("intro-poster.webp", 80)):
+        f = media / name
+        assert f.is_file(), f"missing {name}"
+        assert f.stat().st_size < limit_kb * 1024, f"{name} is {f.stat().st_size // 1024} KB, over {limit_kb} KB"
+
+
+def test_role_cubes_have_six_faces_and_a_credited_photo(built, site):
+    html = read(built, "index.html")
+    tiles = re.findall(r'<a class="picker-tile".*?</a>', html, flags=re.S)
+    assert len(tiles) == 5
+    for r, tile in zip(site.roles, tiles):
+        faces = re.findall(r'class="cube-face cube-(front|right|back|left|top|bottom)"', tile)
+        assert sorted(faces) == sorted(["front", "right", "back", "left", "top", "bottom"]), r.id
+        assert r.photo, f"{r.id} has no cube photo"
+        assert f'static/{r.photo}"' in tile and (built / "static" / r.photo).is_file()
+    credits = unescape(re.search(r'<p class="picker-credits">(.*?)</p>', html, flags=re.S).group(1))
+    assert "made with AI" in credits  # the intro film says what it is
+    for r in site.roles:
+        assert r.photo_credit in credits and str(r.photo_link) in credits, f"{r.id}: photographer not credited"
 
 
 # ---------------------------------------------------------------- role pages
