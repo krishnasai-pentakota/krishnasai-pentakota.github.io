@@ -43,7 +43,7 @@ it fell back to lime. CSS variables inherit *down* the tree, never sideways. Set
 2.5-second timer gives the page back if the script never starts; Skip / Esc / Enter / Space
 skip it; any error hands the page straight back; GPU memory is released when it ends.
 
-## Block 3 — two rendering lessons from this layer
+## Block 3 — three rendering lessons from this layer
 
 1. **Tone mapping decides your colours.** The ribbons first rendered pastel. ACES Filmic, the
    usual "cinematic" tone mapper, desaturates bright surfaces. Three variants were rendered
@@ -52,6 +52,15 @@ skip it; any error hands the page straight back; GPU memory is released when it 
 2. **Warm up before the clock starts.** The first frame stalled while the GPU compiled the
    satin shader. `renderer.compileAsync()` plus one silent `render()` now happen *before* the
    GSAP timeline starts, so the first visible frame is already smooth.
+
+3. **A scroll box only clips what it positions.** After going live, the Factory and FDE Lab
+   pages were 80 px too wide on phones. The cause was a hidden screen-reader label
+   (`.sr-only`, which is `position: absolute`) inside the second tile. An absolutely positioned
+   element is placed against its nearest *positioned* ancestor, and that was the whole rows
+   area, not the shelf. A scroll container (`overflow-x: auto`) only clips descendants it
+   contains in that sense, so the label poked out past the screen edge. One line fixed it:
+   `position: relative` on `.shelf-track`. Found by hiding elements one at a time until the
+   overflow disappeared. `tools/check_layout.py` now checks every page at three widths.
 
 **Why `createStage()` is exported:** the sandbox has no GPU, so the timeline couldn't be
 filmed in real time. Exporting the stage let a tiny test page draw any single moment of the

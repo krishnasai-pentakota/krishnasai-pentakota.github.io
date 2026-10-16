@@ -318,6 +318,9 @@
   .empty-row { margin: 0; color: var(--color-muted); }
 
   .shelf-track {
+    /* position: relative makes the shelf the containing block, so absolutely positioned
+       children (e.g. .sr-only labels) are clipped by its scroll box instead of pushing the page wider. */
+    position: relative;
     display: grid; grid-auto-flow: column; grid-auto-columns: 84%; gap: 16px;
     overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
     /* The row runs to the screen edge, so the next tile peeks in; padding keeps hover lift unclipped. */

@@ -46,6 +46,8 @@ pip install -r requirements.txt
 python build.py                     # first run downloads Tailwind once
 python -m http.server 8000 --directory dist    # then open http://localhost:8000
 python -m pytest -q                 # the 58 checks
+python tools/check_layout.py        # optional: real-browser check, every page at 3 widths
+                                    # (needs: pip install playwright; playwright install chromium)
 ```
 
 Open the site through `http://localhost`, not by double-clicking `index.html`: browsers
