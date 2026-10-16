@@ -7,8 +7,6 @@
    4. Quick look: a native <dialog> filled from a <template> per project.
    5. Print and copy buttons (resume, cover letter).
    6. Cover letter: fills the letter in as you type, in this browser only.
-   7. "Replay intro" on the opening screen.
-   The cinematic intro itself lives in intro.js.
 
    Controls that need this script ship with the `hidden` attribute and are only
    revealed here, so a visitor without JavaScript never sees a button that does
@@ -171,23 +169,10 @@
     }
   }
 
-  // ------------------------------------------------------------- replay intro
-  function initReplay() {
-    var button = document.querySelector("[data-replay-intro]");
-    if (!button || reduceMotion.matches) return;   // the intro never plays with reduced motion
-    button.hidden = false;
-    button.addEventListener("click", function () {
-      try { sessionStorage.removeItem("ks-intro"); } catch (e) { /* ignore */ }
-      window.scrollTo(0, 0);
-      window.location.reload();
-    });
-  }
-
   initHeader();
   initMenu();
   initShelves();
   initQuickLook();
   initPrint();
   initCoverLetter();
-  initReplay();
 })();

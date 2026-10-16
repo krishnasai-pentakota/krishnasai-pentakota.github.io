@@ -57,7 +57,6 @@ async def main() -> int:
         }
         for label, options in sizes.items():
             context = await browser.new_context(**options)
-            await context.add_init_script("sessionStorage.setItem('introSeen', '1')")  # skip the intro
             page = await context.new_page()
             page.on("pageerror", lambda e, label=label: problems.append(f"{label}: JS error: {e}"))
             for path in pages:

@@ -27,9 +27,9 @@ id,layer,task,est_hours,actual_hours,status,done_when,notes
 26,L3,Warehouse 3D demo on generated data (Three.js),3,,Not started,Runs in browser; no company data,
 27,L4,GitHub repo (permanent home for the code),0.5,,Done,Code pushed from the laptop,krishnasai-pentakota.github.io
 28,L4,Actions deploy to Pages,1,,Done,Live URL opens on phone,.github/workflows/deploy.yml; tests gate every deploy
-29,L4,Link check + Lighthouse run,1,,Not started,No broken links; scores recorded,
+29,L4,Link check + Lighthouse run,1,,Done,No broken links; scores recorded,"16 Oct: links checked by tests; role pages perf 96-98, accessibility 100, best practices 100; SEO 60 only because of noindex (on purpose)"
 30,L3,Five roles: roles.yaml + picker + role pages,3,,Done,Picker shows 5 tiles; each role page has banner + rows,Netflix-style
-31,L3,Cinematic intro: Three.js satin ribbons + GSAP timeline,3,,Done,Skip/Esc works; reduced motion skips; once per session,Neutral tone mapping keeps role colours
+31,L3,Cinematic intro: Three.js satin ribbons + GSAP timeline,3,,Removed,Skip/Esc works; reduced motion skips; once per session,Removed 16 Oct: not wanted; replaced by task 39
 32,L3,Dashboard screenshots from both repos (WebP),1,,Done,Banner + gallery + quick look show real KPIs,"12 screens, 1.2 MB"
 33,L3,Hire me page + cover letter that fills in locally,1.5,,Done,Letter updates as you type; nothing is sent,
 34,L3,Studio: festival slideshow demo with sample names,1,,Done,No real names or company names (tested),
@@ -37,3 +37,5 @@ id,layer,task,est_hours,actual_hours,status,done_when,notes
 36,L3,You: LinkedIn profile URL in profile.yaml,0.1,,Not started,LinkedIn card + resume link appear,
 37,L3,You: Layer 3 exercises in docs/layer-3-notes.md,0.5,,Not started,All three done,
 38,L3,Sri Veda film on YouTube (unlisted) + poster,1,,Not started,Client OK received; video link in sri-veda-promo.yaml,
+39,L5,Intro video: you walk out of a computer screen with a suitcase,3,,Not started,Plays once per visit; Skip works; still image for reduced motion; fades into the picker,Waiting on: full-body photo + clip (Google Flow or Weave)
+40,L4,Phone layout check in a real browser,0.5,,Done,Every page fits 390 px and Pixel 7 screens,tools/check_layout.py; fixed 80 px overflow on Factory and FDE Lab

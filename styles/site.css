@@ -54,7 +54,7 @@
       --color-bg: #fff; --color-surface: #fff; --color-surface-2: #f2f3f5; --color-ink: #111; --color-soft: #222;
       --color-muted: #4a5260; --color-line: #d5d8de; color-scheme: light;
     }
-    .site-header, .site-footer, .skip, .intro, .intro-skip, .quick-look, .letter-form, .resume-toolbar { display: none !important; }
+    .site-header, .site-footer, .skip, .quick-look, .letter-form, .resume-toolbar { display: none !important; }
   }
 }
 
@@ -204,33 +204,6 @@
   .picker-tile:hover .picker-satin::after, .picker-tile:focus-visible .picker-satin::after { transform: translateX(120%); }
   .picker-tile:hover .picker-label, .picker-tile:focus-visible .picker-label { color: var(--color-ink); }
   .picker-foot { margin: clamp(32px, 5vw, 56px) 0 0; font-size: 14.5px; color: var(--color-soft); }
-  .picker-replay { margin-top: 8px; color: var(--color-muted); font-weight: 500; font-size: 14px; }
-
-  /* ================================================================ the intro
-     intro.js only runs when index.html set "intro-pending". While it plays,
-     the picker waits underneath, invisible, then rises into place. */
-  .intro, .intro-skip { display: none; }
-  .intro-pending .intro, .intro-running .intro { display: block; }
-  .intro-pending .intro-skip, .intro-running .intro-skip { display: inline-flex; }
-  .intro-pending .picker, .intro-pending .site-footer { opacity: 0; }
-  .intro-running body { overflow: hidden; }
-  .intro { position: fixed; inset: 0; z-index: 100; background: #06070A; }
-  .intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .intro-mark {
-    position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0;
-    font-family: var(--font-display); font-weight: 900; font-size: clamp(5.5rem, 17vw, 13rem); line-height: 1; color: var(--color-ink);
-    text-shadow: 0 0 40px rgb(255 255 255 / 0.25), 0 10px 60px rgb(0 0 0 / 0.8);
-  }
-  .intro-flash {
-    position: absolute; inset: 0; pointer-events: none; opacity: 0;
-    background: radial-gradient(circle at 50% 50%, #fff 0%, rgb(255 255 255 / 0.7) 30%, rgb(255 255 255 / 0) 72%);
-  }
-  .intro-skip {
-    position: fixed; right: 22px; bottom: 22px; z-index: 101; align-items: center; min-height: 40px; padding: 0 16px;
-    border: 1px solid rgb(255 255 255 / 0.3); border-radius: 999px; background: rgb(6 7 10 / 0.5);
-    color: var(--color-ink); font: inherit; font-size: 14px; letter-spacing: .02em; cursor: pointer; backdrop-filter: blur(6px);
-  }
-  .intro-skip:hover { background: rgb(6 7 10 / 0.8); }
 
   /* ================================================================ artwork
      A project's cover image, or a satin pattern in its role colour. */

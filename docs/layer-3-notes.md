@@ -28,6 +28,12 @@ it fell back to lime. CSS variables inherit *down* the tree, never sideways. Set
 
 ## Block 2 — the intro: Three.js draws, GSAP directs
 
+> **Removed on 16 Oct 2026.** You didn't like the ribbons, so the intro, Three.js and GSAP
+> were taken out and the site now opens straight on the five roles. The next intro is a
+> short video of you walking out of a computer screen with a suitcase. The notes below stay
+> as a record of how a real-time 3D intro works; the code is in the git history
+> (commit `6543897`) if you ever want to look at it.
+
 - **Three.js** builds real 3D geometry. Each ribbon is a strip laid along a curve. At 240 points
   along the curve we take its "frame" (which way is forward, up and sideways), rotate the
   sideways direction by a twist angle, and put a vertex half a ribbon-width each side.

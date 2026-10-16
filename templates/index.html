@@ -4,54 +4,21 @@
 {% block title %}{{ profile.name }} — choose a role{% endblock %}
 {% block body_class %}page-picker{% endblock %}
 
-{% block head_extra %}
-{# Decide before anything paints whether the intro plays: not for people who
-   asked their device to reduce motion, and only once per browser session.
-   If the intro script never starts (an old browser, a blocked script), the
-   timer below gives the page back after 2.5 s, so nobody is left on a black screen. #}
-<script>
-(function () {
-  var d = document.documentElement, reduce = true, seen = true;
-  try {
-    reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    seen = sessionStorage.getItem("ks-intro") === "1";
-  } catch (e) {}
-  if (!reduce && !seen) {
-    d.classList.add("intro-pending");
-    setTimeout(function () {
-      if (!d.classList.contains("intro-running")) d.classList.remove("intro-pending");
-    }, 2500);
-  }
-})();
-</script>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ root }}static/vendor/gsap.min.js" defer></script>
-<script type="module" src="{{ root }}static/js/intro.js"></script>
-{% endblock %}
-
 {% block header %}{% endblock %}
 
 {% block main %}
-{# The intro: five satin ribbons, one per role, weave in and tie off on the
-   monogram. Pure decoration, so screen readers skip it. #}
-<div class="intro" data-intro aria-hidden="true">
-  <canvas class="intro-canvas" data-intro-canvas></canvas>
-  <div class="intro-mark" data-intro-mark>{{ profile.monogram }}</div>
-  <div class="intro-flash" data-intro-flash></div>
-</div>
-<button type="button" class="intro-skip" data-intro-skip>Skip intro</button>
-
+{# The opening screen: five roles, like profiles on a streaming service.
+   (The intro video of Krishna walking out of a computer screen will play
+   before this once the clip is made; until then the page opens straight here.) #}
 <section class="picker" aria-labelledby="picker-title" data-picker>
   <div class="picker-inner">
-    <p class="picker-name" data-picker-fade>{{ profile.name }}</p>
-    <h1 class="picker-title" id="picker-title" data-picker-fade>Who's here?</h1>
+    <p class="picker-name">{{ profile.name }}</p>
+    <h1 class="picker-title" id="picker-title">Who's here?</h1>
     <ul class="picker-grid" role="list">
       {% for r in site.roles %}
       {% set count = site.in_role(r.id) | length %}
       <li>
-        <a class="picker-tile" href="{{ r.page }}" style="--role: {{ r.color }}; --i: {{ loop.index0 }}" data-picker-tile>
+        <a class="picker-tile" href="{{ r.page }}" style="--role: {{ r.color }}">
           <span class="picker-avatar" aria-hidden="true">
             <span class="picker-satin"></span>
             {{ icon(r.icon, 64, 1.6) }}
@@ -62,11 +29,10 @@
       </li>
       {% endfor %}
     </ul>
-    <p class="picker-foot" data-picker-fade>
+    <p class="picker-foot">
       {{ profile.headline }}
       {% if site.last_updated %}<span class="text-muted"> · Updated {{ site.last_updated | nicedate }}</span>{% endif %}
     </p>
-    <button type="button" class="link-button picker-replay" data-replay-intro hidden>{{ icon("replay", 16) }} Replay intro</button>
   </div>
 </section>
 {% endblock %}

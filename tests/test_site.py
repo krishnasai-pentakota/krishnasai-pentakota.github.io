@@ -112,7 +112,7 @@ def test_js_only_controls_ship_hidden(built):
     """A visitor without JavaScript never sees a button that does nothing."""
     for page in all_pages(built):
         html = page.read_text(encoding="utf-8")
-        for tag in re.findall(r"<button[^>]*(?:data-quick-look=|data-print|data-copy-letter|data-replay-intro)[^>]*>", html):
+        for tag in re.findall(r"<button[^>]*(?:data-quick-look=|data-print|data-copy-letter)[^>]*>", html):
             assert " hidden" in tag, f"{page.name}: JS-only control not hidden by default: {tag}"
 
 
@@ -121,12 +121,9 @@ def test_scripts_are_safe(built):
         html = page.read_text(encoding="utf-8")
         root = "../" * len(page.relative_to(built).parent.parts)
         assert f'<script src="{root}static/js/site.js" defer></script>' in html, page.name
-        # Only the opening screen loads a module (the intro), and it can fail safely.
-        if page.name != "index.html" or page.parent != built:
-            assert 'type="module"' not in html, f"{page.name}: module scripts don't run from file://"
-    for js in ("site.js", "intro.js"):
-        code = (built / "static" / "js" / js).read_text(encoding="utf-8")
-        assert not re.search(r"\.(innerHTML|outerHTML)\s*\+?=", code), f"{js}: build DOM with textContent, never innerHTML"
+        assert 'type="module"' not in html, f"{page.name}: module scripts don't run from file://"
+    code = (built / "static" / "js" / "site.js").read_text(encoding="utf-8")
+    assert not re.search(r"\.(innerHTML|outerHTML)\s*\+?=", code), "site.js: build DOM with textContent, never innerHTML"
 
 
 # ---------------------------------------------------------------- the opening screen
@@ -139,16 +136,14 @@ def test_picker_shows_the_five_roles(built, site):
         assert (built / r.page).is_file()
 
 
-def test_intro_has_every_way_out(built):
-    """The intro must never trap anyone: reduced motion skips it, it plays once per
-    session, a timer rescues a page whose script never starts, and there's a Skip button."""
+def test_opening_screen_has_no_ribbon_intro(built):
+    """Decision, 16 Oct: the ribbon intro is gone. The site opens straight on the
+    picker until the video intro (Krishna walking out of a screen) is made."""
     html = read(built, "index.html")
-    assert "prefers-reduced-motion: reduce" in html and "sessionStorage" in html
-    assert re.search(r"setTimeout\(function \(\) \{\s*if \(!d\.classList\.contains\(\"intro-running\"\)\)", html)
-    assert re.search(r'<button type="button" class="intro-skip"[^>]*>Skip intro</button>', html)
-    intro = (built / "static" / "js" / "intro.js").read_text(encoding="utf-8")
-    assert ".catch(" in intro and "finish()" in intro          # any failure hands the page back
-    assert "renderer.dispose()" in intro                       # GPU memory is released afterwards
+    for leftover in ("data-intro", "intro-pending", "Skip intro", "Replay intro", "gsap", "three"):
+        assert leftover not in html, f"index.html still has the old intro: '{leftover}'"
+    for gone in ("js/intro.js", "vendor/three-lite.module.js", "vendor/gsap.min.js"):
+        assert not (built / "static" / gone).exists(), f"{gone} should no longer ship"
 
 
 # ---------------------------------------------------------------- role pages
