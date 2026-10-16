@@ -1,9 +1,9 @@
-/* The opening screen: the intro film, then the role cubes.
+/* The opening screen: the intro film, then the role tiles.
 
    index.html's head script has already decided, before anything painted:
-   - "cubes-go" on <html>: the five cubes tumble in. CSS does all of that motion.
+   - "tiles-go" on <html>: the five role tiles fade up one by one. CSS does that.
    - "intro-pending": the intro film plays first. This script plays it, then hands the
-     page over to the cubes when the film ends, on Skip / Esc / Enter / Space, or as soon
+     page over to the role tiles when the film ends, on Skip / Esc / Enter / Space, or as soon
      as anything goes wrong (autoplay blocked, no playable format, slow connection).
    Every way out ends on the role picker, which is always there underneath.
 
@@ -33,7 +33,7 @@
   function finish() {
     if (done) return;
     done = true;
-    // The film fades out over the picker while the cubes tumble in underneath it.
+    // The film fades out over the picker while the role tiles fade up underneath it.
     html.classList.add("intro-leaving");
     html.classList.remove("intro-pending", "intro-playing");
     window.removeEventListener("keydown", onKey);
@@ -65,7 +65,7 @@
 
   video.addEventListener("playing", function () { started = true; });
   video.addEventListener("ended", finish);
-  // Start the hand-over just before the last frame, so film and cubes feel like one move.
+  // Start the hand-over just before the last frame, so film and tiles feel like one move.
   video.addEventListener("timeupdate", function () {
     if (video.duration && video.currentTime > video.duration - 0.35) finish();
   });

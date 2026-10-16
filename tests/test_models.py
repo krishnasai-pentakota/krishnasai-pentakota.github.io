@@ -214,14 +214,16 @@ def test_roles_must_be_exactly_the_five():
 
 def test_role_photo_must_be_credited_and_local():
     base = roles()[0].model_dump()
-    with pytest.raises(ValidationError, match="photo_credit and photo_link"):
-        Role.model_validate({**base, "photo": "img/roles/factory.webp"})          # whose photo is it?
+    with pytest.raises(ValidationError, match="credit"):
+        Role.model_validate({**base, "photos": [{"src": "img/roles/factory.webp"}]})   # whose photo is it?
     with pytest.raises(ValidationError, match="inside static"):
-        Role.model_validate({**base, "photo": "https://images.example.com/x.jpg",  # hotlinked, not ours to serve
-                             "photo_credit": "Someone", "photo_link": "https://unsplash.com/photos/x"})
-    ok = Role.model_validate({**base, "photo": "img/roles/factory.webp", "photo_credit": "Geoff Oliver",
-                              "photo_link": "https://unsplash.com/photos/a-room-full-of-machinery-D16BDmKILsc"})
-    assert ok.photo == "img/roles/factory.webp"
+        Role.model_validate({**base, "photos": [{"src": "https://images.example.com/x.jpg",  # hotlinked
+                                                 "credit": "Someone", "link": "https://unsplash.com/photos/x"}]})
+    photo = {"src": "img/roles/factory.webp", "credit": "Mick Haupt",
+             "link": "https://unsplash.com/photos/a-close-up-of-a-colorful-weaving-machine-5EUy6c3e1bM"}
+    with pytest.raises(ValidationError):
+        Role.model_validate({**base, "photos": [photo, photo, photo]})                   # at most two per tile
+    assert Role.model_validate({**base, "photos": [photo]}).photos[0].credit == "Mick Haupt"
 
 
 def test_one_banner_per_role():

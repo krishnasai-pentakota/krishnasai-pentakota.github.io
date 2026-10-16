@@ -6,7 +6,7 @@
 
 {% block head_extra %}
 {# Decide before anything paints:
-   - cubes-go: the role cubes spin in (not for people who asked their device to reduce motion)
+   - tiles-go: the role tiles fade up one by one (not for people who asked their device to reduce motion)
    - intro-pending: the intro film plays first (once per browser session, not on Data Saver)
    If opening.js never starts (blocked script, old browser), the timer gives the page back after 3 s. #}
 <script>
@@ -17,7 +17,7 @@
     intro = motion && sessionStorage.getItem("ks-intro") !== "1"
       && !(navigator.connection && navigator.connection.saveData);
   } catch (e) {}
-  if (motion) d.classList.add("cubes-go");
+  if (motion) d.classList.add("tiles-go");
   if (intro) {
     d.classList.add("intro-pending");
     setTimeout(function () {
@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ root }}static/js/opening.js" defer></script>
+<script src="{{ root }}static/js/opening.js?v={{ v }}" defer></script>
 {% endblock %}
 
 {% block header %}{% endblock %}
@@ -40,9 +40,9 @@
    downloads it unless it actually plays. #}
 <div class="intro" data-intro aria-hidden="true">
   <video class="intro-video" data-intro-video muted playsinline preload="none"
-         poster="{{ root }}static/media/intro-poster.webp" width="1280" height="720">
-    <source src="{{ root }}static/media/intro.webm" type="video/webm">
-    <source src="{{ root }}static/media/intro.mp4" type="video/mp4">
+         poster="{{ root }}static/media/intro-poster.webp?v={{ v }}" width="1280" height="720">
+    <source src="{{ root }}static/media/intro.webm?v={{ v }}" type="video/webm">
+    <source src="{{ root }}static/media/intro.mp4?v={{ v }}" type="video/mp4">
   </video>
 </div>
 <div class="intro-controls" data-intro-controls>
@@ -50,7 +50,8 @@
   <button type="button" class="intro-button" data-intro-skip>Skip intro</button>
 </div>
 
-{# The opening screen: five roles, each a cube that tumbles in and settles on its photo. #}
+{# The opening screen: five roles, each a photo tile with its icon. A role with two
+   photos (Client work: a hospital and a restaurant) slowly cross-fades between them. #}
 <section class="picker" aria-labelledby="picker-title" data-picker>
   <div class="picker-inner">
     <p class="picker-name">{{ profile.name }}</p>
@@ -60,19 +61,10 @@
       {% set count = site.in_role(r.id) | length %}
       <li>
         <a class="picker-tile" href="{{ r.page }}" style="--role: {{ r.color }}; --i: {{ loop.index0 }}">
-          <span class="cube-stage" aria-hidden="true">
-            <span class="cube">
-              <span class="cube-face cube-front">
-                {% if r.photo %}<img src="{{ root }}static/{{ r.photo }}" alt="" width="720" height="720" decoding="async">{% endif %}
-                <span class="cube-shade"></span>
-                <span class="cube-badge">{{ icon(r.icon, 22, 1.8) }}</span>
-              </span>
-              <span class="cube-face cube-right">{{ icon(r.icon, 64, 1.6) }}</span>
-              <span class="cube-face cube-back">{{ icon(r.icon, 64, 1.6) }}</span>
-              <span class="cube-face cube-left">{{ icon(r.icon, 64, 1.6) }}</span>
-              <span class="cube-face cube-top"></span>
-              <span class="cube-face cube-bottom"></span>
-            </span>
+          <span class="tile-photo{% if r.photos | length > 1 %} tile-photo--fade{% endif %}" aria-hidden="true">
+            {% for ph in r.photos %}<img src="{{ root }}static/{{ ph.src }}" alt="" width="720" height="720" decoding="async">{% endfor %}
+            <span class="tile-photo-shade"></span>
+            <span class="tile-photo-badge">{{ icon(r.icon, 22, 1.8) }}</span>
           </span>
           <span class="picker-label">{{ r.name }}</span>
           <span class="picker-sub">{{ r.tagline }}{% if count %} · {{ count }} {{ "project" if count == 1 else "projects" }}{% endif %}</span>
@@ -84,11 +76,11 @@
       {{ profile.headline }}
       {% if site.last_updated %}<span class="text-muted"> · Updated {{ site.last_updated | nicedate }}</span>{% endif %}
     </p>
-    {% set credited = site.roles | selectattr("photo") | list %}
+    {% set photos = site.role_photos %}
     <p class="picker-credits">
       Intro film made with AI (Google Veo) from my photo.
-      {% if credited %}Role photos on Unsplash by
-      {% for r in credited %}<a href="{{ r.photo_link }}" rel="noopener">{{ r.photo_credit }}</a>{{ ", " if not loop.last and loop.revindex > 2 else (" and " if loop.revindex == 2 else "") }}{% endfor %}.{% endif %}
+      {% if photos %}Role photos on Unsplash by
+      {% for ph in photos %}<a href="{{ ph.link }}" rel="noopener">{{ ph.credit }}</a>{{ ", " if loop.revindex > 2 else (" and " if loop.revindex == 2 else "") }}{% endfor %}.{% endif %}
     </p>
   </div>
 </section>

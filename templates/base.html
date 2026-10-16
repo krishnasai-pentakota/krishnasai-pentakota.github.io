@@ -26,8 +26,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
   {# root is "" on top-level pages and "../" inside work/. Never a leading slash:
      that would break at username.github.io/<repo>/ and when opened from disk. #}
-  <link rel="stylesheet" href="{{ root }}static/css/site.css">
-  <script src="{{ root }}static/js/site.js" defer></script>
+  <link rel="stylesheet" href="{{ root }}static/css/site.css?v={{ v }}">
+  <script src="{{ root }}static/js/site.js?v={{ v }}" defer></script>
   {% block scripts %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}"{% if current_role %} style="--role: {{ current_role.color }}"{% endif %}>

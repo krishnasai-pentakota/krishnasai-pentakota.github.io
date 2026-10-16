@@ -390,6 +390,18 @@ class Resume(Prose):
 # ---------------------------------------------------------------- the five roles
 
 
+class RolePhoto(Strict):
+    """A photo on a role's tile, and who took it. Credit and link are required:
+    every photo on the site says whose it is and where it came from."""
+
+    src: str  # image under static/, e.g. img/roles/factory.webp
+    credit: str = Field(min_length=2, max_length=40)  # the photographer's name
+    link: HttpUrl  # the photo's page, e.g. on Unsplash
+
+    _path = field_validator("src")(_relative_asset)
+    _https = field_validator("link")(_https_only)
+
+
 class Role(Strict):
     """One tile on the opening screen, and the page behind it."""
 
@@ -399,19 +411,8 @@ class Role(Strict):
     intro: str = Field(min_length=20, max_length=320)
     icon: Icon
     color: str = Field(pattern=r"^#[0-9A-Fa-f]{6}$")
-    # The photo on the front of the role's cube, and who took it.
-    photo: str | None = None  # image under static/, e.g. img/roles/factory.webp
-    photo_credit: str | None = Field(default=None, max_length=40)  # photographer's name
-    photo_link: HttpUrl | None = None  # the photo's page, e.g. on Unsplash
-
-    _path = field_validator("photo")(_relative_asset)
-    _https = field_validator("photo_link")(_https_only)
-
-    @model_validator(mode="after")
-    def _photos_are_credited(self) -> Role:
-        if self.photo and not (self.photo_credit and self.photo_link):
-            raise ValueError("a role photo needs photo_credit and photo_link (whose photo it is, and where it came from)")
-        return self
+    # The tile's photo. With two, the tile slowly cross-fades between them.
+    photos: list[RolePhoto] = Field(default_factory=list, max_length=2)
 
     @property
     def page(self) -> str:
@@ -455,6 +456,11 @@ class Site(BaseModel):
     # Jinja, keeps the templates dumb and this logic testable.
     def _sorted(self, items: list[Project]) -> list[Project]:
         return sorted(items, key=lambda p: (p.order, p.title))
+
+    @property
+    def role_photos(self) -> list[RolePhoto]:
+        """Every photo on the opening screen, in tile order: the credits line."""
+        return [photo for role in self.roles for photo in role.photos]
 
     def role(self, rid: str) -> Role:
         return next(r for r in self.roles if r.id == rid)

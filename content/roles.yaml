@@ -1,8 +1,9 @@
 # The five tiles on the opening screen, in the order they appear.
 # Each one opens its own page: factory.html, hire.html, client.html, lab.html, studio.html.
 # icon: loom | badge | briefcase | flask | clapper      color: the tile's colour
-# photo: the front of the role's cube (under static/), with the photographer's name and the
-#        photo's page. All five are free to use under the Unsplash License.
+# photos: one or two photos for the tile (under static/), each with the photographer's name and
+#         the photo's page. Two photos = the tile slowly cross-fades between them.
+#         All are free to use under the Unsplash License (never Unsplash+).
 
 - id: factory
   name: Factory
@@ -13,9 +14,10 @@
     numbers behind them.
   icon: loom
   color: "#C6F36B"
-  photo: img/roles/factory.webp
-  photo_credit: Geoff Oliver
-  photo_link: https://unsplash.com/photos/a-room-full-of-machinery-D16BDmKILsc
+  photos:
+    - src: img/roles/factory.webp
+      credit: Mick Haupt
+      link: https://unsplash.com/photos/a-close-up-of-a-colorful-weaving-machine-5EUy6c3e1bM
 
 - id: hire
   name: Hire me
@@ -25,9 +27,10 @@
     for your role, and where to find my code.
   icon: badge
   color: "#8AB4F8"
-  photo: img/roles/hire.webp
-  photo_credit: Hunters Race
-  photo_link: https://unsplash.com/photos/person-standing-near-the-stairs-MYbhN8KaaEc
+  photos:
+    - src: img/roles/hire.webp
+      credit: Hunters Race
+      link: https://unsplash.com/photos/person-standing-near-the-stairs-MYbhN8KaaEc
 
 - id: client
   name: Client work
@@ -37,9 +40,13 @@
     service businesses near Visakhapatnam.
   icon: briefcase
   color: "#F2C46D"
-  photo: img/roles/client.webp
-  photo_credit: Saad Ahmad
-  photo_link: https://unsplash.com/photos/a-man-sells-snacks-and-drinks-at-a-small-shop-BYQrA_uhX2Y
+  photos:
+    - src: img/roles/client-hospital.webp
+      credit: Acton Crawford
+      link: https://unsplash.com/photos/brown-and-white-concrete-building-near-green-trees-under-blue-sky-during-daytime-8PB_TFEy2XQ
+    - src: img/roles/client-restaurant.webp
+      credit: Leonardo Ziaja
+      link: https://unsplash.com/photos/elegant-restaurant-dining-area-with-warm-lighting-Ph7Y42lXzyw
 
 - id: lab
   name: FDE Lab
@@ -49,9 +56,10 @@
     projects in my Forward Deployed Engineer program. Code, tests and write-ups you can read.
   icon: flask
   color: "#B9A2FF"
-  photo: img/roles/lab.webp
-  photo_credit: Luke Chesser
-  photo_link: https://unsplash.com/photos/graphs-of-performance-analytics-on-a-laptop-screen-JKUTrJ4vK00
+  photos:
+    - src: img/roles/lab.webp
+      credit: Luke Chesser
+      link: https://unsplash.com/photos/graphs-of-performance-analytics-on-a-laptop-screen-JKUTrJ4vK00
 
 - id: studio
   name: Studio
@@ -61,6 +69,7 @@
     events. Available as a paid service.
   icon: clapper
   color: "#FF8D7A"
-  photo: img/roles/studio.webp
-  photo_credit: Marcos Rocha
-  photo_link: https://unsplash.com/photos/black-video-camera-on-black-tripod--5ZpILiiOgM
+  photos:
+    - src: img/roles/studio.webp
+      credit: Marcos Rocha
+      link: https://unsplash.com/photos/black-video-camera-on-black-tripod--5ZpILiiOgM

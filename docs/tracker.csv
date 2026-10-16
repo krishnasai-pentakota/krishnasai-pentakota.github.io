@@ -39,5 +39,8 @@ id,layer,task,est_hours,actual_hours,status,done_when,notes
 38,L3,Sri Veda film on YouTube (unlisted) + poster,1,,Not started,Client OK received; video link in sri-veda-promo.yaml,
 39,L5,Intro video: you walk out of a computer screen with a suitcase,3,,Done,Plays once per visit; Skip works; still image for reduced motion; fades into the picker,"Gemini mark blended out (delogo); WebM 0.5 MB + MP4 0.8 MB; credited as AI-made"
 40,L4,Phone layout check in a real browser,0.5,,Done,Every page fits 390 px and Pixel 7 screens,tools/check_layout.py; fixed 80 px overflow on Factory and FDE Lab
-41,L5,Role cubes: 3D CSS cubes that tumble in and settle on a photo,2,,Done,Five cubes animate in order; hover tilts; still with reduced motion,Pure CSS; Unsplash photos credited in roles.yaml
+41,L5,Role cubes: 3D CSS cubes that tumble in and settle on a photo,2,,Removed,Five cubes animate in order; hover tilts; still with reduced motion,Removed 16 Oct: no 3D wanted; replaced by task 43
 42,L5,You: Layer 5 exercises in docs/layer-5-notes.md,0.5,,Not started,All three done,
+43,L5,Flat role photo tiles (one icon each); Factory = loom threads; Client = hospital + restaurant,1,,Done,Each tile shows its icon once; Client cross-fades; photos credited,Tested: one <svg> per tile
+44,L5,3D star mouse pointer + sparkle trail,1,,Done,Star on every page; glowing star on links; no trail on touch or reduced motion,Real cursor image: no lag; works in pop-ups
+45,L5,Version-stamp CSS/JS (?v=fingerprint),0.5,,Done,A new page never loads yesterday's cached CSS,Fixes the triple-icon bug seen on 16 Oct

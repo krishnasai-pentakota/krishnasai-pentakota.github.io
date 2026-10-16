@@ -7,6 +7,7 @@
    4. Quick look: a native <dialog> filled from a <template> per project.
    5. Print and copy buttons (resume, cover letter).
    6. Cover letter: fills the letter in as you type, in this browser only.
+   7. Star trail: small sparkles fade behind the star pointer (desktop mouse only).
 
    Controls that need this script ship with the `hidden` attribute and are only
    revealed here, so a visitor without JavaScript never sees a button that does
@@ -169,10 +170,36 @@
     }
   }
 
+  // ------------------------------------------------------------- star trail
+  // The pointer itself is a CSS cursor image (styles/site.css). This only adds a
+  // light trail: a sparkle every ~16 px of movement, gone in 0.75 s, at most 14 at
+  // once. Only for a real mouse, and never for people who asked for less motion.
+  function initStarTrail() {
+    var mouse = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!mouse.matches || reduceMotion.matches) return;
+    var lastX = -100, lastY = -100, alive = 0;
+    document.addEventListener("pointermove", function (e) {
+      if (e.pointerType !== "mouse" || alive >= 14) return;
+      var dx = e.clientX - lastX, dy = e.clientY - lastY;
+      if (dx * dx + dy * dy < 256) return;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      var spark = document.createElement("span");
+      spark.className = "star-spark";
+      spark.setAttribute("aria-hidden", "true");
+      spark.style.left = e.clientX + "px";
+      spark.style.top = e.clientY + "px";
+      document.body.appendChild(spark);
+      alive += 1;
+      spark.addEventListener("animationend", function () { spark.remove(); alive -= 1; });
+    }, { passive: true });
+  }
+
   initHeader();
   initMenu();
   initShelves();
   initQuickLook();
   initPrint();
   initCoverLetter();
+  initStarTrail();
 })();

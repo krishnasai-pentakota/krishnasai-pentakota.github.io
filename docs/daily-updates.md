@@ -39,7 +39,7 @@ git push
 | You took a screenshot | save it as `static/img/<project>/<name>.webp`, add it under `screenshots:` with `alt:` |
 | There's a public link | add under `links:` with `type: live` (dashboard), `code` (repo), `video` or `doc` |
 | You made a new intro film | save it as `static/media/intro.webm` and `intro.mp4` (ask Claude to convert and blend out any watermark) |
-| A role needs a different cube photo | save it as `static/img/roles/<role>.webp`, then set `photo_credit` and `photo_link` in `content/roles.yaml` |
+| A role needs a different photo | save it as `static/img/roles/<name>.webp`, then in `content/roles.yaml` set its `photos:` entry: `src`, `credit` (photographer) and `link` (the photo's page). Two photos = the tile cross-fades |
 | A brand new project | copy a similar file in `content/projects/`, rename it, pick `kind:` (factory, client, lab or studio) |
 
 Statuses that can show results (`metrics`): implemented, delivered, prototype.

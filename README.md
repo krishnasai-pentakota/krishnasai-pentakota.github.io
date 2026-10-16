@@ -26,8 +26,9 @@ push to main      → GitHub Actions: tests → build → publish to GitHub Page
 Python only runs at build time. Visitors get plain HTML, CSS and a little JavaScript, with
 no frameworks or libraries to download. The opening screen plays a 9-second intro film
 (Krishna walking out of a computer screen, made with Google Veo from his photo), then the
-five roles tumble in as 3D cubes and settle on their photos. The film plays once per browser
-session and is skipped for reduced motion and Data Saver; the cubes are pure CSS.
+five role tiles fade up, each with a photo and its icon. The film plays once per browser
+session and is skipped for reduced motion and Data Saver. The mouse pointer is a gold 3D
+star on every page, with a light sparkle trail on desktop.
 
 ## Updating it
 
@@ -66,9 +67,10 @@ You can also double-click `dist/index.html`: every page works straight from disk
 | `static/img/` | Screenshots and covers (WebP) | Yes |
 | `static/demos/` | Playable Studio demos | Yes |
 | `static/js/site.js` | Rows, quick look, menu, cover letter | Rarely |
-| `static/js/opening.js` | Plays the intro film and hands over to the role cubes | Rarely |
+| `static/js/opening.js` | Plays the intro film and hands over to the role tiles | Rarely |
 | `static/media/` | The intro film (`intro.webm`, `intro.mp4`) and its first frame (`intro-poster.webp`) | To change the film |
-| `static/img/roles/` | The photo on each role cube (Unsplash, credited in `roles.yaml`) | Yes |
+| `static/img/roles/` | The photos on the role tiles (Unsplash, credited in `roles.yaml`) | Yes |
+| `static/img/cursor-star*.png` | The 3D star pointer (normal, and over links) | Rarely |
 | `styles/site.css` | Design tokens and components (Tailwind source) | When the look changes |
 | `templates/` | Page layouts (Jinja) | When the structure changes |
 | `portfolio/` | The content rules (`models.py`), loader and renderer | When a rule changes |
@@ -101,7 +103,7 @@ Statuses: `implemented` · `delivered` · `in_progress` · `prototype` · `conce
 - [x] **L2 Interactions:** sideways rows, quick-look dialog, project pages, printable resume
 - [x] **L3 Five roles:** role picker, Netflix-style role pages, real dashboard screenshots, Hire me, cover letter, Studio demo
 - [x] **L4 Ship:** GitHub repo, Actions (test → build → publish), privacy guards, phone layout check
-- [x] **L5 Opening:** intro film (walking out of a screen), role cubes with photos, credits
+- [x] **L5 Opening:** intro film (walking out of a screen), role photo tiles, 3D star pointer, versioned CSS/JS
 - [ ] **Next:** more case studies (clinic, sales, store system), Sri Veda film on YouTube, warehouse 3D demo on generated data
 
 Tracker with hours and done-criteria: `docs/tracker.csv`. Learning notes: `docs/layer-0-notes.md` to `docs/layer-3-notes.md`.

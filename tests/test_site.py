@@ -92,6 +92,7 @@ def test_no_dead_links_on_any_page(built):
                 continue
             assert not ref.startswith("/"), f"{where}: {ref} is root-absolute; breaks on GitHub Pages project sites"
             path, _, anchor = ref.partition("#")
+            path = path.split("?", 1)[0]  # site.css?v=… : the ?v= part is a version stamp, not a file
             target = (page.parent / path).resolve() if path else page.resolve()
             assert target.is_file(), f"{where}: {ref} points at a file that isn't in the build"
             if anchor and target.suffix == ".html":
@@ -120,7 +121,7 @@ def test_scripts_are_safe(built):
     for page in all_pages(built):
         html = page.read_text(encoding="utf-8")
         root = "../" * len(page.relative_to(built).parent.parts)
-        assert f'<script src="{root}static/js/site.js" defer></script>' in html, page.name
+        assert re.search(rf'<script src="{re.escape(root)}static/js/site\.js\?v=[0-9a-f]{{10}}" defer></script>', html), page.name
         assert 'type="module"' not in html, f"{page.name}: module scripts don't run from file://"
     for js in ("site.js", "opening.js"):
         code = (built / "static" / "js" / js).read_text(encoding="utf-8")
@@ -175,19 +176,54 @@ def test_intro_film_files_are_small_and_clean(built):
         assert f.stat().st_size < limit_kb * 1024, f"{name} is {f.stat().st_size // 1024} KB, over {limit_kb} KB"
 
 
-def test_role_cubes_have_six_faces_and_a_credited_photo(built, site):
+def test_role_tiles_are_flat_with_one_icon_and_credited_photos(built, site):
+    """Decision, 16 Oct: no 3D cubes. Each tile is a photo with its icon shown once."""
     html = read(built, "index.html")
+    assert "cube" not in html, "the 3D cubes are gone; no cube markup should remain"
     tiles = re.findall(r'<a class="picker-tile".*?</a>', html, flags=re.S)
     assert len(tiles) == 5
     for r, tile in zip(site.roles, tiles):
-        faces = re.findall(r'class="cube-face cube-(front|right|back|left|top|bottom)"', tile)
-        assert sorted(faces) == sorted(["front", "right", "back", "left", "top", "bottom"]), r.id
-        assert r.photo, f"{r.id} has no cube photo"
-        assert f'static/{r.photo}"' in tile and (built / "static" / r.photo).is_file()
+        assert tile.count("<svg") == 1, f"{r.id}: its icon must appear exactly once"
+        assert r.photos, f"{r.id} has no photo"
+        for ph in r.photos:
+            assert f'static/{ph.src}"' in tile and (built / "static" / ph.src).is_file(), ph.src
+        assert ("tile-photo--fade" in tile) == (len(r.photos) == 2), r.id
+    assert len(site.role("client").photos) == 2  # a hospital and a restaurant, cross-fading
     credits = unescape(re.search(r'<p class="picker-credits">(.*?)</p>', html, flags=re.S).group(1))
     assert "made with AI" in credits  # the intro film says what it is
-    for r in site.roles:
-        assert r.photo_credit in credits and str(r.photo_link) in credits, f"{r.id}: photographer not credited"
+    for ph in site.role_photos:
+        assert ph.credit in credits and str(ph.link) in credits, f"{ph.src}: photographer not credited"
+
+
+def test_assets_carry_one_version_stamp(built):
+    """Every page asks for the same fingerprinted CSS and JS, so a new page can never
+    be paired with an old cached stylesheet (that once showed each icon three times)."""
+    stamps = set()
+    for page in all_pages(built):
+        html = page.read_text(encoding="utf-8")
+        found = re.findall(r'static/(?:css/site\.css|js/site\.js)\?v=([0-9a-f]{10})"', html)
+        assert len(found) == 2, f"{page.name}: CSS and JS links need ?v= stamps"
+        stamps.update(found)
+    assert len(stamps) == 1, f"pages disagree on the asset version: {stamps}"
+
+
+def test_version_stamp_changes_when_styles_change(tmp_path):
+    from portfolio.render import asset_version
+    css = tmp_path / "site.css"
+    css.write_text("a { color: red }")
+    before = asset_version(css)
+    css.write_text("a { color: blue }")
+    assert asset_version(css) != before
+
+
+def test_star_pointer_everywhere(built):
+    css = (built / "static" / "css" / "site.css").read_text(encoding="utf-8")
+    for name in ("cursor-star.png", "cursor-star-link.png"):
+        assert f"../img/{name}" in css, f"site.css doesn't use {name}"
+        assert (built / "static" / "img" / name).is_file(), f"missing static/img/{name}"
+    assert "cursor:pointer" not in css.replace(" ", ""), "every clickable thing should show the star, not the plain hand"
+    js = (built / "static" / "js" / "site.js").read_text(encoding="utf-8")
+    assert "reduceMotion.matches) return;" in js[js.index("function initStarTrail"):]  # no trail for reduced motion
 
 
 # ---------------------------------------------------------------- role pages

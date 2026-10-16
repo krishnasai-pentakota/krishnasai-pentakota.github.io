@@ -99,7 +99,7 @@
   .menu-button {
     display: none; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; margin-left: auto;
     border: 1px solid var(--color-line); border-radius: 10px; background: rgb(18 21 28 / 0.8);
-    color: var(--color-ink); font: inherit; font-size: 15px; cursor: pointer;
+    color: var(--color-ink); font: inherit; font-size: 15px; cursor: url(../img/cursor-star-link.png) 16 16, pointer;
   }
   /* Only collapse the menu when JavaScript is there to open it. */
   @media (max-width: 860px) {
@@ -123,7 +123,7 @@
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 0 22px;
     border: 0; border-radius: 6px; font: inherit; font-weight: 600; font-size: 15.5px; line-height: 1;
-    text-decoration: none; cursor: pointer; transition: background-color .2s, transform .2s;
+    text-decoration: none; cursor: url(../img/cursor-star-link.png) 16 16, pointer; transition: background-color .2s, transform .2s;
   }
   .btn:active { transform: scale(.98); }
   /* The bright "Play" button and the grey "More info" one, streaming-style. */
@@ -136,10 +136,31 @@
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
   .link-button {
     display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none;
-    color: var(--color-ink); font: inherit; font-weight: 600; cursor: pointer;
+    color: var(--color-ink); font: inherit; font-weight: 600; cursor: url(../img/cursor-star-link.png) 16 16, pointer;
     text-decoration: underline; text-decoration-color: rgb(255 255 255 / 0.35); text-underline-offset: 4px;
   }
   .link-button:hover { text-decoration-color: currentColor; }
+
+  /* ================================================================ the star pointer
+     The mouse pointer is a small gold 3D star on every page; over anything you can
+     click it tilts and glows. A real cursor image (not an element chasing the mouse),
+     so it never lags, clicks exactly where it points and also works inside pop-ups.
+     Text fields keep the normal text cursor. Touch screens have no pointer to change. */
+  html { cursor: url(../img/cursor-star.png) 16 16, auto; }
+  a, button, summary, select, label[for], [role="button"] { cursor: url(../img/cursor-star-link.png) 16 16, pointer; }
+  input, textarea, [contenteditable="true"] { cursor: text; }
+
+  /* The trail: tiny sparkles that fade where the star has just been (site.js adds them). */
+  .star-spark {
+    position: fixed; z-index: 2000; width: 16px; height: 16px; margin: -8px 0 0 -8px; pointer-events: none;
+    background: radial-gradient(circle, #FFF7DA 0 18%, #FFC23A 46%, rgb(255 194 58 / 0) 72%);
+    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+    animation: spark-fade .75s ease-out forwards;
+  }
+  @keyframes spark-fade {
+    from { opacity: .95; transform: scale(1) rotate(0deg); }
+    to   { opacity: 0;   transform: scale(.2) rotate(90deg) translateY(10px); }
+  }
 
   /* ================================================================ the opening screen */
   .page-picker .site-footer { margin-top: 0; }
@@ -165,14 +186,14 @@
     font-size: clamp(2.8rem, 6.4vw, 5rem); line-height: .95; letter-spacing: .005em;
   }
   .picker-grid {
-    /* --cube is the edge length of every role cube; the faces sit half of it out from the centre. */
-    --cube: clamp(136px, 15vw, 196px);
+    /* --tile is the size of every role photo. */
+    --tile: clamp(136px, 15vw, 196px);
     display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(18px, 2.6vw, 36px);
     list-style: none; margin: 0; padding: 0;
   }
-  .picker-grid > li { width: var(--cube); }
+  .picker-grid > li { width: var(--tile); }
   @media (max-width: 520px) {
-    .picker-grid { --cube: min(160px, calc((100vw - 2 * var(--gutter) - 14px) / 2)); gap: 22px 14px; }
+    .picker-grid { --tile: min(160px, calc((100vw - 2 * var(--gutter) - 14px) / 2)); gap: 22px 14px; }
   }
 
   .picker-tile { display: grid; justify-items: center; gap: 12px; color: var(--color-muted); text-decoration: none; }
@@ -184,85 +205,54 @@
   .picker-credits { margin: 10px 0 0; max-width: 72ch; font-size: 12.5px; line-height: 1.5; color: var(--color-muted); }
   .picker-credits a { color: inherit; text-decoration: underline; text-decoration-color: rgb(255 255 255 / 0.25); text-underline-offset: 3px; }
 
-  /* ================================================================ the role cubes
-     Each role is a real 3D cube: six faces folded around a centre point. The front
-     face carries the role's photo; the other five are satin in the role's colour.
-     On arrival the cubes tumble in one after another and settle on their photo. */
-  .cube-stage { display: block; width: var(--cube); height: var(--cube); perspective: 760px; }
-  .cube {
-    position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d;
-    transform: translateZ(calc(var(--cube) / -2)); /* pushed back half a cube, so the front face sits at its natural size */
-    transition: transform .55s cubic-bezier(.2,.7,.2,1);
+  /* ================================================================ the role tiles
+     A square photo per role, its icon badge, and a line of the role's colour along
+     the bottom. On arrival they fade up one after another: flat, no 3D. */
+  .tile-photo {
+    position: relative; display: block; width: var(--tile); height: var(--tile); overflow: hidden; border-radius: 10px;
+    background: #0C0E13; box-shadow: 0 22px 44px -24px rgb(0 0 0 / 0.95);
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .25s;
   }
-  .cube-face {
-    position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: 10px;
-    color: #0B0D12; backface-visibility: hidden;
-    background:
-      linear-gradient(118deg, transparent 0 18%, rgb(255 255 255 / 0.22) 26%, transparent 34%),
-      linear-gradient(135deg, color-mix(in oklab, var(--role) 62%, white) 0%, var(--role) 42%, color-mix(in oklab, var(--role) 58%, black) 100%);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35);
-  }
-  .cube-face svg { width: 42%; height: auto; }
-  .cube-front  { transform: translateZ(calc(var(--cube) / 2)); background: #0C0E13; box-shadow: 0 22px 44px -24px rgb(0 0 0 / 0.95); }
-  .cube-right  { transform: rotateY(90deg) translateZ(calc(var(--cube) / 2)); }
-  .cube-back   { transform: rotateY(180deg) translateZ(calc(var(--cube) / 2)); }
-  .cube-left   { transform: rotateY(-90deg) translateZ(calc(var(--cube) / 2)); }
-  .cube-top    { transform: rotateX(90deg) translateZ(calc(var(--cube) / 2)); filter: brightness(.8); }
-  .cube-bottom { transform: rotateX(-90deg) translateZ(calc(var(--cube) / 2)); filter: brightness(.55); }
-
-  .cube-front img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .tile-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
   /* Darken the photo toward the bottom and wash a little role colour in from the corner. */
-  .cube-shade {
+  .tile-photo-shade {
     position: absolute; inset: 0;
     background:
-      linear-gradient(180deg, rgb(6 7 10 / 0) 38%, rgb(6 7 10 / 0.62) 100%),
-      linear-gradient(135deg, color-mix(in oklab, var(--role) 38%, transparent) 0%, transparent 55%);
+      linear-gradient(180deg, rgb(6 7 10 / 0) 40%, rgb(6 7 10 / 0.6) 100%),
+      linear-gradient(135deg, color-mix(in oklab, var(--role) 30%, transparent) 0%, transparent 50%);
   }
-  .cube-front::after {
+  .tile-photo::after {
     content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12), inset 0 -3px 0 var(--role);
-    transition: box-shadow .2s;
   }
-  .cube-badge {
+  .tile-photo-badge {
     position: absolute; left: 10px; bottom: 10px; display: grid; place-items: center; width: 38px; height: 38px;
     border-radius: 9px; background: var(--role); color: #0B0D12; box-shadow: 0 6px 16px rgb(0 0 0 / 0.5);
   }
-  .cube-badge svg { width: 22px; }
-  .picker-tile:focus-visible .cube-front::after { box-shadow: inset 0 0 0 3px var(--color-ink), inset 0 -3px 0 var(--role); }
+  .tile-photo-badge svg { width: 22px; height: auto; }
+  .picker-tile:hover .tile-photo, .picker-tile:focus-visible .tile-photo {
+    transform: translateY(-6px);
+    box-shadow: 0 0 0 3px var(--color-ink), 0 26px 50px -20px color-mix(in oklab, var(--role) 55%, transparent);
+  }
+  .picker-tile:hover .tile-photo img { transform: scale(1.05); }
 
-  /* Hover or keyboard focus turns the cube a little, so you see its satin side. */
-  @media (prefers-reduced-motion: no-preference) {
-    .picker-tile:hover .cube, .picker-tile:focus-visible .cube {
-      transform: translateZ(calc(var(--cube) / -2)) rotateX(-8deg) rotateY(-24deg);
-    }
-  }
+  /* Two photos (Client work: a hospital, then a restaurant): the second slowly fades in and out. */
+  @keyframes tile-swap { 0%, 40% { opacity: 0; } 50%, 90% { opacity: 1; } 100% { opacity: 0; } }
+  .tile-photo--fade img + img { opacity: 0; animation: tile-swap 10s ease-in-out 2s infinite; }
+  @media (prefers-reduced-motion: reduce) { .tile-photo--fade img + img { animation: none; } }
 
-  /* Arrival: each cube drops in tumbling, overshoots a touch, and settles on its photo.
-     "backwards" fill only holds the first frame during the delay; afterwards the cube's
-     own resting transform takes over again, so hover still works. Every keyframe lists
-     the same functions in the same order, so the angles animate smoothly. */
-  @keyframes cube-in {
-    0%   { opacity: 0; transform: translateZ(calc(var(--cube) / -2)) translateY(-70px) rotateX(-140deg) rotateY(-220deg) scale(.45); }
-    18%  { opacity: 1; }
-    72%  { transform: translateZ(calc(var(--cube) / -2)) translateY(6px) rotateX(10deg) rotateY(14deg) scale(1.03); }
-    100% { opacity: 1; transform: translateZ(calc(var(--cube) / -2)) translateY(0) rotateX(0deg) rotateY(0deg) scale(1); }
+  /* Arrival: the name and title rise in, then the tiles one after another. */
+  @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } }
+  .tiles-go:not(.intro-pending) .picker-tile {
+    animation: rise-in .7s cubic-bezier(.2,.7,.2,1) backwards;
+    animation-delay: calc(var(--i, 0) * 110ms + 150ms);
   }
-  @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } }
-  .cubes-go:not(.intro-pending) .cube {
-    animation: cube-in 1.5s cubic-bezier(.2,.75,.25,1) backwards;
-    animation-delay: calc(var(--i, 0) * 130ms + 120ms);
-  }
-  .cubes-go:not(.intro-pending) .picker-label,
-  .cubes-go:not(.intro-pending) .picker-sub {
-    animation: rise-in .6s ease-out backwards;
-    animation-delay: calc(var(--i, 0) * 130ms + 900ms);
-  }
-  .cubes-go:not(.intro-pending) .picker-name,
-  .cubes-go:not(.intro-pending) .picker-title { animation: rise-in .8s ease-out backwards; }
+  .tiles-go:not(.intro-pending) .picker-name,
+  .tiles-go:not(.intro-pending) .picker-title { animation: rise-in .8s ease-out backwards; }
 
   /* ================================================================ the intro film
      opening.js only plays it when index.html set "intro-pending". While it plays, the
-     picker waits underneath, hidden; then the film fades away as the cubes tumble in. */
+     picker waits underneath, hidden; then the film fades away as the role tiles fade up. */
   .intro, .intro-controls { display: none; }
   .intro-pending .intro, .intro-leaving .intro { display: block; }
   .intro-pending .intro-controls { display: flex; }
@@ -281,7 +271,7 @@
   }
   .intro-controls { position: fixed; right: 20px; bottom: 20px; z-index: 101; gap: 8px; }
   .intro-button {
-    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; cursor: url(../img/cursor-star-link.png) 16 16, pointer;
     border: 1px solid rgb(255 255 255 / 0.3); border-radius: 999px; background: rgb(6 7 10 / 0.5);
     color: var(--color-ink); font: inherit; font-size: 14px; letter-spacing: .02em; backdrop-filter: blur(6px);
   }
@@ -390,7 +380,7 @@
   .shelf-controls { display: flex; gap: 8px; flex: none; }
   .shelf-button {
     display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid var(--color-line); background: var(--color-surface); color: var(--color-ink); cursor: pointer;
+    border: 1px solid var(--color-line); background: var(--color-surface); color: var(--color-ink); cursor: url(../img/cursor-star-link.png) 16 16, pointer;
   }
   .shelf-button:hover { border-color: rgb(255 255 255 / 0.3); }
   .shelf-button[aria-disabled="true"] { opacity: .3; cursor: default; }
@@ -471,7 +461,7 @@
   .quick-look-close {
     position: sticky; top: 12px; float: right; z-index: 3; margin: 12px 12px -56px 0;
     display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
-    border: 0; background: rgb(6 7 10 / 0.75); color: var(--color-ink); cursor: pointer;
+    border: 0; background: rgb(6 7 10 / 0.75); color: var(--color-ink); cursor: url(../img/cursor-star-link.png) 16 16, pointer;
   }
   .quick-look-close:hover { background: rgb(6 7 10 / 0.95); }
   .details { padding-bottom: 30px; }
