@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% set weaving = site.project("weaving-audit") %}
+{% set sales = site.project("sales-dashboard") %}
+
+{% block title %}Cover letter — {{ profile.name }}{% endblock %}
+{% block description %}A cover letter from {{ profile.name }}, filled in for your role.{% endblock %}
+{% block body_class %}page-resume{% endblock %}
+
+{% block main %}
+<div class="resume-wrap mx-auto max-w-[900px] px-4 sm:px-8">
+  <div class="resume-toolbar">
+    <a href="hire.html">{{ icon("arrow-left", 16) }} Back to Hire me</a>
+    <div class="actions">
+      <button type="button" class="btn btn--ghost" data-copy-letter hidden>Copy letter</button>
+      <button type="button" class="btn btn--play" data-print hidden>Print or save as PDF</button>
+    </div>
+  </div>
+
+  {# Everything happens in this browser: nothing typed here is sent anywhere. #}
+  <form class="letter-form" data-letter-form hidden>
+    <p class="text-muted">Fill these in and the letter updates as you type. Nothing you type leaves this page.</p>
+    <div class="letter-fields">
+      <label>Role<input type="text" name="role" placeholder="Forward Deployed Engineer" autocomplete="off"></label>
+      <label>Company<input type="text" name="company" placeholder="Your company" autocomplete="off"></label>
+      <label>Focus
+        <select name="focus">
+          <option value="fde">Forward-deployed / solutions</option>
+          <option value="data">Data engineering</option>
+          <option value="analytics">Analytics</option>
+        </select>
+      </label>
+    </div>
+    <label class="letter-why">Why this company (optional, in your own words)<textarea name="why" rows="3"></textarea></label>
+  </form>
+
+  <article class="sheet letter" aria-label="Cover letter" data-letter>
+    <p>Dear Hiring Manager,</p>
+    <p>I'm applying for the <span data-fill="role">Forward Deployed Engineer</span> role at <span data-fill="company">your company</span>. I'm the only AI and data engineer at a ribbon manufacturer, where I work inside the weaving, store, sales and accounts teams and turn the data they already keep into systems they use every day.</p>
+    <p data-focus="fde">That is the core of forward-deployed work: sit with the people who own the problem, learn how each number is really made, then ship. On the weaving floor I rebuilt eight months of disagreeing workbooks into {{ weaving.metrics[1].value }} machine-shift rows and showed that {{ weaving.metrics[0].value }} of the output shortfall came from machines not running, not from targets set too high. That finding changed what management worked on.</p>
+    <p data-focus="data" hidden>Most of my work is making unreliable data dependable. For the weaving department I built a PostgreSQL platform with constraints, an idempotent load and {{ weaving.metrics[3].value }} automated checks, after an audit that reproduced 43.6 million yards of production exactly. For sales I linked 22,615 invoice lines to their orders with none left unmatched, and the dashboard reconciles to the accounts report.</p>
+    <p data-focus="analytics" hidden>I build analysis people can act on. The sales dashboard I built compares every period two ways on a like-for-like basis, and it surfaced that the top three customers were {{ sales.metrics[0].value }} of sales and on-time delivery was {{ sales.metrics[1].value }}. Both are now visible every month instead of discovered by accident.</p>
+    <p>I check every number before anyone relies on it, and I say plainly what the data can't tell us. Both projects are public with their code and tests: <a href="{{ sales.live_link.url }}">the live sales dashboard</a> and <a href="https://github.com/krishnasai-pentakota">my GitHub</a>.</p>
+    <p data-fill-block="why" hidden><span data-fill="why"></span></p>
+    <p>I'd welcome the chance to talk about how I could help at <span data-fill="company">your company</span>.</p>
+    <p>Yours sincerely,<br>{{ profile.name }}<br>{% if profile.email %}<a href="mailto:{{ profile.email }}">{{ profile.email }}</a>{% endif %}</p>
+  </article>
+</div>
+{% endblock %}

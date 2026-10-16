@@ -1,0 +1,12 @@
+title: SOP Assistant
+kind: lab
+status: concept
+updated: 2026-10-12
+order: 11
+period: Nov 2026 – Jan 2027
+summary: >-
+  Answers questions from a ribbon plant's SOP and QC manuals with hybrid search in my
+  own PostgreSQL, cites the source section, and is graded on a 50-question gold set.
+  Project 2 of my FDE program.
+stack: [PostgreSQL, hybrid search, RAG, evals]
+tags: [retrieval, citations, FDE program]

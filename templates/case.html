@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_line, metrics, flow, chips, actions, art %}
+{% from "_icons.html" import icon %}
+{% set cs = project.case_study %}
+
+{% block title %}{{ project.title }} — {{ profile.name }}{% endblock %}
+{% block description %}{{ project.why or project.summary }}{% endblock %}
+
+{% block main %}
+<article class="case" style="--role: {{ current_role.color }}" aria-labelledby="case-title">
+  <header class="case-hero">
+    <div class="billboard-art">{{ art(project, current_role, root, eager=true) }}</div>
+    <div class="billboard-shade" aria-hidden="true"></div>
+    <div class="case-hero-inner">
+      <p class="case-back"><a href="{{ root }}{{ current_role.page }}#{{ project.id }}">{{ icon("arrow-left", 16) }} {{ current_role.name }}</a></p>
+      {{ status_line(project) }}
+      <h1 class="case-title" id="case-title">{{ project.title }}</h1>
+      {% if project.client %}<p class="case-client">{{ project.client }}</p>{% endif %}
+      <p class="case-lede">{{ project.summary }}</p>
+      {{ actions(project, root, quick=false, page_link=false) }}
+    </div>
+  </header>
+
+  <div class="case-wrap">
+    {% if project.why %}
+    <section class="case-why" aria-labelledby="why-title">
+      <h2 class="case-h2" id="why-title">Why it matters</h2>
+      <p>{{ project.why }}</p>
+    </section>
+    {% endif %}
+
+    {% if project.metrics %}
+    <section class="case-metrics" aria-labelledby="results-title">
+      <h2 class="case-h2" id="results-title">Results</h2>
+      {{ metrics(project.metrics) }}
+    </section>
+    {% elif project.goal %}
+    <section class="case-why" aria-labelledby="goal-title">
+      <h2 class="case-h2" id="goal-title">Goal</h2>
+      <p>{{ project.goal }}</p>
+    </section>
+    {% endif %}
+
+    {% if project.flow %}
+    <section class="case-flow" aria-labelledby="flow-title">
+      <h2 class="case-h2" id="flow-title">{{ "How the data moves" if project.kind in ["factory", "lab"] else "How it works" }}</h2>
+      {{ flow(project.flow) }}
+    </section>
+    {% endif %}
+
+    {% if project.screenshots %}
+    <section class="case-gallery" aria-labelledby="screens-title">
+      <h2 class="case-h2" id="screens-title">Screens</h2>
+      <div class="gallery">
+        {% for s in project.screenshots %}
+        <figure>
+          <a href="{{ root }}static/{{ s.src }}" target="_blank" rel="noopener"><img src="{{ root }}static/{{ s.src }}" alt="{{ s.alt }}" loading="lazy" decoding="async"></a>
+          {% if s.caption %}<figcaption>{{ s.caption }}</figcaption>{% endif %}
+        </figure>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <div class="case-body">
+      <div class="case-main">
+        {% if cs %}
+        <section aria-labelledby="problem-title">
+          <h2 class="case-h2" id="problem-title">The problem</h2>
+          {% for para in cs.problem | paragraphs %}<p>{{ para }}</p>{% endfor %}
+        </section>
+        <section aria-labelledby="steps-title">
+          <h2 class="case-h2" id="steps-title">What I did</h2>
+          <ol class="steps">{% for s in cs.steps %}<li>{{ s }}</li>{% endfor %}</ol>
+        </section>
+        {% if cs.decisions %}
+        <section aria-labelledby="decisions-title">
+          <h2 class="case-h2" id="decisions-title">Decisions and why</h2>
+          <dl class="decisions">
+            {% for d in cs.decisions %}<div><dt>{{ d.choice }}</dt><dd>{{ d.why }}</dd></div>{% endfor %}
+          </dl>
+        </section>
+        {% endif %}
+        {% if cs.outcome %}
+        <section aria-labelledby="outcome-title">
+          <h2 class="case-h2" id="outcome-title">What changed</h2>
+          {% for para in cs.outcome | paragraphs %}<p>{{ para }}</p>{% endfor %}
+        </section>
+        {% endif %}
+        {% if cs.next %}
+        <section aria-labelledby="next-title">
+          <h2 class="case-h2" id="next-title">What's next</h2>
+          {% for para in cs.next | paragraphs %}<p>{{ para }}</p>{% endfor %}
+        </section>
+        {% endif %}
+        {% elif project.highlights %}
+        <section aria-labelledby="does-title">
+          <h2 class="case-h2" id="does-title">What I did</h2>
+          <ul class="highlights highlights--large">
+            {% for h in project.highlights %}<li>{{ h }}</li>{% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+      </div>
+
+      <aside class="case-aside" aria-label="Project facts">
+        <dl class="facts">
+          {% if project.my_role %}<div><dt>My role</dt><dd>{{ project.my_role }}</dd></div>{% endif %}
+          {% if project.client %}<div><dt>For</dt><dd>{{ project.client }}</dd></div>{% endif %}
+          {% if project.period %}<div><dt>When</dt><dd>{{ project.period }}</dd></div>{% endif %}
+          {% if project.updated %}<div><dt>Last updated</dt><dd>{{ project.updated | nicedate }}</dd></div>{% endif %}
+          {% if project.stack %}<div><dt>Tools</dt><dd>{{ chips(project.stack) }}</dd></div>{% endif %}
+        </dl>
+        {% for l in project.links if l.type == "code" %}
+        <a class="contact-card" href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ icon("code", 22) }}<span><strong>{{ l.label }}</strong>github.com</span><span class="sr-only"> (opens in a new tab)</span></a>
+        {% endfor %}
+        {% if project.proof_note %}<p class="case-proof">{{ project.proof_note }}</p>{% endif %}
+        {% if cs and project.highlights %}
+        <h2 class="aside-h2">In short</h2>
+        <ul class="highlights">
+          {% for h in project.highlights %}<li>{{ h }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </aside>
+    </div>
+
+    {% if prev or next %}
+    <nav class="pager" aria-label="More in {{ current_role.name }}">
+      {% if prev %}<a class="pager-link" href="{{ root }}{{ prev.page }}" rel="prev"><span class="pager-dir">Previous</span><span>{{ prev.title }}</span></a>{% else %}<span></span>{% endif %}
+      {% if next %}<a class="pager-link pager-link--next" href="{{ root }}{{ next.page }}" rel="next"><span class="pager-dir">Next</span><span>{{ next.title }}</span></a>{% endif %}
+    </nav>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}

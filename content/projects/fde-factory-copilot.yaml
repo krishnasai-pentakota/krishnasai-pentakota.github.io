@@ -1,0 +1,11 @@
+title: Factory Copilot
+kind: lab
+status: concept
+updated: 2026-10-12
+order: 12
+period: Feb–Apr 2027
+summary: >-
+  The capstone: SOP search, a SQL agent and MCP tools behind one FastAPI service, with
+  a human approving anything that writes. Project 6 of my FDE program.
+stack: [FastAPI, MCP, agents, PostgreSQL]
+tags: [agents, human approval, FDE program]

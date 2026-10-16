@@ -1,0 +1,16 @@
+title: WhatsApp billing & dispatch bot for a cable/DTH operator
+kind: client
+status: concept
+order: 2
+updated: 2026-10-13
+client: A local cable, DTH and AP Fiber operator
+summary: >-
+  Turns the operator's WhatsApp into the front desk: catalogue, recharge requests,
+  payment links and payment-received confirmations, plus technician dispatch, so the
+  owner stops doing it all by hand.
+goal: Cut the owner's manual billing and follow-up work by about 90%.
+my_role: Discovery and system design
+stack: [WhatsApp Cloud API, Python, Payment links]
+tags: [client work, automation, WhatsApp, payments]
+# `goal` is a target. Once it's live and you've measured it, move the real
+# number into `metrics` (with evidence) and change the status.

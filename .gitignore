@@ -1,0 +1,19 @@
+# Build output: GitHub Actions rebuilds it on every push
+dist/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Full-length videos stay out of git (upload them to YouTube; keep short teasers in static/media/)
+*.mp4
+*.mov
+!static/media/*.mp4

@@ -1,0 +1,22 @@
+title: Weekly managers' meeting builder
+kind: factory
+status: prototype   # change to implemented if it's used every week
+order: 4
+client: A ribbon manufacturer (employer)
+period: Sep 2026
+updated: 2026-09-28
+summary: >-
+  One offline HTML tool for the weekly managers' meeting. Five departments load their Excel
+  or CSV summaries, each file is checked row by row, and the presentation builds itself.
+why: >-
+  Every week someone stitched five departments' spreadsheets into slides by hand, and
+  errors reached the meeting before anyone caught them.
+highlights:
+  - Each department's file is validated row by row before it reaches a slide
+  - KPI tiles, charts, calculated key points and managers' notes, generated
+  - Present and print-to-PDF modes
+  - Reads .xlsx files in the browser with no external library
+my_role: Designed and built it
+stack: [JavaScript, HTML]
+tags: [reporting, validation, presentation]
+proof_note: Used offline inside the company, so there is no public link.

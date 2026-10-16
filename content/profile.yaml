@@ -1,0 +1,25 @@
+# Your public profile.
+# Anything left as null is simply not shown (no dead buttons, no "#" links).
+
+name: Krishna Sai Pentakota
+short_name: Krishna Sai
+monogram: KS
+headline: Forward Deployed Engineer · AI & Data Engineer
+tagline: I embed with the teams who run the work, untangle their data, and ship systems they actually use.
+summary: >-
+  Sole AI and data engineer at a ribbon manufacturer, reporting to the Managing Director.
+  I work alongside weaving, warehouse, sales and accounts teams, audit their Excel and ERP
+  data, and ship validated PostgreSQL and Streamlit systems. I also build websites,
+  WhatsApp automation and films for local businesses.
+location: Anakapalle, Andhra Pradesh, India
+availability: null
+
+# Fill these in when ready. Each one switches on its button or link.
+email: pentakotakrishnasai17@gmail.com
+phone: null          # shown on the resume page only, e.g. +91 98765 43210
+github: https://github.com/krishnasai-pentakota   # the profile page, not a private repo (that shows visitors a 404)
+linkedin: null       # https://www.linkedin.com/in/<handle>
+resume_pdf: null     # put the PDF in static/ and write e.g. docs/resume.pdf
+
+site_url: https://krishnasai-pentakota.github.io/
+noindex: true        # true = Google won't list the site; people with the link can still open it

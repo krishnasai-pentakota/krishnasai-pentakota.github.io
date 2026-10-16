@@ -1,0 +1,137 @@
+title: Weaving production intelligence
+kind: factory
+also_in: [lab]         # the public repo is also an open case study
+status: prototype      # the repo calls it a "working prototype"
+featured: true         # the banner on the Factory page
+order: 1
+client: A ribbon manufacturer (employer)
+period: Jan–Aug 2026 data
+updated: 2026-09-30
+summary: >-
+  Eight months of hand-kept weaving workbooks that disagreed with each other, rebuilt
+  into one reconciled record, a PostgreSQL platform and a dashboard the plant can read.
+why: >-
+  Management couldn't answer how much was made, against what target, by which loom and
+  shift. Overwritten stop reasons and line counts hid how much each breakdown cost.
+highlights:
+  - Walked every production floor and read the logs before opening a spreadsheet
+  - Found metres switched to yards mid-year, gross switched to net, and a formula silently zeroing output
+  - Rebuilt the record at one grain, loom × day × shift, with a confidence label on every row
+  - Logged every correction with its effect in yards, in an audit trail
+  - Built a PostgreSQL platform with validating ETL, 16 views and an 8-screen dashboard
+  - Added a Telugu and English floor board for the shift supervisors
+my_role: "Sole engineer: audit, data model, ETL, tests and dashboard"
+stack: [Python, SQL, PostgreSQL, Streamlit, Plotly, pandas]
+tags: [data audit, reconciliation, star schema, idempotent ETL, manufacturing]
+
+# Every number needs `evidence`: where you can open it and show it.
+metrics:
+  - value: "82%"
+    label: of the output shortfall was machines stopping, not targets
+    evidence: weaving-dashboard repo, README Results table and docs/case-study.md (18 % target vs 82 % availability).
+  - value: "29,531"
+    label: machine-shift rows rebuilt from wide sheets
+    evidence: weaving-dashboard repo README ("29,531 machine-shift rows").
+  - value: "43.6M yd"
+    label: of Jan–Aug production reproduced exactly
+    evidence: weaving-dashboard repo README Results (43,645,373 yd gross, reproduced from the final workbook).
+  - value: "66"
+    label: automated checks passing on a fresh database
+    evidence: weaving-dashboard repo README Results ("66 / 66").
+  - value: "3,401"
+    label: rejection events where QC and production disagreed
+    evidence: weaving-dashboard repo docs/case-study.md.
+  - value: "476,916 yd"
+    label: lost to 83 changeovers, priced for the first time
+    evidence: weaving-dashboard repo docs/deep-dive/findings.md, item 10 (two-day cost).
+
+cover: img/weaving/cover.webp
+screenshots:
+  - src: img/weaving/command-centre.webp
+    alt: Command centre showing plant production, efficiency, rejection rate and the losses that need a decision
+    caption: Command centre. What needs a decision, ranked by the yards behind it
+  - src: img/weaving/machines.webp
+    alt: Grid of every loom against every working day, coloured by efficiency
+    caption: Every loom, every day. 70 looms × 24 days
+  - src: img/weaving/quality.webp
+    alt: Quality screen breaking rejected ribbon down by cause
+    caption: Quality. Why ribbon is rejected
+  - src: img/weaving/shifts-people.webp
+    alt: Shift trend and staffing what-if screen
+    caption: Shifts and people. Shift trend and a staffing what-if
+  - src: img/weaving/data-health.webp
+    alt: Data health screen showing how much of each figure is measured versus estimated
+    caption: Data health. Can this number be trusted?
+  - src: img/weaving/floor-board.webp
+    alt: Floor board in Telugu and English for shift supervisors
+    caption: Floor board in Telugu and English
+  - src: img/weaving/trend-compare.webp
+    alt: Trend and compare screen with month-on-month production
+    caption: Trend and compare
+
+links:
+  - label: Code and case study
+    url: https://github.com/krishnasai-pentakota/weaving-dashboard/tree/weaving-dashboard/krishna_sai
+    type: code
+proof_note: Runs on-premises on the plant's network. Staff appear under aliases.
+
+flow:
+  - Clerk's monthly Excel workbooks
+  - Validate and reshape in Python
+  - Audit trail of every fix
+  - PostgreSQL, 16 views
+  - Dashboard and Telugu floor board
+
+case_study:
+  problem: >-
+    Weaving production for 70 looms lived in hand-kept monthly Excel workbooks, and they
+    disagreed. Units changed from metres to yards in April without conversion, the basis
+    changed from gross to net in mid-April, line counts were overwritten as the month went
+    on, and a formula fault silently zeroed real production. Nobody could say how much
+    breakdown each machine had caused, or why, so the MD's questions about the worst shift,
+    the worst loom and how much was recoverable had no answer.
+  steps:
+    - >-
+      Started on the floor: visited every production floor, read the logs and SOPs, and
+      talked to the heads of department before opening a spreadsheet.
+    - >-
+      Audited forensically: rebuilt each month by back-solving line counts from the sheets'
+      own arithmetic, recovered production the formulas had zeroed, and logged every
+      correction with its effect in yards.
+    - >-
+      Re-modelled eight months into one grain, loom × day × shift: 29,531 rows, each with a
+      confidence label.
+    - >-
+      Built a first version to learn what the MD's questions really needed, then a second
+      on PostgreSQL with a validating ETL, 16 views, 66 automated checks and an 8-screen
+      dashboard, because the first couldn't be run every day.
+    - >-
+      Fixed the source: a shift-wise entry workbook that flags impossible readings, and a
+      paper log in English and Telugu that records stop time, restart time and a reason.
+  decisions:
+    - choice: Long format before any chart
+      why: >-
+        Wide sheets can't be totalled by machine, shift or reason without copying formulas,
+        which is how the errors got in. With one row per machine-shift, every question
+        becomes a simple group-by.
+    - choice: An audit trail instead of silent fixes
+      why: >-
+        Each corrected number traces back to the cell it came from, so the department can
+        check the work rather than take it on trust.
+    - choice: Reloading a month replaces it
+      why: >-
+        The load is idempotent: running it again after a correction replaces that month
+        instead of adding to it, so nothing is ever counted twice.
+    - choice: Say what the data can't say
+      why: >-
+        Downtime can't be measured from a once-a-day meter reading, so the dashboard says
+        so instead of guessing.
+  outcome: >-
+    The rebuilt record reproduces 43,645,373 yards for January to August exactly, and
+    February matches the plant's own summary on all 24 days. I suspected the targets were
+    unreachable; they weren't. 18% of the shortfall is target-setting and 82% is machines
+    not running. Changeovers were priced for the first time: across 83 dated events, about
+    476,916 yards over the event day and the day before.
+  next: >-
+    Daily use on the plant's network, and the stoppage log feeding real downtime reasons
+    into the dashboard.

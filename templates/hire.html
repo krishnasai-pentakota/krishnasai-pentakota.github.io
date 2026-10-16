@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Hire me — {{ profile.name }}{% endblock %}
+{% block description %}{{ current_role.intro }}{% endblock %}
+{% block body_class %}page-role{% endblock %}
+
+{% block main %}
+<section class="billboard billboard--hire" style="--role: {{ current_role.color }}" aria-labelledby="hire-title">
+  <div class="billboard-art"><span class="art-pattern" aria-hidden="true">{{ icon(current_role.icon, 84, 1.2) }}</span></div>
+  <div class="billboard-shade" aria-hidden="true"></div>
+  <div class="billboard-inner">
+    <p class="billboard-role">{{ icon(current_role.icon, 20, 2) }}<span>{{ current_role.name }}</span></p>
+    <h1 class="billboard-title" id="hire-title">{{ profile.name }}</h1>
+    <p class="billboard-sub">{{ profile.headline }}</p>
+    <p class="billboard-why">{{ profile.tagline }}</p>
+    <div class="actions">
+      {% if site.resume %}<a class="btn btn--play" href="resume.html">{{ icon("file", 18) }}Resume</a>{% endif %}
+      <a class="btn btn--ghost" href="cover-letter.html">{{ icon("pen", 18) }}Cover letter for your role</a>
+      {% if profile.email %}<a class="btn btn--ghost" href="mailto:{{ profile.email }}">{{ icon("mail", 18) }}Email me</a>{% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="rows">
+  <section class="row" aria-labelledby="find-title">
+    <h2 class="row-title" id="find-title">Find me</h2>
+    <ul class="contact-cards" role="list">
+      {% if profile.email %}
+      <li><a class="contact-card" href="mailto:{{ profile.email }}">{{ icon("mail", 22) }}<span><strong>Email</strong>{{ profile.email }}</span></a></li>
+      {% endif %}
+      {% if profile.github %}
+      <li><a class="contact-card" href="{{ profile.github }}" target="_blank" rel="noopener noreferrer">{{ icon("code", 22) }}<span><strong>GitHub</strong>{{ profile.github.host }}{{ profile.github.path }}</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+      {% endif %}
+      {% if profile.linkedin %}
+      <li><a class="contact-card" href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer">{{ icon("link", 22) }}<span><strong>LinkedIn</strong>{{ profile.linkedin.path }}</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+      {% endif %}
+      {% if profile.site_url %}
+      <li><a class="contact-card" href="{{ profile.site_url }}">{{ icon("link", 22) }}<span><strong>This portfolio</strong>{{ profile.site_url.host }}</span></a></li>
+      {% endif %}
+    </ul>
+  </section>
+
+  {% if site.resume %}
+  <section class="row" aria-labelledby="exp-title">
+    <h2 class="row-title" id="exp-title">Experience</h2>
+    <ol class="timeline">
+      {% for job in site.resume.experience %}
+      <li>
+        <p class="timeline-when">{{ job.start }} – {{ job.end }}</p>
+        <p class="timeline-role">{{ job.role }}, {{ job.org }}</p>
+        {% if job.bullets %}<p class="timeline-line">{{ job.bullets[0] }}</p>{% endif %}
+      </li>
+      {% endfor %}
+      {% for e in site.resume.education %}
+      <li>
+        <p class="timeline-when">{{ e.years }}</p>
+        <p class="timeline-role">{{ e.degree }}, {{ e.school }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  {% if site.resume.skills %}
+  <section class="row" aria-labelledby="skills-title">
+    <h2 class="row-title" id="skills-title">Skills</h2>
+    <dl class="skill-grid">
+      {% for g in site.resume.skills %}<div><dt>{{ g.group }}</dt><dd>{{ g.items | join(", ") }}</dd></div>{% endfor %}
+    </dl>
+  </section>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

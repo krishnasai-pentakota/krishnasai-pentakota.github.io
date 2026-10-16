@@ -1,0 +1,24 @@
+title: Festival bonus slideshow
+kind: studio
+status: delivered
+order: 1
+client: A manufacturer's Dussehra bonus meeting
+period: Oct 2026
+updated: 2026-10-15
+summary: >-
+  An animated slideshow for a company's Dussehra bonus meeting, played on a 90-inch screen:
+  3D satin ribbons tie into bows, then every award winner appears with a bilingual line of
+  praise.
+why: >-
+  A bonus meeting is the one day a year the whole floor feels seen. Names on a big screen,
+  in their own language, land better than a printed list.
+highlights:
+  - Satin ribbons drawn in real time, lit so flat strips read as fabric
+  - Every winner's name, with praise lines in English and Telugu
+  - Plays on its own; Space pauses, arrows step through slides
+  - Works offline from a pen drive, with no internet on the projector laptop
+my_role: Concept, design, animation and build
+stack: [HTML, Canvas, Anime.js]
+tags: [animated slideshow, event, Telugu, motion design]
+demo: demos/festival-slideshow.html
+proof_note: The demo shows sample names and amounts; the delivered version used the real ones.

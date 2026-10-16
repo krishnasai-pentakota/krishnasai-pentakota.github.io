@@ -1,0 +1,24 @@
+title: Warehouse 3D inventory map
+kind: factory
+status: prototype   # change to implemented once the stores use it daily
+order: 3
+client: A ribbon manufacturer (employer)
+period: "2026"
+updated: 2026-09-30
+summary: >-
+  Search any item, lot or label and see exactly which rack and level it sits in, on a 3D
+  map of the raw-material store (720 slots) and the finished-goods store (540 positions),
+  coloured by how full and how old the stock is.
+why: >-
+  Stock existed but couldn't be found. Labels carried a number with no record behind it,
+  and one of the two dispatch paths didn't deduct stock at all.
+highlights:
+  - A movement ledger where stock = receipts − issues, never a typed-over balance
+  - FIFO-aware issues and dispatches, so the oldest lot leaves first
+  - 3D rack views with search and fly-to, plus stock-ageing drill-downs
+  - CSV import and export, so records stay portable
+  - Preceded by a gap analysis of the existing store dashboards and source files
+my_role: Mapped both stores with the store teams; data model and 3D map
+stack: [JavaScript, HTML, Three.js]
+tags: [warehouse, 3D, location ledger, FIFO]
+proof_note: Runs offline on a store PC, so there is no public link yet. A demo on generated stock data is planned.

@@ -1,0 +1,31 @@
+title: Sri Ratna's Homoeo Clinic — website & booking
+kind: client
+status: in_progress
+featured: true
+order: 2
+client: Sri Ratna's Homoeo Clinic, Anakapalle & Yelamanchili
+updated: 2026-10-13
+why: >-
+  Patients booked by phone, often when the clinic was busy. A website gives them hours,
+  both branches and a booking request in one place, any time of day.
+summary: >-
+  Website for a two-branch homoeopathy clinic with a WhatsApp booking flow and a live
+  "open now" status for each branch. An hourly-slot booking backend, a doctor's TV
+  dashboard and WhatsApp reminders follow in phases.
+highlights:
+  - Booking form that opens WhatsApp with the request filled in; nothing is sent until the patient taps send
+  - Live "open now" status for both branches
+  - FAQ, feedback and privacy pages, plus a Google review link after the visit
+  - Copy kept within homoeopathy advertising rules, with no cure claims or patient testimonials
+my_role: Discovery, design and build
+stack: [Astro, Tailwind CSS, Supabase, WhatsApp]
+tags: [client work, healthcare, booking, WhatsApp]
+flow:
+  - Patient picks a branch, day and time
+  - Message filled in for WhatsApp
+  - Patient taps send
+  - Clinic confirms the slot
+# When the demo is live, add:
+# links:
+#   - label: Live site
+#     url: https://...

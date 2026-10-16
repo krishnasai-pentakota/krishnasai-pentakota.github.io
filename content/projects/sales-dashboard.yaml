@@ -1,0 +1,73 @@
+title: Sales & order-to-cash analytics
+kind: factory
+also_in: [lab]
+status: implemented
+order: 2
+client: A ribbon and bow manufacturer (employer)
+period: Jan 2025 – Sep 2026 data
+updated: 2026-10-01
+summary: >-
+  One trusted view of orders, sales, the open order book and on-time delivery, built from
+  three Excel sources that disagreed, with every KPI defined, tested and reconciled to the
+  accounts report.
+why: >-
+  Management couldn't say from one place how much was sold, to whom, what was still open
+  and whether deliveries were on time. Stock transfers looked like sales, and charges were
+  easy to double count.
+highlights:
+  - Linked 22,615 invoice lines to 20,241 order lines, with 0 left unmatched
+  - Compares every period two ways, against the previous period and the same days last year
+  - Defined each KPI once and tested it in two implementations that must agree
+  - States what the data covers (80% of the accounts report) instead of hiding it
+  - Customers and staff are aliased so the real data can be shown in public
+my_role: Built it end to end, from number definitions to the live dashboard
+stack: [Python, pandas, JavaScript, Plotly, pytest]
+tags: [sales analytics, reconciliation, KPI definitions]
+
+# What the dashboard surfaced for management. Findings, not my own results.
+metrics:
+  - value: "72%"
+    label: of sales from the top 3 customers, a risk it surfaced
+    evidence: sales-analytics-dashboard README, Key insights (top 3 customers = 72 %).
+  - value: "58%"
+    label: on-time delivery in September, now visible every month
+    evidence: sales-analytics-dashboard README, Key insights (on-time 58 % in September).
+  - value: "₹20.3 L"
+    label: of the open order book past its promised date
+    evidence: sales-analytics-dashboard README, Key insights (₹20.3 L past the promised date).
+  - value: "34"
+    label: automated tests behind the numbers
+    evidence: sales-analytics-dashboard README (34 passing tests).
+
+cover: img/sales/cover.webp
+screenshots:
+  - src: img/sales/overview.webp
+    alt: Executive overview with net sales, comparisons, open order book and on-time delivery
+    caption: Overview. Six questions answered in plain words
+  - src: img/sales/customers.webp
+    alt: Customer analysis showing who drives sales and who is slipping
+    caption: Customers. Who drives sales, who is slipping
+  - src: img/sales/products.webp
+    alt: Product mix by ribbon and bow type, widths and realised rates
+    caption: Products. Mix, widths and realised rates
+  - src: img/sales/orders.webp
+    alt: Open order book, overdue lines and on-time delivery
+    caption: Orders and delivery. Open book and overdue lines
+  - src: img/sales/data-quality.webp
+    alt: Data coverage and monthly reconciliation to the accounts report
+    caption: Data. Coverage and reconciliation to the accounts report
+
+links:
+  - label: Open live dashboard
+    url: https://krishnasai-pentakota.github.io/sales-analytics-dashboard/dashboard/index.html
+    type: live
+  - label: Code and case study
+    url: https://github.com/krishnasai-pentakota/sales-analytics-dashboard
+    type: code
+
+flow:
+  - Three Excel sources
+  - Clean and anonymise in Python
+  - Processed CSVs
+  - KPI engine with 34 tests
+  - Live dashboard

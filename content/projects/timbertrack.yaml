@@ -1,0 +1,22 @@
+title: TimberTrack — timber dispatch and quality app
+kind: client
+status: in_progress   # change to delivered once the owner is using it
+order: 1
+client: A timber trader in Andhra Pradesh
+updated: 2026-10-15
+why: >-
+  Loads travel more than 1,500 km. A dispute over a log's size or quality after it arrives
+  is the trader's word against the buyer's, unless the record was made before it left.
+summary: >-
+  A trader trucks mango and teak logs from Andhra Pradesh to buyers in Rajasthan.
+  TimberTrack measures and prices each log, records the load before it leaves, alerts
+  the buyer on WhatsApp, and keeps one ledger per consignment.
+highlights:
+  - Log measurement and pricing at loading
+  - Photo and video quality check before every dispatch
+  - WhatsApp alert to the buyer when a truck leaves
+  - One ledger per consignment, from loading to payment
+my_role: Discovery, design and build
+# TODO: add the tools once chosen (e.g. FastAPI, PostgreSQL, WhatsApp Cloud API).
+stack: []
+tags: [client work, logistics, quality control, WhatsApp]

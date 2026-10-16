@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Resume — {{ profile.name }}{% endblock %}
+{% block description %}Resume of {{ profile.name }}, {{ profile.headline }}.{% endblock %}
+{% block body_class %}page-resume{% endblock %}
+
+{% block main %}
+<div class="resume-wrap mx-auto max-w-[900px] px-4 sm:px-8">
+  <div class="resume-toolbar">
+    <a href="hire.html">{{ icon("arrow-left", 16) }} Back to Hire me</a>
+    {# hidden until site.js runs: printing needs JavaScript #}
+    <button type="button" class="btn btn--primary" data-print hidden>Print or save as PDF</button>
+  </div>
+
+  {# The sheet looks the same on screen as on paper: what you see is what prints. #}
+  <article class="sheet" aria-labelledby="resume-name">
+    <header class="sheet-head">
+      <h1 class="sheet-name" id="resume-name">{{ profile.name }}</h1>
+      <p class="sheet-role">{{ profile.headline }}</p>
+      <ul class="sheet-contact">
+        {% if profile.location %}<li>{{ profile.location }}</li>{% endif %}
+        {% if profile.email %}<li><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></li>{% endif %}
+        {% if profile.phone %}<li><a href="tel:{{ profile.phone | replace(' ', '') }}">{{ profile.phone }}</a></li>{% endif %}
+        {% if profile.linkedin %}<li><a href="{{ profile.linkedin }}">{{ profile.linkedin.host }}{{ profile.linkedin.path }}</a></li>{% endif %}
+        {% if profile.github %}<li><a href="{{ profile.github }}">{{ profile.github.host }}{{ profile.github.path }}</a></li>{% endif %}
+        {% if profile.site_url %}<li><a href="{{ profile.site_url }}">{{ profile.site_url.host }}{{ profile.site_url.path if profile.site_url.path != "/" else "" }}</a></li>{% endif %}
+      </ul>
+    </header>
+
+    <section class="sheet-section" aria-labelledby="r-summary">
+      <h2 id="r-summary">Summary</h2>
+      <p>{{ resume.summary }}</p>
+    </section>
+
+    <section class="sheet-section" aria-labelledby="r-experience">
+      <h2 id="r-experience">Experience</h2>
+      {% for job in resume.experience %}
+      <div class="job">
+        <div class="job-head">
+          <h3>{{ job.role }}, {{ job.org }}</h3>
+          <p class="job-when">{{ job.start }} – {{ job.end }}</p>
+        </div>
+        {% if job.place %}<p class="job-place">{{ job.place }}</p>{% endif %}
+        {% if job.bullets %}
+        <ul>{% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </section>
+
+    {% if resume.projects %}
+    <section class="sheet-section" aria-labelledby="r-projects">
+      <h2 id="r-projects">Selected projects</h2>
+      {% for pid in resume.projects %}{% set p = site.project(pid) %}
+      <div class="job">
+        <div class="job-head">
+          <h3>{% if p.page %}<a href="{{ root }}{{ p.page }}">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}</h3>
+          <p class="job-when">{{ p.status.label }}</p>
+        </div>
+        <p>{{ p.summary }}</p>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if resume.skills %}
+    <section class="sheet-section" aria-labelledby="r-skills">
+      <h2 id="r-skills">Skills</h2>
+      <dl class="skills">
+        {% for g in resume.skills %}<div><dt>{{ g.group }}</dt><dd>{{ g.items | join(", ") }}</dd></div>{% endfor %}
+      </dl>
+    </section>
+    {% endif %}
+
+    {% if resume.education %}
+    <section class="sheet-section" aria-labelledby="r-education">
+      <h2 id="r-education">Education</h2>
+      {% for e in resume.education %}
+      <div class="job-head">
+        <h3>{{ e.degree }}, {{ e.school }}</h3>
+        <p class="job-when">{{ e.years }}</p>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </article>
+</div>
+{% endblock %}

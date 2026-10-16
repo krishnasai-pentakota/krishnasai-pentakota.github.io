@@ -1,0 +1,21 @@
+title: English bridge for a Chinese-language ERP
+kind: factory
+status: concept   # change to in_progress when the first nightly copy runs
+order: 5
+client: A ribbon manufacturer (employer)
+updated: 2026-10-15
+summary: >-
+  The group's ERP runs on a slow server abroad and shows only Chinese. A nightly copy into
+  a local PostgreSQL database, plus a checked Chinese–English–Telugu glossary, gives
+  managers English reports without changing the ERP itself.
+why: >-
+  Managers have asked for an English ERP for about ten years. Every order and report today
+  needs someone who can read Chinese, or a slow round trip to the server.
+goal: English reports on order and stock data, refreshed every night.
+highlights:
+  - Uses the English name column the ERP already stores, where it's filled in
+  - A verified glossary for the terms that aren't, in English and Telugu
+  - Starts from the exports the sales team can already take, so it needs no special access
+my_role: Research, architecture and build
+stack: [Python, PostgreSQL]
+tags: [ERP, translation, data integration]

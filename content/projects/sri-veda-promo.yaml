@@ -1,0 +1,28 @@
+title: Sri Veda Diagnostics — opening-day welcome film
+kind: studio
+status: delivered
+featured: true
+order: 2
+client: Sri Veda Diagnostics Center
+updated: 2026-10-13
+summary: >-
+  A two-minute 4K surprise film for a diagnostics centre's opening day. The centre's
+  front comes from two photos I shot outside; the scan scenes are AI-generated from
+  carefully written prompts; a Telugu voice-over ties it together.
+why: >-
+  A new centre has one opening day to make an impression. The film showed families the
+  scans it offers, in Telugu, before anyone walked in.
+highlights:
+  - Prompt-built scenes for pregnancy, eye and children's scans
+  - Generated in Google AI Studio, Google Flow and Gemini
+  - Edited in Adobe Express, with a Telugu voice-over from ElevenLabs
+my_role: Concept, AI footage, edit and voice-over
+stack: [Google AI Studio, Google Flow, Gemini, Adobe Express, ElevenLabs]
+tags: [video, Telugu, 4K, generative AI, healthcare]
+media:
+  duration: "2:00"
+  # After uploading (YouTube unlisted is fine) and the client's OK:
+  # video_url: https://www.youtube.com/watch?v=...
+  # poster: img/sri-veda-poster.jpg
+  # alt: Opening frame of the Sri Veda Diagnostics welcome film
+proof_note: Delivered to the client. The film goes here once the client agrees to it being shown.

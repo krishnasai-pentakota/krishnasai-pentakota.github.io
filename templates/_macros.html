@@ -1,0 +1,181 @@
+{# Building blocks shared by every page.
+   root: the way back to the site root ("" or "../"), passed in by render.py. #}
+{% from "_icons.html" import icon %}
+
+{% macro status_line(p) %}
+<div class="meta-line">
+  <span class="status" data-status="{{ p.status.value }}"><span class="status-dot" aria-hidden="true"></span>{{ p.status.label }}</span>
+  {% if p.period %}<span class="text-muted">{{ p.period }}</span>{% endif %}
+  {% if p.media and p.media.duration %}<span class="text-muted">{{ p.media.duration }}</span>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro chips(items, label="Tools") %}
+{% if items %}
+<ul class="chips" aria-label="{{ label }}">
+  {% for s in items %}<li>{{ s }}</li>{% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
+
+{% macro metrics(items, limit=none, cls="") %}
+{% if items %}
+<dl class="metrics {{ cls }}">
+  {% for m in (items[:limit] if limit else items) %}
+  <div class="metric">
+    <dt>{{ m.label }}</dt>
+    <dd>{{ m.value }}</dd>
+  </div>
+  {% endfor %}
+</dl>
+{% endif %}
+{% endmacro %}
+
+{% macro page_link_label(p) %}{{ "Read the case study" if p.case_study else "See project details" }}{% endmacro %}
+
+{# The artwork for a tile or banner: the project's cover image, or a satin
+   ribbon pattern in its role's colour when there's no screenshot yet. #}
+{% macro art(p, role, root, eager=false) %}
+{% if p.thumb %}
+<img class="art-img" src="{{ root }}static/{{ p.thumb }}" alt="" width="1280" height="720"{% if not eager %} loading="lazy"{% endif %} decoding="async">
+{% else %}
+<span class="art-pattern" style="--role: {{ role.color }}" aria-hidden="true">{{ icon(role.icon, 84, 1.2) }}</span>
+{% endif %}
+{% endmacro %}
+
+{# Buttons that act on a project: open the live dashboard or demo, read more. #}
+{% macro actions(p, root, quick=true, page_link=true) %}
+<div class="actions">
+  {% if p.live_link %}
+  <a class="btn btn--play" href="{{ p.live_link.url }}" target="_blank" rel="noopener noreferrer">{{ icon("play", 18) }}{{ p.live_link.label }}<span class="sr-only"> (opens in a new tab)</span></a>
+  {% elif p.demo %}
+  <a class="btn btn--play" href="{{ root }}static/{{ p.demo }}" target="_blank" rel="noopener">{{ icon("play", 18) }}Play the demo<span class="sr-only"> (opens in a new tab)</span></a>
+  {% endif %}
+  {% if p.code_link %}
+  <a class="btn {{ 'btn--ghost' if (p.live_link or p.demo) else 'btn--play' }}" href="{{ p.code_link.url }}" target="_blank" rel="noopener noreferrer">{{ icon("code", 18) }}View the code<span class="sr-only"> (opens in a new tab)</span></a>
+  {% endif %}
+  {% if quick and p.has_more %}
+  <button type="button" class="btn btn--ghost" data-quick-look="{{ p.id }}" aria-haspopup="dialog" hidden>{{ icon("info", 18) }}More info</button>
+  {% endif %}
+  {% if page_link and p.page %}<a class="btn btn--ghost" href="{{ root }}{{ p.page }}">{{ page_link_label(p) }}</a>{% endif %}
+</div>
+{% endmacro %}
+
+{# A tile in a row. The artwork is a link to the project page, so it works
+   without JavaScript; with JavaScript, site.js opens the quick look instead. #}
+{% macro tile(p, role, root, today) %}
+<article class="tile" id="{{ p.id }}" style="--role: {{ role.color }}">
+  {% if p.page %}
+  <a class="tile-art" href="{{ root }}{{ p.page }}" data-quick-look="{{ p.id }}" aria-label="{{ p.title }}">
+  {% else %}
+  <div class="tile-art">
+  {% endif %}
+    {{ art(p, role, root) }}
+    <span class="tile-shade" aria-hidden="true"></span>
+    <span class="tile-title">{{ p.title }}</span>
+    {% if p.is_new(today) %}<span class="tile-new">New this week</span>{% endif %}
+  {% if p.page %}</a>{% else %}</div>{% endif %}
+  <div class="tile-body">
+    {{ status_line(p) }}
+    <p class="tile-summary">{{ p.why or p.summary }}</p>
+    {% if p.metrics %}
+    <p class="tile-kpi"><strong>{{ p.metrics[0].value }}</strong> {{ p.metrics[0].label }}</p>
+    {% elif p.goal %}
+    <p class="tile-kpi tile-kpi--goal"><span>Goal:</span> {{ p.goal }}</p>
+    {% endif %}
+    <div class="tile-links">
+      {% if p.live_link %}<a href="{{ p.live_link.url }}" target="_blank" rel="noopener noreferrer">Live dashboard<span class="sr-only"> (opens in a new tab)</span></a>{% elif p.demo %}<a href="{{ root }}static/{{ p.demo }}" target="_blank" rel="noopener">Play the demo<span class="sr-only"> (opens in a new tab)</span></a>{% endif %}
+      {% if p.code_link %}<a href="{{ p.code_link.url }}" target="_blank" rel="noopener noreferrer">Code<span class="sr-only"> (opens in a new tab)</span></a>{% endif %}
+      {% if p.has_more and not p.page %}<button type="button" class="link-button" data-quick-look="{{ p.id }}" aria-haspopup="dialog" hidden>More info</button>{% endif %}
+      {% if p.page %}<a href="{{ root }}{{ p.page }}">{{ "Case study" if p.case_study else "Details" }}</a>{% endif %}
+    </div>
+  </div>
+</article>
+{% endmacro %}
+
+{# A titled row of tiles that scrolls sideways, Netflix style. #}
+{% macro row(rid, title, items, role, root, today) %}
+{% if items %}
+<section class="row" aria-labelledby="{{ rid }}-title" data-shelf>
+  <div class="row-head">
+    <h2 class="row-title" id="{{ rid }}-title">{{ title }}</h2>
+    <div class="shelf-controls" data-shelf-controls hidden>
+      <button type="button" class="shelf-button" data-shelf-prev aria-label="Scroll {{ title | lower }} back">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button type="button" class="shelf-button" data-shelf-next aria-label="Scroll {{ title | lower }} forward">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="shelf-track" data-shelf-track>
+    {% for p in items %}{{ tile(p, role, root, today) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endmacro %}
+
+{# Everything about a project, for the quick-look panel. #}
+{% macro details(p, role, root, heading_id) %}
+<div class="details" style="--role: {{ role.color }}">
+  <div class="details-art">
+    {{ art(p, role, root) }}
+    <span class="tile-shade" aria-hidden="true"></span>
+    <div class="details-head">
+      {{ status_line(p) }}
+      <h2 class="details-title" id="{{ heading_id }}">{{ p.title }}</h2>
+      {{ actions(p, root, quick=false) }}
+    </div>
+  </div>
+  <div class="details-body">
+    <div class="details-main">
+      {% if p.why %}<p class="details-why">{{ p.why }}</p>{% endif %}
+      <p>{{ p.summary }}</p>
+      {% if p.goal %}<p class="card-goal"><strong>Goal:</strong> {{ p.goal }}</p>{% endif %}
+      {% if p.highlights %}
+      <h3 class="details-h3">What I did</h3>
+      <ul class="highlights">{% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+    <dl class="details-facts">
+      {% if p.client %}<div><dt>For</dt><dd>{{ p.client }}</dd></div>{% endif %}
+      {% if p.my_role %}<div><dt>My role</dt><dd>{{ p.my_role }}</dd></div>{% endif %}
+      {% if p.stack %}<div><dt>Tools</dt><dd>{{ p.stack | join(", ") }}</dd></div>{% endif %}
+      {% for l in p.links if l.type == "code" %}<div><dt>Code</dt><dd><a href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ l.label }}<span class="sr-only"> (opens in a new tab)</span></a></dd></div>{% endfor %}
+      {% if p.proof_note %}<div><dt>Where it runs</dt><dd>{{ p.proof_note }}</dd></div>{% endif %}
+    </dl>
+  </div>
+  {% if p.metrics %}
+  <h3 class="details-h3">Results</h3>
+  {{ metrics(p.metrics) }}
+  {% endif %}
+  {% if p.screenshots %}
+  <h3 class="details-h3">Screens</h3>
+  <ul class="thumbs">
+    {% for s in p.screenshots %}
+    <li><a href="{{ root }}static/{{ s.src }}" target="_blank" rel="noopener"><img src="{{ root }}static/{{ s.src }}" alt="{{ s.alt }}" loading="lazy" decoding="async"><span>{{ s.caption or s.alt }}</span></a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{# A pipeline: the steps really are a sequence, so they're numbered. #}
+{% macro flow(steps) %}
+<ol class="flow">
+  {% for s in steps %}<li><span class="flow-n" aria-hidden="true">{{ loop.index }}</span><span>{{ s }}</span></li>{% endfor %}
+</ol>
+{% endmacro %}
+
+{# The quick-look dialog, filled from a <template> per project. #}
+{% macro quick_look(projects, site, root) %}
+<dialog class="quick-look" data-quick-look-dialog>
+  <button type="button" class="quick-look-close" data-quick-look-close aria-label="Close">
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <div data-quick-look-body></div>
+</dialog>
+{% for p in projects if p.has_more %}
+<template id="ql-{{ p.id }}">{{ details(p, site.role(p.kind), root, "ql-title-" ~ p.id) }}</template>
+{% endfor %}
+{% endmacro %}

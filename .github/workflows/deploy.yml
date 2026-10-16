@@ -1,0 +1,55 @@
+# Every push to main: check the content, run the tests, build the site, publish it.
+# If any check fails, nothing is published and the live site stays as it was.
+name: Test, build and publish
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 0 * * 1"   # Mondays 06:00 IST: rebuild so "New this week" badges expire on time
+  workflow_dispatch:         # the "Run workflow" button on the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false  # never interrupt a deploy halfway
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install the build tools
+        run: pip install -r requirements.txt
+
+      - name: Check the content and run the tests
+        run: python -m pytest -q
+
+      - name: Build the site
+        run: python build.py
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

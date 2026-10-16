@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_line, metrics, actions, art, row, quick_look %}
+{% from "_icons.html" import icon %}
+{% set bill = site.billboard(current_role.id) %}
+{% set all = site.in_role(current_role.id) %}
+
+{% block title %}{{ current_role.name }} — {{ profile.name }}{% endblock %}
+{% block description %}{{ current_role.intro }}{% endblock %}
+{% block body_class %}page-role{% endblock %}
+
+{% block main %}
+{% if bill %}
+{# The billboard: the role's lead project, full width, its dashboard behind it. #}
+<section class="billboard" style="--role: {{ current_role.color }}" aria-labelledby="bill-title">
+  <div class="billboard-art">{{ art(bill, current_role, root, eager=true) }}</div>
+  <div class="billboard-shade" aria-hidden="true"></div>
+  <div class="billboard-inner">
+    <p class="billboard-role">{{ icon(current_role.icon, 20, 2) }}<span>{{ current_role.name }}</span></p>
+    <h1 class="billboard-title" id="bill-title">{{ bill.title }}</h1>
+    {{ status_line(bill) }}
+    <p class="billboard-why">{{ bill.why or bill.summary }}</p>
+    {{ metrics(bill.metrics, 3, "metrics--billboard") }}
+    {{ actions(bill, root) }}
+  </div>
+</section>
+{% endif %}
+
+<div class="rows">
+  <p class="role-intro">{{ current_role.intro }}</p>
+  {% set running = all | selectattr("status.value", "in", ["implemented", "delivered", "prototype"]) | list %}
+  {% set works = all | selectattr("status.value", "in", ["in_progress", "concept"]) | list %}
+  {{ row(current_role.id ~ "-running", "Built and running", running, current_role, root, site.today) }}
+  {{ row(current_role.id ~ "-works", "In the works", works, current_role, root, site.today) }}
+  {% if not all %}
+  <p class="empty-row">Nothing here yet. Projects appear as they're added.</p>
+  {% endif %}
+</div>
+
+{{ quick_look(all, site, root) }}
+{% endblock %}

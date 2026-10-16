@@ -1,0 +1,24 @@
+title: Store inventory system with roles
+kind: factory
+status: in_progress   # change once it's live in the store
+order: 4
+client: A ribbon manufacturer (employer)
+period: "2026"
+updated: 2026-10-13
+why: >-
+  Returns and wastage were never written down, so they vanished into "consumption" and
+  nobody could see what material really cost the plant.
+summary: >-
+  The plant's first store inventory system. Every movement carries a document and an
+  owner, so returns and wastage stop disappearing into "consumption" and the MD gets a
+  stock figure they can trust.
+goal: Make returns and wastage visible, so material cost comes down and store work gets faster.
+highlights:
+  - "Three roles: clerk enters, manager corrects, management reads"
+  - Return notes, so unused material isn't booked as consumed
+  - Wastage notes with a reason code and a supervisor's sign-off
+  - Built on the store team's existing requisition (MRQ) workflow
+my_role: Mapped the store process with the team; designing and building the system
+# TODO: confirm the stack.
+stack: [PostgreSQL, FastAPI, Pydantic]
+tags: [inventory, role-based access, audit trail, cost control]

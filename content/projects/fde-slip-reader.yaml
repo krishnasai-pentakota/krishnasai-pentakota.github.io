@@ -1,0 +1,12 @@
+title: Slip Reader
+kind: lab
+status: concept
+updated: 2026-10-12
+order: 10
+period: Oct–Nov 2026
+summary: >-
+  Reads photographed production slips into validated structured data with an LLM,
+  then scores itself against a hand-labelled answer key. Project 1 of my FDE program,
+  built on made-up ribbon-plant data.
+stack: [Python, Pydantic, LLM APIs, evals]
+tags: [structured output, evals, FDE program]

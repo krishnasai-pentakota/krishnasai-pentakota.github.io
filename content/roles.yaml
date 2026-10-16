@@ -1,0 +1,49 @@
+# The five tiles on the opening screen, in the order they appear.
+# Each one opens its own page: factory.html, hire.html, client.html, lab.html, studio.html.
+# icon: loom | badge | briefcase | flask | clapper      color: the tile's ribbon colour
+
+- id: factory
+  name: Factory
+  tagline: Systems I built inside a ribbon plant
+  intro: >-
+    I work inside a ribbon manufacturer as its only AI and data engineer: weaving, stores,
+    sales and accounts. These are the systems I've built there, with the dashboards and the
+    numbers behind them.
+  icon: loom
+  color: "#C6F36B"
+
+- id: hire
+  name: Hire me
+  tagline: Resume, cover letter and profiles
+  intro: >-
+    Everything a recruiter or hiring manager needs in one place: my resume, a cover letter
+    for your role, and where to find my code.
+  icon: badge
+  color: "#8AB4F8"
+
+- id: client
+  name: Client work
+  tagline: Freelance builds for local businesses
+  intro: >-
+    Websites, WhatsApp automation and small business systems for clinics, traders and
+    service businesses near Visakhapatnam.
+  icon: briefcase
+  color: "#F2C46D"
+
+- id: lab
+  name: FDE Lab
+  tagline: Open case studies and AI projects
+  intro: >-
+    Public repositories and case studies built from real factory problems, plus the AI
+    projects in my Forward Deployed Engineer program. Code, tests and write-ups you can read.
+  icon: flask
+  color: "#B9A2FF"
+
+- id: studio
+  name: Studio
+  tagline: Films, animated slideshows and posters
+  intro: >-
+    Welcome films, animated HTML slideshows, opening videos and posters for businesses and
+    events. Available as a paid service.
+  icon: clapper
+  color: "#FF8D7A"

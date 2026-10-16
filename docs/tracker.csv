@@ -1,0 +1,39 @@
+id,layer,task,est_hours,actual_hours,status,done_when,notes
+1,L0,Pydantic content models with integrity rules,1.5,,Done,Tests pass,
+2,L0,Content files from real work (7 projects),1,,Done,Build passes on real content,
+3,L0,Loader + Jinja renderer + build.py,1,,Done,python build.py produces dist/index.html,
+4,L0,You: run build + tests on your laptop,0.5,,Not started,Both commands pass on Windows,Needs Python 3.11+
+5,L0,You: Layer 0 exercises in docs/layer-0-notes.md,0.5,,Not started,All three done,
+6,L1,Tailwind standalone CLI wired into build,1,,Done,Compiled CSS; no CDN; version pinned,v4.3.3 via pytailwindcss
+7,L1,Store map hero (canvas 3D) + simulated feed,3,,Done,Smooth; pauses off screen; still frame with reduced motion,
+8,L1,Nav + mobile menu,1,,Done,Opens/closes with button; link click; Escape,Works without JS too
+9,L1,Section reveal motion,0.5,,Dropped,,One orchestrated moment (the map) instead of scattered fades
+10,L1,Add-on content: sales dashboard; warehouse 3D map; store inventory system,1,,Done,Content valid,
+11,L1,Weaving row count + Sri Veda role and tools,0.5,,Done,Values from Krishna,
+12,L1,You: confirm statuses (warehouse = prototype; store system = in progress),0.2,,Not started,One word per file,
+13,L1,You: add tools used for the warehouse 3D map; confirm store system stack,0.2,,Done,stack: filled in,"Three.js / JavaScript / HTML, from the LinkedIn doc"
+14,L1,You: Layer 1 exercises in docs/layer-1-notes.md,0.5,,Not started,All three done,
+15,L2,Shelf component (auto at 3+ items),1.5,,Done,Prev/next + touch + keyboard work; buttons only when overflowing,
+16,L2,Quick-look dialog,1,,Done,Focus in; Escape; focus back to opener; backdrop click,Native <dialog> + <template>
+17,L2,Project page template + weaving case study,2.5,,Done,Deep link to each page works; crawler test passes,7 pages; lab + concept-only cards get none
+18,L2,Printable resume page,1,,Done,Prints to 2 clean A4 pages,Placeholders refused by the build
+19,L2,TimberTrack card + name order,0.3,,Done,Content valid,
+20,L2,You: fill TCS + Oliveboard bullets in resume.yaml,0.5,,Done,Real bullets; build passes,From the LinkedIn rewrite doc
+21,L2,You: confirm name order and TimberTrack status + tools,0.2,,Not started,profile.yaml + timbertrack.yaml updated,
+22,L2,You: Layer 2 exercises in docs/layer-2-notes.md,0.5,,Not started,All three done,
+23,L2,You: email + LinkedIn + GitHub in profile.yaml,0.2,,Done,Contact section and resume contact line appear,Email + GitHub in; LinkedIn URL still needed
+24,L3,Case studies: clinic; sales dashboard; store system,3,,Not started,Each has problem/steps/decisions,
+25,L3,Sri Veda film: YouTube upload + teaser clip + poster,1,,Not started,Client OK received,
+26,L3,Warehouse 3D demo on generated data (Three.js),3,,Not started,Runs in browser; no company data,
+27,L4,GitHub repo (permanent home for the code),0.5,,Done,Code pushed from the laptop,krishnasai-pentakota.github.io
+28,L4,Actions deploy to Pages,1,,Done,Live URL opens on phone,.github/workflows/deploy.yml; tests gate every deploy
+29,L4,Link check + Lighthouse run,1,,Not started,No broken links; scores recorded,
+30,L3,Five roles: roles.yaml + picker + role pages,3,,Done,Picker shows 5 tiles; each role page has banner + rows,Netflix-style
+31,L3,Cinematic intro: Three.js satin ribbons + GSAP timeline,3,,Done,Skip/Esc works; reduced motion skips; once per session,Neutral tone mapping keeps role colours
+32,L3,Dashboard screenshots from both repos (WebP),1,,Done,Banner + gallery + quick look show real KPIs,"12 screens, 1.2 MB"
+33,L3,Hire me page + cover letter that fills in locally,1.5,,Done,Letter updates as you type; nothing is sent,
+34,L3,Studio: festival slideshow demo with sample names,1,,Done,No real names or company names (tested),
+35,L3,"Tests for roles, privacy guards, intro exits",1.5,,Done,58 checks pass,
+36,L3,You: LinkedIn profile URL in profile.yaml,0.1,,Not started,LinkedIn card + resume link appear,
+37,L3,You: Layer 3 exercises in docs/layer-3-notes.md,0.5,,Not started,All three done,
+38,L3,Sri Veda film on YouTube (unlisted) + poster,1,,Not started,Client OK received; video link in sri-veda-promo.yaml,

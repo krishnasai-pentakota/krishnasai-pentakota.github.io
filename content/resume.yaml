@@ -1,0 +1,99 @@
+# Your resume, built into resume.html (prints cleanly to A4 or saves as PDF).
+# Name, headline and contact details come from profile.yaml.
+# The build refuses leftover placeholders like "[one line on ...]" or "TODO",
+# so a half-finished line can never reach a recruiter.
+
+summary: >-
+  Sole AI and data engineer at a ribbon manufacturer, reporting directly to the
+  Managing Director. I embed with weaving, warehouse, sales and accounts teams, audit
+  their messy Excel and ERP data, and ship validated PostgreSQL and Streamlit systems
+  they can act on. My forensic audit of eight months of weaving production data showed
+  that 82% of the plant's output shortfall came from machine downtime, not from targets
+  set too high. I build with Python, SQL and AI coding tools (Claude, ChatGPT), with
+  automated tests and reconciliation behind every number.
+
+experience:
+  - role: AI Engineer
+    org: MISO Ribbon
+    place: Atchuthapuram, Andhra Pradesh
+    start: Aug 2026
+    bullets:
+      - >-
+        Ran a 20-day forensic audit of eight months of weaving production records
+        (70 looms, Jan–Aug 2026), rebuilding wide-format monthly workbooks into 29,000+
+        machine-shift rows reconciled to the department's own totals (August within
+        21 yards on 6.6 million).
+      - >-
+        Found errors hiding production from the books: formulas broken by copy-paste
+        (one loom lost 13 days and 59,747 yards in a month), mislabelled date columns,
+        swapped headers, rejection figures that disagreed between tabs. Logged every
+        correction in an audit trail.
+      - >-
+        Showed that 13.5% of the plant's target was charged to stopped machines; added
+        machine-status rules and proved the shortfall was 82% downtime and 18%
+        target-setting. Priced changeovers for the first time: 87 events, about
+        477,000 yards lost.
+      - >-
+        Turned 1,064 production WhatsApp messages into a machine-stoppage log (254
+        events, 9 breakdown reasons) and redesigned the paper production log in English
+        and Telugu to capture stop time, restart time and reason code.
+      - >-
+        Built the weaving dashboard on PostgreSQL and Streamlit: constrained star schema,
+        idempotent Excel ETL, 96 automated tests, 10 screens including a Telugu floor
+        board, every query under 0.5 s.
+      - >-
+        Delivered a sales and marketing dashboard (customer- and product-wise sales,
+        open order book, on-time delivery) that reconciles against the accounts report;
+        its PostgreSQL and FastAPI backend is in progress.
+      - >-
+        Mapped the raw-material and finished-goods stores with the store teams and
+        delivered a prototype 3D warehouse map and a store inventory system plan within
+        the MD's one-month deadline.
+      - >-
+        Ran a company-wide AI usage and hardware assessment and recommended AI seats and
+        PC upgrades to the MD.
+
+  # Bullets below are from your LinkedIn rewrite doc (Sep 2026), kept to its wording.
+  - role: Content Associate
+    org: Oliveboard
+    place: Bengaluru
+    start: Feb 2025
+    end: Jun 2025
+    bullets:
+      - Created and reviewed technical and aptitude questions, solutions and explanations, with a focus on accuracy and consistency.
+      - Analysed learner feedback and performance trends to find and fix weak or confusing content.
+      - >-
+        Started using LLMs (ChatGPT, Claude) in daily work: drafting question variants,
+        cross-checking solutions and structuring explanations, with every AI draft reviewed
+        before publishing.
+
+  - role: Junior Data Analyst
+    org: "Tata Consultancy Services (client: Microsoft)"   # quoted: contains ": "
+    place: Hyderabad
+    start: Feb 2022
+    end: Dec 2023
+    bullets:
+      - Validated and verified client project records and documents against defined quality standards, keeping data accurate and audit-ready.
+      - Ran quality checks on high-volume records and flagged discrepancies for correction before they reached reports.
+      - Built and maintained Excel reports tracking operational activity and performance metrics for team leads.
+
+skills:
+  - group: Data and engineering
+    items: [Python, SQL, PostgreSQL (schemas, constraints, views, roles), ETL, data validation and reconciliation, star-schema modelling, automated testing]
+  - group: Apps and BI
+    items: [Streamlit, Plotly, HTML dashboards, advanced Excel]
+  - group: AI
+    items: [Claude and ChatGPT for development and analysis, AI-adoption assessment, learning FastAPI, Pydantic and Docker]
+  - group: Domain
+    items: [weaving and textile manufacturing, production efficiency and downtime, warehouse inventory, sales reporting, Kingdee EAS ERP data]
+
+education:
+  - degree: B.Tech, Civil Engineering
+    school: Vignan Institute of Information Technology, Visakhapatnam
+    years: "2017 – 2021"
+
+# Project ids from content/projects/. Each links to its case study.
+projects:
+  - clinic-website
+  - timbertrack
+  - sri-veda-promo
