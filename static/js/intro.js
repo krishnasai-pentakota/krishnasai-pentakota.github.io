@@ -10,17 +10,23 @@
 
    It only runs when index.html marked the page "intro-pending", which never
    happens for people who asked their device to reduce motion, or for a second
-   visit in the same browser session. If anything fails (no WebGL, a blocked
-   script), finish() hands the page straight back: the picker is always there. */
+   visit in the same browser session. It also steps aside on machines that
+   can't play it smoothly (no graphics chip, or a frame slower than 50 ms):
+   a stuttering intro is worse than none. If anything fails (no WebGL, a
+   blocked script), the picker rises straight away: it is always there. */
 
 const html = document.documentElement;
 let finished = false;
 let revealed = false;
 let cleanup = () => {};
 
+const SLOW_FRAME_MS = 50;      // slower than ~20 frames a second: not smooth
+const SLOW_WARMUP_MS = 2500;   // longer than this staring at a dark screen: not worth it
+
 if (html.classList.contains("intro-pending")) {
   start().catch((err) => {
-    console.warn("Intro skipped:", err);
+    console.warn("Intro skipped:", err.message || err);
+    reveal();
     finish();
   });
 }
@@ -31,7 +37,6 @@ async function start() {
 
   const gsap = window.gsap;
   if (!gsap) throw new Error("GSAP did not load");
-  const THREE = await import("../vendor/three-lite.module.js");
 
   const root = document.querySelector("[data-intro]");
   const canvas = root.querySelector("[data-intro-canvas]");
@@ -41,11 +46,49 @@ async function start() {
   const tiles = [...document.querySelectorAll("[data-picker-tile]")];
   const colors = tiles.map((t) => getComputedStyle(t).getPropertyValue("--role").trim() || "#C6F36B");
 
+  // Everything set up below is undone in reverse order when the intro ends.
+  const undo = [];
+  cleanup = () => { while (undo.length) undo.pop()(); };
+  undo.push(() => { root.remove(); skip.remove(); });
+
+  // Skip: the button, or Esc / Enter / Space. Live from the first moment,
+  // so nobody waits on a dark screen while the 3D library downloads.
+  let tl = null;
+  let skipped = false;
+  const skipNow = () => {
+    if (skipped || finished) return;
+    skipped = true;
+    if (tl) tl.kill();
+    reveal();
+    gsap.to([root, flash], { opacity: 0, duration: 0.25, onComplete: finish });
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { e.preventDefault(); skipNow(); }
+  };
+  skip.addEventListener("click", skipNow);
+  window.addEventListener("keydown", onKey);
+  undo.push(() => window.removeEventListener("keydown", onKey));
+
+  const THREE = await import("../vendor/three-lite.module.js");
+  if (skipped) return;                                    // skipped while loading
+
   const stage = createStage(THREE, canvas, colors);
+  undo.push(() => stage.dispose());                       // hand the GPU memory back
+  if (stage.software) throw new Error("no graphics chip (software drawing)");
+
   const onResize = () => stage.resize(window.innerWidth, window.innerHeight);
   onResize();
   window.addEventListener("resize", onResize);
+  undo.push(() => window.removeEventListener("resize", onResize));
+
+  const t0 = performance.now();
   await stage.warmUp();
+  if (skipped) return;
+  const frameMs = stage.timeFrame();
+  const warmMs = performance.now() - t0;
+  if (frameMs > SLOW_FRAME_MS || warmMs > SLOW_WARMUP_MS) {
+    throw new Error(`too slow to be smooth (one frame ${Math.round(frameMs)} ms, warm-up ${Math.round(warmMs)} ms)`);
+  }
 
   // ---------------------------------------------------------------- motion
   const state = { t: 0, cam: 18, spin: 0.38 };
@@ -54,8 +97,9 @@ async function start() {
     stage.draw(state);
   };
   gsap.ticker.add(tick);
+  undo.push(() => gsap.ticker.remove(tick));
 
-  const tl = gsap.timeline({ onComplete: finish });
+  tl = gsap.timeline({ onComplete: finish });
   tl.to(state, { cam: 12.5, spin: -0.12, duration: 2.6, ease: "power2.out" }, 0)             // dolly in
     .to(stage.ribbons, { reveal: 1, duration: 1.7, ease: "power2.inOut", stagger: 0.09 }, 0.1) // ribbons sweep in
     .fromTo(mark, { opacity: 0, scale: 0.72, letterSpacing: "0.4em" },                        // monogram rises
@@ -66,27 +110,6 @@ async function start() {
     .add(reveal, 3.05)                                                                         // picker rises
     .to(flash, { opacity: 0, duration: 0.5 }, 3.05)
     .to(root, { opacity: 0, duration: 0.5, ease: "power1.out" }, 3.05);
-
-  // Skip: the button, or Esc / Enter / Space.
-  const skipNow = () => {
-    tl.kill();
-    reveal();
-    gsap.to([root, flash], { opacity: 0, duration: 0.25, onComplete: finish });
-  };
-  const onKey = (e) => {
-    if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { e.preventDefault(); skipNow(); }
-  };
-  skip.addEventListener("click", skipNow);
-  window.addEventListener("keydown", onKey);
-
-  cleanup = () => {
-    gsap.ticker.remove(tick);
-    window.removeEventListener("resize", onResize);
-    window.removeEventListener("keydown", onKey);
-    stage.dispose();                            // hand the GPU memory back
-    root.remove();
-    skip.remove();
-  };
 }
 
 /* ------------------------------------------------------------------ the 3D stage
@@ -123,8 +146,20 @@ export function createStage(THREE, canvas, colors) {
   const ribbons = colors.map((hex, i) => makeRibbon(THREE, hex, i, colors.length));
   ribbons.forEach((r) => group.add(r.mesh));
 
+  // Which chip draws the pixels? SwiftShader / llvmpipe mean the processor is
+  // doing a graphics chip's job (no GPU, or Chrome distrusts the driver).
+  const gl = renderer.getContext();
+  let chip = String(gl.getParameter(gl.RENDERER));       // Firefox gives the real name here
+  if (/^webkit webgl$/i.test(chip)) {                     // Chrome hides it behind an extension
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+    if (ext) chip = String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL));
+  }
+  const software = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(chip);
+
   return {
     ribbons,
+    chip,
+    software,
     resize(w, h) {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
@@ -143,6 +178,26 @@ export function createStage(THREE, canvas, colors) {
       camera.position.z = state.cam;
       group.rotation.y = state.spin;
       renderer.render(scene, camera);
+    },
+    // How long does one busy frame really take? Every ribbon fully drawn, then
+    // readPixels, which makes the browser wait until the chip has finished
+    // (render() alone only queues the work). The second frame is the one timed:
+    // the first also uploads geometry. The opening pose is drawn back after, so
+    // nobody sees the test frame.
+    timeFrame() {
+      const saved = ribbons.map((r) => r.reveal);
+      const px = new Uint8Array(4);
+      const busy = { t: 0, cam: 12.5, spin: 0 };
+      ribbons.forEach((r) => { r.reveal = 1; });
+      this.draw(busy);
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      const t = performance.now();
+      this.draw(busy);
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      const ms = performance.now() - t;
+      ribbons.forEach((r, i) => { r.reveal = saved[i]; });
+      this.draw({ t: 0, cam: 18, spin: 0.38 });
+      return ms;
     },
     dispose() {
       ribbons.forEach((r) => { r.geo.dispose(); r.mat.dispose(); });

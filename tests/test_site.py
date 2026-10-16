@@ -149,6 +149,11 @@ def test_intro_has_every_way_out(built):
     intro = (built / "static" / "js" / "intro.js").read_text(encoding="utf-8")
     assert ".catch(" in intro and "finish()" in intro          # any failure hands the page back
     assert "renderer.dispose()" in intro                       # GPU memory is released afterwards
+    # Skip works while the 3D library is still downloading, not only once it has loaded.
+    assert intro.index('skip.addEventListener("click"') < intro.index('await import(')
+    # Machines that can't play it smoothly get the picker straight away.
+    assert "if (stage.software) throw" in intro
+    assert "frameMs > SLOW_FRAME_MS" in intro and "readPixels" in intro
 
 
 # ---------------------------------------------------------------- role pages
