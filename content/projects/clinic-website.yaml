@@ -50,3 +50,45 @@ links:
   - label: Live site
     url: https://sriratnashomoeo.in
     type: live
+
+case_study:
+  problem: >-
+    Patients booked by phone, and the line was often busy when they called. The clinic had
+    two branches with different days and hours, and no single place that showed both, the
+    hours, or a way to book at any time of day.
+  steps:
+    - >-
+      Put both branches, their hours and the booking flow on one page, so a patient can pick a
+      branch, a day and an hour without phoning.
+    - >-
+      Built it on Astro and Tailwind CSS, with copy checked against homoeopathy advertising
+      rules: no cure claims and no patient testimonials.
+    - >-
+      Stored bookings in Postgres on Supabase as hourly slots per branch, with branch holiday
+      closures set from the staff dashboard.
+    - >-
+      Added a staff dashboard with Google sign-in and a waiting-room TV view that shows the
+      day's list.
+    - >-
+      Wrote the WhatsApp Cloud API bot on the same booking logic and tested it. It waits on
+      Meta's business verification.
+  decisions:
+    - choice: Hourly slots saved in Postgres
+      why: >-
+        A booking is one row with a branch and a time, so the website, the staff dashboard, the
+        TV view and the bot all read the same record instead of keeping three copies.
+    - choice: One booking logic for the website and WhatsApp
+      why: >-
+        Branch hours and slots follow the same rules on both channels, so a booking made either
+        way looks the same to the clinic.
+    - choice: No cure claims or testimonials
+      why: >-
+        Homoeopathy advertising rules limit what a clinic can say, so the copy describes the
+        consultation and the booking, not outcomes.
+  outcome: >-
+    The site is live at sriratnashomoeo.in with online booking for both branches, and five
+    bookings have come through the website so far. The WhatsApp bot is built and tested and
+    goes live once Meta approves the business.
+  next: >-
+    When Meta approves the business, the bot goes live. The public number stays as it is until
+    the clinic confirms the bot number.

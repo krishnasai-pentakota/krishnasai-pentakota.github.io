@@ -19,7 +19,7 @@ email: pentakotakrishnasai17@gmail.com
 phone: null          # shown on the resume page only, e.g. +91 98765 43210
 github: https://github.com/krishnasai-pentakota   # the profile page, not a private repo (that shows visitors a 404)
 linkedin: null       # https://www.linkedin.com/in/<handle>
-resume_pdf: null     # put the PDF in static/ and write e.g. docs/resume.pdf
+resume_pdf: docs/Krishna-Sai-Pentakota-Resume.pdf   # the PDF lives in static/docs/, made by tools/make_resume_pdf.py
 
 site_url: https://krishnasai-pentakota.github.io/
 noindex: true        # true = Google won't list the site; people with the link can still open it

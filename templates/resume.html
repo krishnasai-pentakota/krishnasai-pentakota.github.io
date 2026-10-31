@@ -9,8 +9,11 @@
 <div class="resume-wrap mx-auto max-w-[900px] px-4 sm:px-8">
   <div class="resume-toolbar">
     <a href="hire.html">{{ icon("arrow-left", 16) }} Back to Hire me</a>
-    {# hidden until site.js runs: printing needs JavaScript #}
-    <button type="button" class="btn btn--primary" data-print hidden>Print or save as PDF</button>
+    <div class="resume-actions">
+      {% if profile.resume_pdf %}<a class="btn btn--primary" href="{{ root }}static/{{ profile.resume_pdf }}" download>{{ icon("file", 18) }}Download PDF</a>{% endif %}
+      {# hidden until site.js runs: printing needs JavaScript #}
+      <button type="button" class="btn btn--ghost" data-print hidden>Print</button>
+    </div>
   </div>
 
   {# The sheet looks the same on screen as on paper: what you see is what prints. #}

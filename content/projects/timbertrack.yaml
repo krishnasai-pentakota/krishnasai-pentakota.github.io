@@ -20,3 +20,29 @@ my_role: Discovery, design and build
 # TODO: add the tools once chosen (e.g. FastAPI, PostgreSQL, WhatsApp Cloud API).
 stack: []
 tags: [client work, logistics, quality control, WhatsApp]
+
+case_study:
+  problem: >-
+    The trader sends mango and teak logs more than 1,500 km, to buyers in Rajasthan. When a
+    buyer disputes a log's size or quality after it arrives, it is the trader's word against
+    the buyer's, because nothing was recorded before the truck left.
+  steps:
+    - >-
+      Measured and priced each log at loading, so its size and price are on record before the
+      truck moves.
+    - >-
+      Added a photo and video quality check before every dispatch.
+    - >-
+      Sent the buyer a WhatsApp alert when the truck leaves.
+    - >-
+      Kept one ledger per consignment, from loading to payment.
+  decisions:
+    - choice: Record at loading, not after arrival
+      why: >-
+        A dispute is settled by the record made before the truck left. Measuring at the yard
+        means both sides check the same numbers.
+    - choice: The alert goes through WhatsApp
+      why: >-
+        The buyer reads WhatsApp already, so the alert reaches them without a new app to install.
+  next: >-
+    Move the status to delivered once the owner uses it on every consignment.

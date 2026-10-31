@@ -66,6 +66,9 @@ experience:
         Started using LLMs (ChatGPT, Claude) in daily work: drafting question variants,
         cross-checking solutions and structuring explanations, with every AI draft reviewed
         before publishing.
+      - >-
+        Set a review step for every question before it was published: one correct answer,
+        clear wording and a worked explanation, checked against the same standard each time.
 
   - role: Junior Data Analyst
     org: "Tata Consultancy Services (client: Microsoft)"   # quoted: contains ": "
@@ -73,6 +76,14 @@ experience:
     start: Feb 2022
     end: Dec 2023
     bullets:
+      - >-
+        Owned the quality gate for high-volume Microsoft client records: each batch was
+        checked against the agreed standard, and discrepancies were logged with their cause
+        before any figure reached a report.
+      - >-
+        Turned recurring errors into fixes: traced them to where they started, passed the
+        pattern to team leads with a worked example, and tracked the results in Excel reports
+        so the team could see whether they were falling.
       - Validated and verified client project records and documents against defined quality standards, keeping data accurate and audit-ready.
       - Ran quality checks on high-volume records and flagged discrepancies for correction before they reached reports.
       - Built and maintained Excel reports tracking operational activity and performance metrics for team leads.
@@ -96,4 +107,3 @@ education:
 projects:
   - clinic-website
   - timbertrack
-  - sri-veda-promo
