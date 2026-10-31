@@ -21,6 +21,26 @@ highlights:
 my_role: Discovery, design and build
 stack: [Astro, Tailwind CSS, Supabase (Postgres), WhatsApp Cloud API, Vercel]
 tags: [client work, healthcare, booking, WhatsApp]
+cover: img/clinic/cover.webp
+screenshots:
+  - src: img/clinic/home.webp
+    alt: Home page with the clinic name, the tagline and buttons to book, find the clinics or call
+    caption: Home. Book, find a branch or call in one tap
+  - src: img/clinic/phones.webp
+    alt: Four phone screens showing the home page, health concerns, the booking form and clinic hours
+    caption: On a phone. Built mobile-first, with Call, Book and Directions always in reach
+  - src: img/clinic/booking.webp
+    alt: Booking form with branch, visit type, day and one-hour time slots
+    caption: Booking. Pick a branch, a day and a one-hour slot
+  - src: img/clinic/clinics.webp
+    alt: Both branches with their address, hours and a live open-now status
+    caption: Branches. Live open-now status and hours for both clinics
+  - src: img/clinic/concerns.webp
+    alt: Health concerns grouped by area, in English and Telugu, with a search box
+    caption: Concerns. Grouped, searchable and labelled in Telugu
+  - src: img/clinic/expect.webp
+    alt: Four steps describing what happens in a consultation
+    caption: What to expect. A first visit explained in four steps
 flow:
   - Patient picks a branch, day and hour
   - Booking saved in Postgres
