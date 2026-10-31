@@ -1,31 +1,32 @@
 title: Sri Ratna's Homoeo Clinic — website & booking
 kind: client
-status: in_progress
+status: delivered
 featured: true
 order: 2
 client: Sri Ratna's Homoeo Clinic, Anakapalle & Yelamanchili
-updated: 2026-10-13
+updated: 2026-10-31
 why: >-
   Patients booked by phone, often when the clinic was busy. A website gives them hours,
-  both branches and a booking request in one place, any time of day.
+  both branches and online booking in one place, any time of day.
 summary: >-
-  Website for a two-branch homoeopathy clinic with a WhatsApp booking flow and a live
-  "open now" status for each branch. An hourly-slot booking backend, a doctor's TV
-  dashboard and WhatsApp reminders follow in phases.
+  Live website for a two-branch homoeopathy clinic on its own domain, with online
+  hourly-slot booking stored in Postgres, a staff dashboard and a waiting-room TV view.
+  The WhatsApp booking bot is built and goes live once Meta approves the business.
 highlights:
-  - Booking form that opens WhatsApp with the request filled in; nothing is sent until the patient taps send
-  - Live "open now" status for both branches
-  - FAQ, feedback and privacy pages, plus a Google review link after the visit
+  - Online booking for both branches, with hourly slots saved in Postgres (Supabase)
+  - Staff dashboard with Google sign-in, a waiting-room TV view and branch holiday closures
+  - WhatsApp Cloud API bot on the same booking logic, built and tested; waiting on Meta's verification
+  - Live "open now" status for both branches, plus FAQ, feedback and privacy pages
   - Copy kept within homoeopathy advertising rules, with no cure claims or patient testimonials
 my_role: Discovery, design and build
-stack: [Astro, Tailwind CSS, Supabase, WhatsApp]
+stack: [Astro, Tailwind CSS, Supabase (Postgres), WhatsApp Cloud API, Vercel]
 tags: [client work, healthcare, booking, WhatsApp]
 flow:
-  - Patient picks a branch, day and time
-  - Message filled in for WhatsApp
-  - Patient taps send
-  - Clinic confirms the slot
-# When the demo is live, add:
-# links:
-#   - label: Live site
-#     url: https://...
+  - Patient picks a branch, day and hour
+  - Booking saved in Postgres
+  - Staff see it on the dashboard
+  - Waiting-room TV shows the day's list
+links:
+  - label: Live site
+    url: https://sriratnashomoeo.in
+    type: live

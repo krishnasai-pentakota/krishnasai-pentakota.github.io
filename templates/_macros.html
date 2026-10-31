@@ -84,7 +84,7 @@
     <p class="tile-kpi tile-kpi--goal"><span>Goal:</span> {{ p.goal }}</p>
     {% endif %}
     <div class="tile-links">
-      {% if p.live_link %}<a href="{{ p.live_link.url }}" target="_blank" rel="noopener noreferrer">Live dashboard<span class="sr-only"> (opens in a new tab)</span></a>{% elif p.demo %}<a href="{{ root }}static/{{ p.demo }}" target="_blank" rel="noopener">Play the demo<span class="sr-only"> (opens in a new tab)</span></a>{% endif %}
+      {% if p.live_link %}<a href="{{ p.live_link.url }}" target="_blank" rel="noopener noreferrer">{{ "Live site" if "site" in (p.live_link.label | lower) else "Live dashboard" }}<span class="sr-only"> (opens in a new tab)</span></a>{% elif p.demo %}<a href="{{ root }}static/{{ p.demo }}" target="_blank" rel="noopener">Play the demo<span class="sr-only"> (opens in a new tab)</span></a>{% endif %}
       {% if p.code_link %}<a href="{{ p.code_link.url }}" target="_blank" rel="noopener noreferrer">Code<span class="sr-only"> (opens in a new tab)</span></a>{% endif %}
       {% if p.has_more and not p.page %}<button type="button" class="link-button" data-quick-look="{{ p.id }}" aria-haspopup="dialog" hidden>More info</button>{% endif %}
       {% if p.page %}<a href="{{ root }}{{ p.page }}">{{ "Case study" if p.case_study else "Details" }}</a>{% endif %}
