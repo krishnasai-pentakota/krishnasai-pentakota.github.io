@@ -4,6 +4,7 @@ A mobile web app for Aditya Traders. It records lorry trips and their costs, and
 
 - **App:** `apps/aditya/index.html`, plain HTML/CSS/JS. The site build copies it as-is to https://krishnasai-pentakota.github.io/aditya/
 - **Database:** Supabase project `aditya-traders` (Mumbai). The schema and security rules are in `docs/aditya-app/supabase/001_trips_core.sql`.
+- **Demo (no login, sample data):** https://krishnasai-pentakota.github.io/aditya/demo/ (built from the real page by `docs/aditya-app/demo/build_demo.py`; rebuild it after changing the app).
 - **Login:** email and password. Only people the owner approves can see or change anything (enforced by Row-Level Security in the database).
 
 ## What version 1 does
