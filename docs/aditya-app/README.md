@@ -32,11 +32,14 @@ A mobile web app for Aditya Traders. It records lorry trips and their costs, and
 2. **The very first account becomes the owner automatically.** Everyone after that waits for approval.
 3. The owner opens **Menu → Team** in the app, taps **Approve**, and sets their role (owner, accountant or staff).
 
-## Who can do what (version 1)
+## Who can do what (version 1.1)
+The accountant may not change costs (owner's answer, 24 Nov). The database enforces this.
+
 | | Owner | Accountant | Staff |
 |---|---|---|---|
 | See all lorries and history | ✓ | ✓ | ✓ |
-| Add or edit lorries and costs | ✓ | ✓ | ✓ |
+| Add or edit lorries | ✓ | ✓ | ✓ |
+| Add or change costs (cost lines, lorry hire) | ✓ | | ✓ |
 | Delete a lorry | ✓ | | |
 | Approve people and set roles | ✓ | | |
 

@@ -189,6 +189,9 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
     const me = DB.profiles.find(p => p.id === uid());
     const member = me && me.active;
     if (t !== "profiles" && !member) return {data: this.op === "select" ? [] : null, error: this.op === "select" ? null : {message:"row-level security"}};
+    // Owner's answer E5: the accountant may not change costs (same rule as the real database).
+    if (me && me.role === "accountant" && this.op !== "select" && (t === "trip_charges" || (t === "trips" && this.op === "update" && this.val && "freight_amount" in this.val)))
+      return {data:null, error:{message:"The accountant cannot change costs."}};
     if (this.op === "select") {
       let rows = t === "v_trips" ? vtrips() : DB[t].slice();
       if (t === "trip_reviews") rows = rows.filter(r => r.user_id === uid());
@@ -302,7 +305,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
    ===================================================================== */
 const SUPABASE_URL = "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "1.0 DEMO (sample data)";
+const APP_VERSION = "1.1 DEMO (sample data)";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 
 /* Status names are the three stages the owner named on the 24 Nov call. */
@@ -330,6 +333,8 @@ const todayIST = () => new Date().toLocaleDateString("en-CA", {timeZone:"Asia/Ko
 const personName = id => { const p = S.people[id]; return p ? (p.full_name || p.email || "Someone") : (id ? "Someone" : "System"); };
 const sawmillLabel = id => { const s = S.sawmills.find(x => x.id === id); return s ? s.name + (s.place ? ", " + s.place : "") : (id ? "#" + id : "—"); };
 const partyLabel = id => { const p = S.parties.find(x => x.id === id); return p ? p.name + (p.city ? ", " + p.city : "") : (id ? "#" + id : "—"); };
+/* Owner's answer E5 (24 Nov): the accountant may not change costs. The database enforces this too. */
+const canCost = () => !!S.me && S.me.role !== "accountant";
 const cacheKey = () => "at_trips_" + (S.user ? S.user.id : "x");
 function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }
 function lsSet(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
@@ -587,10 +592,10 @@ async function renderTrip(id){
     ${"freight_amount" in was ? `<div class="small" style="color:var(--red);text-align:right">was ${esc(inr(was.freight_amount))}</div>` : ""}`;
   if (costs === null) h += `<p class="mut small">Costs need signal to load.</p>`;
   else {
-    for (const c of costs) h += `<div class="cost ${costChg.has(c.id) ? "chg" : ""}"><div class="grow"><b>${esc(c.charge_type)}</b>${costChg.has(c.id) ? ` <span class="badge b-edited">${since && c.created_at > since ? "Added" : "Changed"}</span>` : ""}<div class="small mut">${[c.paid_to ? "To " + esc(c.paid_to) : "", c.paid_on ? esc(dShort(c.paid_on)) : "", c.note ? esc(c.note) : ""].filter(Boolean).join(" · ") || "&nbsp;"}</div></div><span class="money">${inr(c.amount)}</span><button class="btn small" data-cost="${c.id}">Edit</button></div>`;
+    for (const c of costs) h += `<div class="cost ${costChg.has(c.id) ? "chg" : ""}"><div class="grow"><b>${esc(c.charge_type)}</b>${costChg.has(c.id) ? ` <span class="badge b-edited">${since && c.created_at > since ? "Added" : "Changed"}</span>` : ""}<div class="small mut">${[c.paid_to ? "To " + esc(c.paid_to) : "", c.paid_on ? esc(dShort(c.paid_on)) : "", c.note ? esc(c.note) : ""].filter(Boolean).join(" · ") || "&nbsp;"}</div></div><span class="money">${inr(c.amount)}</span>${canCost() ? `<button class="btn small" data-cost="${c.id}">Edit</button>` : ""}</div>`;
     h += `<div class="tot"><span>Other costs</span><span class="money">${inr(t.charges_total)}</span></div>
       <div class="tot big"><span>Total</span><span class="money">${inr(t.total_cost)}</span></div>
-      <button class="btn" style="width:100%;margin-top:10px" id="addCost">+ Add a cost</button>
+      ${canCost() ? `<button class="btn" style="width:100%;margin-top:10px" id="addCost">+ Add a cost</button>` : `<p class="small mut" style="margin-top:8px">Costs are added and changed by the owner or staff.</p>`}
       <div id="costForm"></div>`;
   }
   h += `</div>`;
@@ -709,7 +714,7 @@ async function renderForm(id){
       <label class="f"><span>Driver phone</span><input class="in" name="driver_phone" type="tel" inputmode="tel" value="${esc(t.driver_phone || "")}"></label>
     </div>
     <label class="f"><span>Transporter / broker</span><input class="in" name="transporter" value="${esc(t.transporter || "")}"></label>
-    <label class="f"><span>Lorry hire (freight, ₹)</span><input class="in" name="freight_amount" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(t.freight_amount ?? "")}"></label>
+    <label class="f"><span>Lorry hire (freight, ₹)</span><input class="in" name="freight_amount" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(t.freight_amount ?? "")}" ${canCost() ? "" : "disabled"}>${canCost() ? "" : `<small class="mut">Only the owner or staff can change costs.</small>`}</label>
   </div>
   <div class="card">
     <h3>Load</h3>
@@ -795,6 +800,7 @@ async function renderForm(id){
   $("fCancel").onclick = () => { if (!id) lsSet("at_draft_new", null); history.back(); };
   $("fSave").onclick = async () => {
     const rec = collect();
+    if (!canCost()) delete rec.freight_amount;      // locked field: never send it
     if (!rec.vehicle_no) { toast("Write the vehicle number.", true); form.vehicle_no.focus(); return; }
     for (const k of ["freight_amount","quantity_cft","net_weight_t"]) if (rec[k] !== null && (isNaN(rec[k]) || rec[k] < 0)) return toast("Check the number in " + FIELD[k] + ".", true);
     const b = $("fSave"); b.disabled = true; b.textContent = "Saving…";

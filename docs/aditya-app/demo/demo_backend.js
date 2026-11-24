@@ -63,6 +63,9 @@
     const me = DB.profiles.find(p => p.id === uid());
     const member = me && me.active;
     if (t !== "profiles" && !member) return {data: this.op === "select" ? [] : null, error: this.op === "select" ? null : {message:"row-level security"}};
+    // Owner's answer E5: the accountant may not change costs (same rule as the real database).
+    if (me && me.role === "accountant" && this.op !== "select" && (t === "trip_charges" || (t === "trips" && this.op === "update" && this.val && "freight_amount" in this.val)))
+      return {data:null, error:{message:"The accountant cannot change costs."}};
     if (this.op === "select") {
       let rows = t === "v_trips" ? vtrips() : DB[t].slice();
       if (t === "trip_reviews") rows = rows.filter(r => r.user_id === uid());

@@ -373,3 +373,36 @@ revoke insert, update, delete on public.change_log from authenticated;
 revoke execute on function public.charges_log(), public.trips_log(),
                            public.handle_new_user(), public.touch_review(bigint)
   from authenticated, anon, public;
+
+-- ---------- Migration 003 (24 Nov 2026): accountant may not change costs ----
+-- Owner's questionnaire answer E5. Costs = cost lines + lorry hire.
+create or replace function public.can_edit_costs()
+returns boolean language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.profiles
+                 where id = (select auth.uid()) and active and role in ('owner','staff'));
+$$;
+revoke execute on function public.can_edit_costs() from anon, public;
+grant  execute on function public.can_edit_costs() to authenticated;
+
+drop policy "members add charges"    on public.trip_charges;
+drop policy "members edit charges"   on public.trip_charges;
+drop policy "members delete charges" on public.trip_charges;
+create policy "owner/staff add charges"    on public.trip_charges for insert to authenticated
+  with check ((select public.can_edit_costs()));
+create policy "owner/staff edit charges"   on public.trip_charges for update to authenticated
+  using ((select public.can_edit_costs())) with check ((select public.can_edit_costs()));
+create policy "owner/staff delete charges" on public.trip_charges for delete to authenticated
+  using ((select public.can_edit_costs()));
+
+create or replace function public.trips_cost_guard()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  if new.freight_amount is distinct from old.freight_amount
+     and exists (select 1 from public.profiles where id = auth.uid() and role = 'accountant') then
+    raise exception 'The accountant cannot change costs (lorry hire).' using errcode = '42501';
+  end if;
+  return new;
+end $$;
+revoke execute on function public.trips_cost_guard() from authenticated, anon, public;
+create trigger trips_cost_guard before update on public.trips
+  for each row execute function public.trips_cost_guard();

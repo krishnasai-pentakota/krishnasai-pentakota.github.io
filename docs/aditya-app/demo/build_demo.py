@@ -16,7 +16,9 @@ s = swap(app, '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2
          "<script>\n" + backend + "\n</script>")
 # 2. title and version label
 s = swap(s, "<title>Aditya Traders</title>", "<title>Aditya Traders (Demo)</title>")
-s = swap(s, 'const APP_VERSION = "1.0 (25 Nov 2026)";', 'const APP_VERSION = "1.0 DEMO (sample data)";')
+import re
+s, n = re.subn(r'const APP_VERSION = "([^"]+)";', lambda m: 'const APP_VERSION = "' + m.group(1).split(" (")[0] + ' DEMO (sample data)";', s, count=1)
+assert n == 1, "APP_VERSION not found"
 # 3. login screen -> pick a person, no password
 a = s.index("function showLogin(msg){"); b = s.index("async function afterLogin(){")
 s = s[:a] + '''function showLogin(msg){
