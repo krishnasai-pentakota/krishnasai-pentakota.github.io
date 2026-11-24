@@ -95,6 +95,14 @@ textarea.in{min-height:80px}
 .hist{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:0 0 10px}
 .hist.new{border-left-color:var(--red)}
 .hist .when{font-size:14px;color:var(--mut)}
+/* photos and files */
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.file{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.file.chg{border:2px solid var(--red)}
+.file .thumb{display:flex;align-items:center;justify-content:center;height:120px;background:#f1ece6;color:var(--mut);font-weight:800;text-decoration:none}
+.file .thumb img{width:100%;height:100%;object-fit:cover}
+.file .cap{padding:6px 8px}
+.upl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
 /* people */
 .person{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 /* login */
@@ -132,13 +140,16 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
    ===================================================================== */
 const SUPABASE_URL = "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "1.1 (25 Nov 2026)";
+const APP_VERSION = "1.2 (25 Nov 2026)";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 
 /* Status names are the three stages the owner named on the 24 Nov call. */
 const STATUS = {order_taken:"Order taken", on_the_way:"On the way", completed:"Completed"};
 const WOODS = ["Mango","Teak","Acacia","Other"];
 const COST_TYPES = ["Hamali / loading","Weighbridge","Permit","Commission","Toll","Other"];
+/* Owner's voice note (25 Nov): attach the weighbridge (kanta) slip or a receipt to the lorry. */
+const FILE_KINDS = ["Weighbridge slip","Receipt","Invoice","Lorry receipt (LR)","Other"];
+const BUCKET = "lorry-files";
 /* Friendly names for the history screen and the Excel "History" sheet. */
 const FIELD = {trip_date:"Date",vehicle_no:"Vehicle no",lorry_capacity_t:"Lorry (tons)",driver_name:"Driver name",driver_phone:"Driver phone",transporter:"Transporter / broker",sawmill_id:"Sawmill",wood_type:"Wood",quantity_cft:"Quantity (CFT)",net_weight_t:"Net weight (tons)",freight_amount:"Lorry hire (₹)",party_id:"Party",destination:"Destination",status:"Status",notes:"Notes",charge_type:"Cost type",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note"};
 
@@ -355,15 +366,16 @@ function renderList(){
 async function renderTrip(id){
   chrome("Lorry", {back:true});
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
-  let t, costs, log;
+  let t, costs, log, files;
   try {
-    [t, costs, log] = await Promise.all([
+    [t, costs, log, files] = await Promise.all([
       q(sb.from("v_trips").select("*").eq("id", id).maybeSingle()),
       q(sb.from("trip_charges").select("*").eq("trip_id", id).order("id")),
-      q(sb.from("change_log").select("*").eq("trip_id", id).order("changed_at", {ascending:false}).limit(200))
+      q(sb.from("change_log").select("*").eq("trip_id", id).order("changed_at", {ascending:false}).limit(200)),
+      q(sb.from("trip_files").select("*").eq("trip_id", id).order("id"))
     ]);
   } catch(e) {
-    t = S.trips.find(x => x.id === id); costs = null; log = [];
+    t = S.trips.find(x => x.id === id); costs = null; log = []; files = null;
     if (!t) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
     toast("Offline: showing saved details. Costs and history need signal.", true);
   }
@@ -375,10 +387,12 @@ async function renderTrip(id){
   const fresh = since ? log.filter(l => l.changed_at > since && l.changed_by !== S.user.id) : [];
   const was = {};                       // field -> oldest "before" value
   const costChg = new Set();            // charge ids changed/added
-  let costRemoved = 0;
+  const fileNew = new Set();            // file ids added since my check
+  let costRemoved = 0, filesRemoved = 0;
   for (const l of fresh.slice().reverse()) {
     if (l.table_name === "trips" && l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) { if (!(k in was)) was[k] = v[0]; }
     if (l.table_name === "trip_charges") { if (l.action === "delete") costRemoved++; else costChg.add(l.record_id); }
+    if (l.table_name === "trip_files") { if (l.action === "delete") filesRemoved++; else fileNew.add(l.record_id); }
   }
   const show = (k, v) => {
     if (k === "sawmill_id") return sawmillLabel(v);
@@ -394,7 +408,7 @@ async function renderTrip(id){
   };
 
   let h = "";
-  if (t.my_flag === "edited") h += `<div class="alert red"><span class="grow"><b>Changed since you checked it</b> on ${esc(dTime(since))}. Changes are shown in red.${costRemoved ? ` ${costRemoved} cost${costRemoved > 1 ? "s" : ""} removed.` : ""}</span><button class="btn small" id="chk">Mark as checked</button></div>`;
+  if (t.my_flag === "edited") h += `<div class="alert red"><span class="grow"><b>Changed since you checked it</b> on ${esc(dTime(since))}. Changes are shown in red.${costRemoved ? ` ${costRemoved} cost${costRemoved > 1 ? "s" : ""} removed.` : ""}${filesRemoved ? ` ${filesRemoved} file${filesRemoved > 1 ? "s" : ""} removed.` : ""}</span><button class="btn small" id="chk">Mark as checked</button></div>`;
   if (t.my_flag === "new") h += `<div class="alert info"><span class="grow">You have not checked this lorry yet.</span><button class="btn small" id="chk">Mark as checked</button></div>`;
 
   h += `<div class="card"><div class="row" style="margin-bottom:10px"><span class="veh grow">${esc(t.vehicle_no)}</span><span class="st st-${t.status}">${STATUS[t.status]}</span></div>
@@ -430,6 +444,22 @@ async function renderTrip(id){
   }
   h += `</div>`;
 
+  // Photos and files (weighbridge slip, receipts…)
+  h += `<div class="card"><h3>Photos and files</h3>`;
+  if (files === null) h += `<p class="mut small">Photos need signal to load.</p>`;
+  else {
+    h += files.length ? `<div class="files">${files.map(f => `<div class="file ${fileNew.has(f.id) ? "chg" : ""}">
+        <a class="thumb" id="fl-${f.id}" target="_blank" rel="noopener">${/^image\//.test(f.mime_type || "") ? `<img alt="${esc(f.kind)}" id="fi-${f.id}">` : "PDF"}</a>
+        <div class="cap"><b class="small">${esc(f.kind)}</b>${fileNew.has(f.id) ? ` <span class="badge b-edited">New</span>` : ""}
+        <div class="small mut">${esc(dShort(f.created_at.slice(0, 10)))} · ${esc(personName(f.created_by))}</div>
+        ${S.me.role === "owner" ? `<button class="btn small red" style="margin-top:6px;width:100%" data-delfile="${f.id}">Remove</button>` : ""}</div></div>`).join("")}</div>`
+      : `<p class="mut small">No photos yet. Add the weighbridge slip or a receipt.</p>`;
+    h += `<div class="upl"><select class="in" id="fKind" aria-label="What is it?">${FILE_KINDS.map(k => `<option>${esc(k)}</option>`).join("")}</select>
+      <label class="btn pri" for="fPick" id="fPickBtn">+ Add photo</label></div>
+      <input type="file" id="fPick" accept="image/*,application/pdf" hidden>`;
+  }
+  h += `</div>`;
+
   // Actions
   h += `<div class="row" style="margin-bottom:10px"><a class="btn pri grow" href="#/edit/${t.id}">Edit lorry</a><a class="btn wa grow" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(waText(t, costs))}">Share on WhatsApp</a></div>`;
 
@@ -441,12 +471,64 @@ async function renderTrip(id){
   const chk = $("chk");
   if (chk) chk.onclick = async () => { chk.disabled = true; try { await q(sb.rpc("mark_checked", {p_trip_ids:[t.id]})); toast("Marked as checked."); renderTrip(id); } catch(e) { toast(errText(e), true); chk.disabled = false; } };
   const ac = $("addCost"); if (ac) ac.onclick = () => costForm(t.id, null, id);
+  if (files && files.length) showFileLinks(files);
+  const pick = $("fPick");
+  if (pick) pick.onchange = async () => {
+    const f = pick.files && pick.files[0]; if (!f) return;
+    const btn = $("fPickBtn"); btn.textContent = "Uploading…"; btn.style.pointerEvents = "none";
+    try { await uploadFile(t.id, f, $("fKind").value); toast("Photo saved."); renderTrip(id); }
+    catch(e) { toast(errText(e), true); btn.textContent = "+ Add photo"; btn.style.pointerEvents = ""; pick.value = ""; }
+  };
+  document.querySelectorAll("[data-delfile]").forEach(b => b.onclick = async () => {
+    const f = files.find(x => x.id === Number(b.dataset.delfile));
+    if (!confirm("Remove this " + f.kind + "?")) return;
+    try { await q(sb.from("trip_files").delete().eq("id", f.id)); await sb.storage.from(BUCKET).remove([f.storage_path]); toast("Removed."); renderTrip(id); }
+    catch(e) { toast(errText(e), true); }
+  });
   document.querySelectorAll("[data-cost]").forEach(b => b.onclick = () => costForm(t.id, costs.find(c => c.id === Number(b.dataset.cost)), id));
   const del = $("delTrip");
   if (del) del.onclick = async () => {
     if (!confirm("Delete lorry " + t.vehicle_no + " and all its costs? This cannot be undone. (The history keeps a record.)")) return;
     try { await q(sb.from("trips").delete().eq("id", t.id)); toast("Deleted."); location.hash = "#/"; } catch(e) { toast(errText(e), true); }
   };
+}
+
+/* Files are private: show them through links that expire after an hour. */
+async function showFileLinks(files){
+  try {
+    const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(files.map(f => f.storage_path), 3600);
+    if (error) throw error;
+    for (const f of files) {
+      const hit = data.find(d => d.path === f.storage_path);
+      if (!hit || !hit.signedUrl) continue;
+      const a = $("fl-" + f.id), img = $("fi-" + f.id);
+      if (a) a.href = hit.signedUrl;
+      if (img) img.src = hit.signedUrl;
+    }
+  } catch(e) { /* thumbnails stay blank; the list still shows */ }
+}
+/* Phone photos are often 3-5 MB: shrink to about 1600 px so they upload on weak signal. */
+async function shrink(file){
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;      // PDFs and HEIC go as they are
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.75));
+    return blob && blob.size < file.size ? new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", {type:"image/jpeg"}) : file;
+  } catch(e) { return file; }
+}
+async function uploadFile(tripId, original, kind){
+  const file = await shrink(original);
+  if (file.size > 10 * 1024 * 1024) throw new Error("File is bigger than 10 MB.");
+  const ext = (file.name.match(/\.([a-z0-9]+)$/i) || [, file.type === "application/pdf" ? "pdf" : "jpg"])[1].toLowerCase();
+  const path = `${tripId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const up = await sb.storage.from(BUCKET).upload(path, file, {contentType: file.type || undefined, upsert: false});
+  if (up.error) throw up.error;
+  try { await q(sb.from("trip_files").insert({trip_id: tripId, kind, storage_path: path, file_name: original.name, mime_type: file.type || null, size_bytes: file.size})); }
+  catch(e) { await sb.storage.from(BUCKET).remove([path]); throw e; }
 }
 
 function histItem(l, since){
@@ -459,6 +541,8 @@ function histItem(l, since){
     if (l.action === "insert") what = "Added this lorry";
     else if (l.action === "delete") what = "Deleted this lorry";
     else what = Object.entries(ch).map(([k, v]) => `${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("<br>");
+  } else if (l.table_name === "trip_files") {
+    what = (l.action === "insert" ? "Added photo/file: " : "Removed photo/file: ") + `<b>${esc(ch.kind)}</b>`;
   } else {
     if (l.action === "insert") what = `Added cost: ${esc(ch.charge_type)} <b>${esc(inr(ch.amount))}</b>`;
     else if (l.action === "delete") what = `Removed cost: ${esc(ch.charge_type)} ${esc(inr(ch.amount))}`;
@@ -679,9 +763,9 @@ function renderExport(){
       const s3 = [];
       for (const l of logs) {
         const base = {"When":dFull(l.changed_at), "By":personName(l.changed_by), "Vehicle no":veh[l.trip_id]?.vehicle_no, "Trip ID":l.trip_id};
-        const what = (l.table_name === "trips" ? "Lorry " : "Cost ") + ({insert:"added", update:"changed", delete:"removed"}[l.action]);
+        const what = ({trips:"Lorry ", trip_charges:"Cost ", trip_files:"Photo/file "}[l.table_name] || "") + ({insert:"added", update:"changed", delete:"removed"}[l.action]);
         if (l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) s3.push({...base, "What":what, "Field":FIELD[k] || k, "Old value":fmtCell(k, v[0]), "New value":fmtCell(k, v[1])});
-        else s3.push({...base, "What":what, "Field":l.table_name === "trip_charges" ? (l.changes?.charge_type || "") : "", "Old value":l.action === "delete" && l.table_name === "trip_charges" ? n(l.changes?.amount) : "", "New value":l.action === "insert" && l.table_name === "trip_charges" ? n(l.changes?.amount) : ""});
+        else s3.push({...base, "What":what, "Field":l.table_name === "trip_charges" ? (l.changes?.charge_type || "") : l.table_name === "trip_files" ? (l.changes?.kind || "") : "", "Old value":l.action === "delete" && l.table_name === "trip_charges" ? n(l.changes?.amount) : "", "New value":l.action === "insert" && l.table_name === "trip_charges" ? n(l.changes?.amount) : ""});
       }
       const wb = XLSX.utils.book_new();
       const add = (rows, name, empty) => { const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [empty]); ws["!cols"] = Object.keys(rows[0] || empty).map(k => ({wch: Math.max(10, k.length + 2)})); XLSX.utils.book_append_sheet(wb, ws, name); };

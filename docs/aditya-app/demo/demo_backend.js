@@ -81,6 +81,7 @@
       const r = {...this.val, id: ++st.seq[t], created_at: ts, created_by: uid()};
       if (t === "trips") { r.updated_at = ts; r.last_change_at = ts; r.last_change_by = uid(); r.status = r.status || "order_taken"; r.trip_date = r.trip_date || ts.slice(0, 10); DB.trips.push(r); log(r.id, "trips", r.id, "insert", strip(r, META)); touch(r.id); }
       else if (t === "trip_charges") { r.amount = Number(r.amount); DB.trip_charges.push(r); log(r.trip_id, "trip_charges", r.id, "insert", strip(r, CMETA)); bump(r.trip_id); }
+      else if (t === "trip_files") { DB.trip_files.push(r); log(r.trip_id, "trip_files", r.id, "insert", {kind:r.kind, file_name:r.file_name}); bump(r.trip_id); }
       else DB[t].push(r);
       return {data: this.one ? {...r} : [r], error: null};
     }
@@ -100,8 +101,9 @@
       DB[t].forEach(r => (this.f.every(f => f(r)) ? gone : keep).push(r));
       DB[t] = keep;
       for (const r of gone) {
-        if (t === "trips") { log(r.id, "trips", r.id, "delete", strip(r, META)); DB.trip_charges = DB.trip_charges.filter(c => c.trip_id !== r.id); DB.trip_reviews = DB.trip_reviews.filter(x => x.trip_id !== r.id); }
+        if (t === "trips") { log(r.id, "trips", r.id, "delete", strip(r, META)); DB.trip_charges = DB.trip_charges.filter(c => c.trip_id !== r.id); DB.trip_reviews = DB.trip_reviews.filter(x => x.trip_id !== r.id); DB.trip_files = (DB.trip_files || []).filter(x => x.trip_id !== r.id); }
         if (t === "trip_charges") { log(r.trip_id, "trip_charges", r.id, "delete", strip(r, CMETA)); bump(r.trip_id); }
+        if (t === "trip_files") { log(r.trip_id, "trip_files", r.id, "delete", {kind:r.kind}); bump(r.trip_id); }
       }
       return {data: null, error: null};
     }
@@ -115,13 +117,13 @@
   function at(daysAgo){ st.clock = Date.now() - daysAgo * 864e5; }
   function run(q){ seeding = true; const r = q.run(); return r.data; }
   function seed(){
-    st = {clock: Date.now() - 3 * 864e5, seq:{sawmills:0, parties:0, trips:0, trip_charges:0, change_log:0},
+    st = {clock: Date.now() - 3 * 864e5, seq:{sawmills:0, parties:0, trips:0, trip_charges:0, change_log:0, trip_files:0},
       DB:{profiles:[
           {id:"d-owner", email:"owner@demo", full_name:"Owner (sample)", role:"owner", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-acc", email:"accountant@demo", full_name:"Accountant (sample)", role:"accountant", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-staff", email:"staff@demo", full_name:"Field staff (sample)", role:"staff", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-new", email:"new.person@demo", full_name:"", role:"staff", active:false, created_at:new Date(Date.now() - 864e5).toISOString()}],
-        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[]}};
+        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[]}};
     seeding = true;
     const q = t => new Q(t);
     as("owner@demo"); at(3.2);
@@ -155,9 +157,22 @@
   }
   try { st = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e) { st = null; }
   if (!st || !st.DB) seed();
+  if (!st.DB.trip_files) { st.DB.trip_files = []; st.seq.trip_files = 0; }
 
+  const FKEY = "aditya_demo_files_v1";
+  const fget = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "{}"); } catch(e) { return {}; } };
+  const asDataURL = f => new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = bad; r.readAsDataURL(f); });
   window.supabase = { createClient: () => ({
     from: t => new Q(t),
+    storage: { from: () => ({
+      async upload(path, file){
+        const all = fget(); all[path] = await asDataURL(file);
+        try { localStorage.setItem(FKEY, JSON.stringify(all)); } catch(e) { return {data:null, error:{message:"Demo photo space on this phone is full. Tap Reset, or try the real app (no such limit)."}}; }
+        return {data:{path}, error:null};
+      },
+      async createSignedUrls(paths){ const all = fget(); return {data: paths.map(x => ({path:x, signedUrl: all[x] || null})), error:null}; },
+      async remove(paths){ const all = fget(); paths.forEach(x => delete all[x]); try { localStorage.setItem(FKEY, JSON.stringify(all)); } catch(e){} return {data:[], error:null}; }
+    })},
     rpc: (fn, args) => Promise.resolve().then(() => { if (fn === "mark_checked") { markChecked(args.p_trip_ids); save(); return {data:null, error:null}; } return {data:null, error:{message:"unknown"}}; }),
     auth: {
       onAuthStateChange(cb){ cbs.push(cb); setTimeout(() => cb("INITIAL_SESSION", session), 0); return {data:{subscription:{unsubscribe(){}}}}; },
@@ -166,5 +181,5 @@
       async getSession(){ return {data:{session}}; }
     }
   })};
-  window.__demoReset = () => { try { localStorage.removeItem(KEY); localStorage.removeItem("at_draft_new"); } catch(e){} location.replace(location.pathname); };
+  window.__demoReset = () => { try { localStorage.removeItem(KEY); localStorage.removeItem("at_draft_new"); localStorage.removeItem(FKEY); } catch(e){} location.replace(location.pathname); };
 })();
