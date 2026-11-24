@@ -57,6 +57,7 @@
   Q.prototype.insert = function(o){ this.op = "insert"; this.val = o; return this; };
   Q.prototype.update = function(o){ this.op = "update"; this.val = o; return this; };
   Q.prototype.delete = function(){ this.op = "delete"; return this; };
+  Q.prototype.upsert = function(o){ this.op = "upsert"; this.val = o; return this; };
   Q.prototype.then = function(res, rej){ return Promise.resolve().then(() => { const r = this.run(); if (!seeding) save(); return r; }).then(res, rej); };
   Q.prototype.run = function(){
     const DB = st.DB, t = this.t;
@@ -66,6 +67,11 @@
     // Owner's answer E5: the accountant may not change costs (same rule as the real database).
     if (me && me.role === "accountant" && this.op !== "select" && (t === "trip_charges" || (t === "trips" && this.op === "update" && this.val && "freight_amount" in this.val)))
       return {data:null, error:{message:"The accountant cannot change costs."}};
+    // Purchase/sale prices: owner only (same as the real database)
+    if (t === "trip_prices") {
+      if (!(me && me.role === "owner")) return {data: this.op === "select" ? (this.one ? null : []) : null, error: this.op === "select" ? null : {message:"row-level security"}};
+      if (this.op === "upsert") { const ex = DB.trip_prices.find(x => x.trip_id === this.val.trip_id); if (ex) Object.assign(ex, this.val); else DB.trip_prices.push({...this.val}); return {data:null, error:null}; }
+    }
     if (this.op === "select") {
       let rows = t === "v_trips" ? vtrips() : DB[t].slice();
       if (t === "trip_reviews") rows = rows.filter(r => r.user_id === uid());
@@ -123,7 +129,7 @@
           {id:"d-acc", email:"accountant@demo", full_name:"Accountant (sample)", role:"accountant", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-staff", email:"staff@demo", full_name:"Field staff (sample)", role:"staff", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-new", email:"new.person@demo", full_name:"", role:"staff", active:false, created_at:new Date(Date.now() - 864e5).toISOString()}],
-        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[]}};
+        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[], trip_prices:[]}};
     seeding = true;
     const q = t => new Q(t);
     as("owner@demo"); at(3.2);
@@ -149,6 +155,7 @@
     run(q("trips").update({freight_amount:48500}).eq("id", t2.id));
     cost(t2.id, "Toll", 850);
     markChecked([t1.id, t2.id]);
+    st.DB.trip_prices.push({trip_id:t1.id, purchase_rate:610, purchase_basis:"per CFT", purchase_amount:719800, purchase_note:"Sample: small difference 2,000 agreed", sale_rate:null, sale_basis:null, sale_amount:812000, sale_note:null});
     at(0.1);
     trip({trip_date:istDate(0), vehicle_no:"AP05TD4004", lorry_capacity_t:35, driver_name:null, driver_phone:"90000 00004", transporter:null, sawmill_id:s3.id, wood_type:"Acacia", quantity_cft:null, net_weight_t:null, freight_amount:51000, party_id:p2.id, destination:null, status:"order_taken", notes:"Loading today"});
     seeding = false; session = null;
@@ -158,6 +165,7 @@
   try { st = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e) { st = null; }
   if (!st || !st.DB) seed();
   if (!st.DB.trip_files) { st.DB.trip_files = []; st.seq.trip_files = 0; }
+  if (!st.DB.trip_prices) st.DB.trip_prices = [];
 
   const FKEY = "aditya_demo_files_v1";
   const fget = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "{}"); } catch(e) { return {}; } };

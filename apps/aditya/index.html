@@ -140,7 +140,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
    ===================================================================== */
 const SUPABASE_URL = "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "1.2 (25 Nov 2026)";
+const APP_VERSION = "1.3 (25 Nov 2026)";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 
 /* Status names are the three stages the owner named on the 24 Nov call. */
@@ -150,6 +150,9 @@ const COST_TYPES = ["Hamali / loading","Weighbridge","Permit","Commission","Toll
 /* Owner's voice note (25 Nov): attach the weighbridge (kanta) slip or a receipt to the lorry. */
 const FILE_KINDS = ["Weighbridge slip","Receipt","Invoice","Lorry receipt (LR)","Other"];
 const BUCKET = "lorry-files";
+/* Owner's voice note (25 Nov): the purchase rate is seen by the owner only. The database hides it from everyone else. */
+const BASES = ["per CFT","per ton","per lorry"];
+const isOwner = () => !!S.me && S.me.role === "owner";
 /* Friendly names for the history screen and the Excel "History" sheet. */
 const FIELD = {trip_date:"Date",vehicle_no:"Vehicle no",lorry_capacity_t:"Lorry (tons)",driver_name:"Driver name",driver_phone:"Driver phone",transporter:"Transporter / broker",sawmill_id:"Sawmill",wood_type:"Wood",quantity_cft:"Quantity (CFT)",net_weight_t:"Net weight (tons)",freight_amount:"Lorry hire (₹)",party_id:"Party",destination:"Destination",status:"Status",notes:"Notes",charge_type:"Cost type",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note"};
 
@@ -366,7 +369,7 @@ function renderList(){
 async function renderTrip(id){
   chrome("Lorry", {back:true});
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
-  let t, costs, log, files;
+  let t, costs, log, files, price = null;
   try {
     [t, costs, log, files] = await Promise.all([
       q(sb.from("v_trips").select("*").eq("id", id).maybeSingle()),
@@ -374,6 +377,7 @@ async function renderTrip(id){
       q(sb.from("change_log").select("*").eq("trip_id", id).order("changed_at", {ascending:false}).limit(200)),
       q(sb.from("trip_files").select("*").eq("trip_id", id).order("id"))
     ]);
+    if (isOwner()) price = await q(sb.from("trip_prices").select("*").eq("trip_id", id).maybeSingle());
   } catch(e) {
     t = S.trips.find(x => x.id === id); costs = null; log = []; files = null;
     if (!t) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
@@ -430,6 +434,19 @@ async function renderTrip(id){
   ${t.driver_phone ? `<div class="row" style="margin-top:12px"><a class="btn small" href="tel:${esc(String(t.driver_phone).replace(/[^\d+]/g,""))}">Call driver</a></div>` : ""}
   </div>`;
 
+  // Purchase and sale price: owner only
+  if (isOwner()) {
+    const pr = price || {};
+    const line = (rate, basis, amt) => [rate != null ? inr(rate) + (basis ? " " + basis : "") : "", amt != null ? "Amount " + inr(amt) : ""].filter(Boolean).join(" · ") || "—";
+    h += `<div class="card" style="border-color:var(--mango)"><div class="row"><h3 class="grow" style="margin:0">Purchase and sale price</h3><span class="badge" style="background:#fff6dc;color:#7a5200">Only you see this</span></div>
+      <dl class="kv" style="margin-top:10px">
+        <dt>Purchase</dt><dd>${esc(line(pr.purchase_rate, pr.purchase_basis, pr.purchase_amount))}${pr.purchase_note ? `<span class="small mut" style="display:block;font-weight:400">${esc(pr.purchase_note)}</span>` : ""}</dd>
+        <dt>Sale</dt><dd>${esc(line(pr.sale_rate, pr.sale_basis, pr.sale_amount))}${pr.sale_note ? `<span class="small mut" style="display:block;font-weight:400">${esc(pr.sale_note)}</span>` : ""}</dd>
+      </dl>
+      <button class="btn small" style="margin-top:10px" id="editPrice">${price ? "Edit prices" : "+ Add prices"}</button>
+      <div id="priceForm"></div></div>`;
+  }
+
   // Costs
   h += `<div class="card"><h3>Costs for this lorry</h3>
     <div class="tot ${"freight_amount" in was ? "chg" : ""}"><span>Lorry hire (freight)</span><span class="money" ${"freight_amount" in was ? 'style="color:var(--red)"' : ""}>${inr(t.freight_amount)}</span></div>
@@ -471,6 +488,7 @@ async function renderTrip(id){
   const chk = $("chk");
   if (chk) chk.onclick = async () => { chk.disabled = true; try { await q(sb.rpc("mark_checked", {p_trip_ids:[t.id]})); toast("Marked as checked."); renderTrip(id); } catch(e) { toast(errText(e), true); chk.disabled = false; } };
   const ac = $("addCost"); if (ac) ac.onclick = () => costForm(t.id, null, id);
+  const ep = $("editPrice"); if (ep) ep.onclick = () => priceForm(t.id, price, id);
   if (files && files.length) showFileLinks(files);
   const pick = $("fPick");
   if (pick) pick.onchange = async () => {
@@ -582,6 +600,37 @@ function costForm(tripId, c, backId){
   if (d) d.onclick = async () => {
     if (!confirm("Remove this cost?")) return;
     try { await q(sb.from("trip_charges").delete().eq("id", c.id)); toast("Cost removed."); renderTrip(backId); } catch(e) { toast(errText(e), true); }
+  };
+}
+
+/* Owner only: purchase and sale price. Typed in; the app does not multiply anything yet. */
+function priceForm(tripId, pr, backId){
+  pr = pr || {};
+  const basis = (id, v) => `<select class="in" id="${id}">${["", ...BASES].map(b => `<option value="${b}" ${b === (v || "") ? "selected" : ""}>${b || "— basis —"}</option>`).join("")}</select>`;
+  const box = $("priceForm");
+  box.innerHTML = `<div class="addbox" style="margin-top:12px">
+    <h3>Purchase (from the sawmill)</h3>
+    <div class="two"><label class="f"><span>Rate (₹)</span><input class="in" id="pRate" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(pr.purchase_rate ?? "")}"></label>
+    <label class="f"><span>Rate is</span>${basis("pBasis", pr.purchase_basis)}</label></div>
+    <label class="f"><span>Purchase amount (₹)</span><input class="in" id="pAmt" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(pr.purchase_amount ?? "")}"></label>
+    <label class="f"><span>Note (e.g. small difference agreed)</span><input class="in" id="pNote" value="${esc(pr.purchase_note || "")}"></label>
+    <h3>Sale (to the party)</h3>
+    <div class="two"><label class="f"><span>Rate (₹)</span><input class="in" id="sRate" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(pr.sale_rate ?? "")}"></label>
+    <label class="f"><span>Rate is</span>${basis("sBasis", pr.sale_basis)}</label></div>
+    <label class="f"><span>Sale amount (₹)</span><input class="in" id="sAmt" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(pr.sale_amount ?? "")}"></label>
+    <label class="f"><span>Note</span><input class="in" id="sNote" value="${esc(pr.sale_note || "")}"></label>
+    <div class="row"><button class="btn pri grow" id="prSave">Save prices</button><button class="btn" id="prCancel">Cancel</button></div>
+  </div>`;
+  box.scrollIntoView({behavior:"smooth", block:"center"});
+  $("prCancel").onclick = () => { box.innerHTML = ""; };
+  $("prSave").onclick = async () => {
+    const rec = {trip_id: tripId,
+      purchase_rate: num($("pRate").value), purchase_basis: $("pBasis").value || null, purchase_amount: num($("pAmt").value), purchase_note: $("pNote").value.trim() || null,
+      sale_rate: num($("sRate").value), sale_basis: $("sBasis").value || null, sale_amount: num($("sAmt").value), sale_note: $("sNote").value.trim() || null};
+    for (const k of ["purchase_rate","purchase_amount","sale_rate","sale_amount"]) if (rec[k] !== null && (isNaN(rec[k]) || rec[k] < 0)) return toast("Check the numbers.", true);
+    const b = $("prSave"); b.disabled = true; b.textContent = "Saving…";
+    try { await q(sb.from("trip_prices").upsert(rec, {onConflict: "trip_id"})); toast("Prices saved."); renderTrip(backId); }
+    catch(e) { toast(errText(e), true); b.disabled = false; b.textContent = "Save prices"; }
   };
 }
 
@@ -737,7 +786,7 @@ function renderExport(){
   const d = new Date(), y = d.toLocaleDateString("en-CA", {timeZone:"Asia/Kolkata"}).slice(0, 7);
   $("app").innerHTML = `<div class="card">
     <h2>Download for the accountant</h2>
-    <p class="mut">One Excel file with three sheets: <b>Lorries</b> (one row per lorry with totals), <b>Costs</b> (every cost line) and <b>Changes</b> (every edit, who and when).</p>
+    <p class="mut">One Excel file with three sheets: <b>Lorries</b> (one row per lorry with totals), <b>Costs</b> (every cost line) and <b>Changes</b> (every edit, who and when).${isOwner() ? " As owner you also get a <b>Prices</b> sheet." : ""}</p>
     <div class="two"><label class="f"><span>From</span><input class="in" type="date" id="xFrom" value="${y}-01"></label><label class="f"><span>To</span><input class="in" type="date" id="xTo" value="${todayIST()}"></label></div>
     <button class="btn pri" style="width:100%" id="xGo">Download Excel</button>
     <p class="small mut" id="xMsg"></p>
@@ -756,6 +805,8 @@ function renderExport(){
         costs = costs.concat(await q(sb.from("trip_charges").select("*").in("trip_id", part).order("id")));
         logs = logs.concat(await q(sb.from("change_log").select("*").in("trip_id", part).order("changed_at")));
       }
+      let prices = [];
+      if (isOwner()) for (let i = 0; i < ids.length; i += 150) prices = prices.concat(await q(sb.from("trip_prices").select("*").in("trip_id", ids.slice(i, i + 150))));
       const veh = Object.fromEntries(trips.map(t => [t.id, t]));
       const n = v => v === null || v === undefined ? null : Number(v);
       const s1 = trips.map(t => ({"Date":t.trip_date, "Vehicle no":t.vehicle_no, "Lorry (T)":t.lorry_capacity_t, "Status":STATUS[t.status], "Sawmill":t.sawmill_name, "Sawmill place":t.sawmill_place, "Wood":t.wood_type, "Quantity (CFT)":n(t.quantity_cft), "Net weight (T)":n(t.net_weight_t), "Party":t.party_name, "Party city":t.party_city, "Destination":t.destination, "Driver":t.driver_name, "Driver phone":t.driver_phone, "Transporter":t.transporter, "Lorry hire (₹)":n(t.freight_amount), "Other costs (₹)":n(t.charges_total), "Total cost (₹)":n(t.total_cost), "Notes":t.notes, "Times edited":n(t.change_count), "Last change":dFull(t.last_change_at), "Last change by":personName(t.last_change_by), "Trip ID":t.id}));
@@ -772,6 +823,10 @@ function renderExport(){
       add(s1, "Lorries", {"Date":"No lorries in these dates"});
       add(s2, "Costs", {"Vehicle no":"No costs in these dates"});
       add(s3, "Changes", {"When":"No changes in these dates"});
+      if (isOwner()) {
+        const s4 = prices.map(pr => ({"Lorry date":veh[pr.trip_id]?.trip_date, "Vehicle no":veh[pr.trip_id]?.vehicle_no, "Quantity (CFT)":n(veh[pr.trip_id]?.quantity_cft), "Purchase rate (₹)":n(pr.purchase_rate), "Purchase basis":pr.purchase_basis, "Purchase amount (₹)":n(pr.purchase_amount), "Purchase note":pr.purchase_note, "Sale rate (₹)":n(pr.sale_rate), "Sale basis":pr.sale_basis, "Sale amount (₹)":n(pr.sale_amount), "Sale note":pr.sale_note, "Trip ID":pr.trip_id}));
+        add(s4, "Prices (owner)", {"Vehicle no":"No prices in these dates"});
+      }
       XLSX.writeFile(wb, `Aditya_Traders_${from}_to_${to}.xlsx`);
       msg.textContent = `Downloaded: ${s1.length} lorries, ${s2.length} costs, ${s3.length} changes.`;
     } catch(e) { toast(errText(e), true); }
