@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b3315">
+<title>Aditya Traders</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%235b3315'/%3E%3Ctext x='16' y='23' font-family='Arial' font-weight='700' font-size='18' text-anchor='middle' fill='%23f3b733'%3EAT%3C/text%3E%3C/svg%3E">
+<style>
+/* Aditya Traders trips app, version 1.
+   Plain HTML/CSS/JS, system fonts only: loads fast on low-end Android over weak signal.
+   Colours: teak brown band, mango yellow accent, red = "edited since you checked". */
+:root{--bg:#f6f2ec;--card:#fff;--ink:#22170f;--mut:#6e5d4f;--line:#e5dbcf;--wood:#5b3315;--wood2:#7a4a24;--mango:#f3b733;--red:#c62828;--redbg:#fdecea;--blue:#1d4ed8;--bluebg:#e8efff;--green:#12864a;--greenbg:#e6f4ec}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--wood2)}
+.hidden{display:none!important}
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--wood);color:#fbf3e9;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:10px}
+.top h1{font-size:19px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .back{background:none;border:0;color:inherit;font-size:24px;min-width:44px;min-height:44px;cursor:pointer;padding:0}
+.top .menu{background:rgba(255,255,255,.12);border:0;color:inherit;border-radius:8px;min-height:40px;padding:6px 12px;font-weight:600;cursor:pointer}
+.net{background:#7a2e0e;color:#fff;text-align:center;font-size:14px;padding:6px 10px}
+main{max-width:760px;margin:0 auto;padding:12px 12px 110px}
+/* generic */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn.pri{background:var(--wood);border-color:var(--wood);color:#fff}
+.btn.wa{background:var(--green);border-color:var(--green);color:#fff}
+.btn.red{color:var(--red);border-color:#efb4ae}
+.btn.small{min-height:40px;padding:6px 12px;font-size:15px}
+.btn:disabled{opacity:.55}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grow{flex:1}
+.mut{color:var(--mut)}
+.small{font-size:14px}
+h2{font-size:20px;margin:6px 0 12px}
+h3{font-size:17px;margin:0 0 8px}
+/* list */
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;-webkit-overflow-scrolling:touch}
+.chip{flex:none;min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed=true]{background:var(--wood);border-color:var(--wood);color:#fff}
+.chip .n{display:inline-block;min-width:22px;margin-left:4px;padding:0 6px;border-radius:999px;background:var(--red);color:#fff;font-size:13px}
+.search{width:100%;min-height:46px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;margin-bottom:10px;font-size:16px}
+.alert{border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.alert.red{background:var(--redbg);color:#7f1d1d;border:1px solid #f3c1bb}
+.alert.info{background:#fff6dc;color:#5b4106;border:1px solid #f0dfaa}
+.day{font-size:14px;font-weight:700;color:var(--mut);margin:14px 2px 6px}
+.trip{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-left:5px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.trip.edited{border-left-color:var(--red);background:#fffafa}
+.trip.new{border-left-color:var(--blue)}
+.trip .l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.veh{font-size:18px;font-weight:800;letter-spacing:.02em}
+.trip .l2{margin-top:4px;color:var(--mut);font-size:15px}
+.trip .l3{margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;font-size:15px}
+.money{font-weight:700;white-space:nowrap}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;font-weight:700;white-space:nowrap}
+.b-edited{background:var(--red);color:#fff}
+.b-new{background:var(--bluebg);color:var(--blue)}
+.st{display:inline-block;padding:2px 8px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;margin-left:auto}
+.st-order_taken{background:#f1ece6;color:#5b4a3a}
+.st-on_the_way{background:#fff1cc;color:#7a5200}
+.st-completed{background:var(--greenbg);color:var(--green)}
+.fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:15;min-height:56px;padding:0 22px;border-radius:999px;border:0;background:var(--mango);color:#2a1b0b;font-weight:800;font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer}
+.empty{text-align:center;padding:40px 16px;color:var(--mut)}
+/* forms */
+label.f{display:block;margin-bottom:12px}
+label.f>span{display:block;font-weight:600;margin-bottom:4px}
+.in{width:100%;min-height:48px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-size:16px}
+textarea.in{min-height:80px}
+.in:focus,.chip:focus-visible,.btn:focus-visible,.seg button:focus-visible,.trip:focus-visible{outline:3px solid var(--mango);outline-offset:1px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:70px;min-height:48px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-weight:700;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--wood);border-color:var(--wood);color:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pick{display:flex;gap:8px}
+.pick select{flex:1}
+.addbox{background:#faf6f1;border:1px dashed var(--line);border-radius:10px;padding:10px;margin-top:8px}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.savebar .inner{max-width:760px;margin:0 auto;display:flex;gap:8px}
+.savebar .btn{flex:1}
+/* detail */
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.kv dt{color:var(--mut)}
+.kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.kv dd.chg{color:var(--red)}
+.was{display:block;font-weight:400;font-size:14px;color:var(--red)}
+.tot{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
+.tot.big{font-size:18px;font-weight:800}
+.cost{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.cost .grow{min-width:0}
+.cost.chg .money{color:var(--red)}
+.hist{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:0 0 10px}
+.hist.new{border-left-color:var(--red)}
+.hist .when{font-size:14px;color:var(--mut)}
+/* people */
+.person{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+/* login */
+.login{max-width:420px;margin:8vh auto 0;padding:0 16px}
+.brand{background:var(--wood);color:#fbf3e9;border-radius:16px;padding:22px 20px;margin-bottom:16px}
+.brand b{display:block;font-size:26px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:50;background:#22170f;color:#fff;padding:12px 16px;border-radius:10px;max-width:92vw;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.toast.err{background:var(--red)}
+.menuSheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.35);display:flex;align-items:flex-start;justify-content:flex-end;padding:60px 10px 0}
+.menuSheet .box{background:#fff;border-radius:12px;min-width:230px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.menuSheet button{display:block;width:100%;text-align:left;padding:14px 16px;border:0;border-bottom:1px solid var(--line);background:#fff;font-weight:600;cursor:pointer;min-height:48px}
+.menuSheet .who{padding:12px 16px;background:#faf6f1;font-size:14px;color:var(--mut);border-bottom:1px solid var(--line)}
+footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
+@media (max-width:380px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top" id="top">
+  <button class="back hidden" id="backBtn" aria-label="Back">&#8592;</button>
+  <h1 id="title">Aditya Traders</h1>
+  <button class="menu hidden" id="menuBtn">Menu</button>
+</div>
+<div class="net hidden" id="net"></div>
+<main id="app"><div class="empty">Loading…</div></main>
+<button class="fab hidden" id="fab">+ New lorry</button>
+<div id="toastHost"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+{
+/* =====================================================================
+   Settings. The key below is Supabase's public "anon" key: it is meant
+   to be in the page. All data is protected by Row-Level Security in the
+   database (only approved people can read or write anything).
+   ===================================================================== */
+const SUPABASE_URL = "https://yqcsmuycditxkhvdfwyz.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
+const APP_VERSION = "1.0 (25 Nov 2026)";
+const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+
+/* Status names are the three stages the owner named on the 24 Nov call. */
+const STATUS = {order_taken:"Order taken", on_the_way:"On the way", completed:"Completed"};
+const WOODS = ["Mango","Teak","Acacia","Other"];
+const COST_TYPES = ["Hamali / loading","Weighbridge","Permit","Commission","Toll","Other"];
+/* Friendly names for the history screen and the Excel "History" sheet. */
+const FIELD = {trip_date:"Date",vehicle_no:"Vehicle no",lorry_capacity_t:"Lorry (tons)",driver_name:"Driver name",driver_phone:"Driver phone",transporter:"Transporter / broker",sawmill_id:"Sawmill",wood_type:"Wood",quantity_cft:"Quantity (CFT)",net_weight_t:"Net weight (tons)",freight_amount:"Lorry hire (₹)",party_id:"Party",destination:"Destination",status:"Status",notes:"Notes",charge_type:"Cost type",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note"};
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true}});
+
+/* ---------- app state ---------- */
+const S = {user:null, me:null, trips:[], sawmills:[], parties:[], people:{}, filter:"all", q:"", loadedAt:null, offline:false};
+
+/* ---------- small helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = v => (v === null || v === undefined || v === "") ? null : Number(v);
+const inr = v => v === null || v === undefined || v === "" ? "—" : "₹" + Number(v).toLocaleString("en-IN", {maximumFractionDigits:2});
+const qty = (v, unit) => v === null || v === undefined || v === "" ? null : Number(v).toLocaleString("en-IN", {maximumFractionDigits:3}) + " " + unit;
+const dShort = d => d ? new Date(d + (d.length === 10 ? "T00:00:00+05:30" : "")).toLocaleDateString("en-IN", {day:"numeric", month:"short", year:"numeric", timeZone:"Asia/Kolkata"}) : "—";
+const dTime = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", month:"short", hour:"numeric", minute:"2-digit", timeZone:"Asia/Kolkata"}) : "—";
+const dFull = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", month:"short", year:"numeric", hour:"numeric", minute:"2-digit", timeZone:"Asia/Kolkata"}) : "";
+const todayIST = () => new Date().toLocaleDateString("en-CA", {timeZone:"Asia/Kolkata"});
+const personName = id => { const p = S.people[id]; return p ? (p.full_name || p.email || "Someone") : (id ? "Someone" : "System"); };
+const sawmillLabel = id => { const s = S.sawmills.find(x => x.id === id); return s ? s.name + (s.place ? ", " + s.place : "") : (id ? "#" + id : "—"); };
+const partyLabel = id => { const p = S.parties.find(x => x.id === id); return p ? p.name + (p.city ? ", " + p.city : "") : (id ? "#" + id : "—"); };
+const cacheKey = () => "at_trips_" + (S.user ? S.user.id : "x");
+function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }
+function lsSet(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+
+function toast(msg, isErr){
+  const t = document.createElement("div");
+  t.className = "toast" + (isErr ? " err" : "");
+  t.textContent = msg;
+  $("toastHost").replaceChildren(t);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, isErr ? 6000 : 3000);
+}
+/* Turn Supabase / network errors into plain words. */
+function errText(e){
+  const m = (e && (e.message || e.error_description || e.msg)) || String(e || "");
+  if (/fetch|network|Failed to fetch|NetworkError|timeout/i.test(m)) return "No signal or server not reachable. Your entry is kept — tap Save again when you have signal.";
+  if (/Invalid login/i.test(m)) return "Wrong email or password.";
+  if (/row-level security|permission|not allowed/i.test(m)) return "You are not allowed to do this. Ask the owner.";
+  return m || "Something went wrong.";
+}
+async function q(promise){ const r = await promise; if (r.error) throw r.error; return r.data; }
+
+/* ---------- screen chrome ---------- */
+function chrome(title, {back=false, fab=false, menu=true} = {}){
+  $("title").textContent = title;
+  $("backBtn").classList.toggle("hidden", !back);
+  $("menuBtn").classList.toggle("hidden", !menu || !S.me || !S.me.active);
+  $("fab").classList.toggle("hidden", !fab);
+  window.scrollTo(0, 0);
+}
+function setNet(){
+  const n = $("net");
+  if (!navigator.onLine) { n.textContent = "No internet. Showing the last saved list" + (S.loadedAt ? " from " + dTime(S.loadedAt) : "") + "."; n.classList.remove("hidden"); }
+  else if (S.offline) { n.textContent = "Could not reach the server. Showing the list from " + dTime(S.loadedAt) + "."; n.classList.remove("hidden"); }
+  else n.classList.add("hidden");
+}
+window.addEventListener("online", () => { setNet(); if (S.me && S.me.active) route(); });
+window.addEventListener("offline", setNet);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && S.me && S.me.active && (location.hash || "#/") === "#/") loadList(true); });
+
+/* =====================================================================
+   Login, approval and loading
+   ===================================================================== */
+function showLogin(msg){
+  chrome("Aditya Traders", {menu:false});
+  $("app").innerHTML = `
+  <div class="login">
+    <div class="brand"><b>Aditya Traders</b>Lorry trips, costs and checks</div>
+    <form id="loginForm" class="card" novalidate>
+      <label class="f"><span>Email</span><input class="in" id="lEmail" type="email" autocomplete="username" inputmode="email" required></label>
+      <label class="f"><span>Password</span><input class="in" id="lPw" type="password" autocomplete="current-password" required></label>
+      <p class="small" id="lMsg" style="color:var(--red)">${esc(msg || "")}</p>
+      <button class="btn pri" style="width:100%" id="lBtn">Sign in</button>
+      <p class="small mut">No account yet, or forgot your password? Ask the owner.</p>
+    </form>
+  </div>`;
+  $("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const b = $("lBtn"); b.disabled = true; b.textContent = "Signing in…";
+    const { error } = await sb.auth.signInWithPassword({email:$("lEmail").value.trim(), password:$("lPw").value});
+    if (error) { $("lMsg").textContent = errText(error); b.disabled = false; b.textContent = "Sign in"; }
+  });
+}
+
+async function afterLogin(){
+  try {
+    const me = await q(sb.from("profiles").select("*").eq("id", S.user.id).maybeSingle());
+    S.me = me;
+  } catch(e) {
+    // Offline at startup: fall back to the last cached profile + list.
+    const c = lsGet(cacheKey());
+    if (c && c.me) { S.me = c.me; S.trips = c.trips || []; S.sawmills = c.sawmills || []; S.parties = c.parties || []; S.people = c.people || {}; S.loadedAt = c.at; S.offline = true; setNet(); route(); return; }
+    $("app").innerHTML = `<div class="empty">${esc(errText(e))}<br><br><button class="btn" onclick="location.reload()">Try again</button></div>`;
+    return;
+  }
+  if (!S.me || !S.me.active) {
+    chrome("Aditya Traders", {menu:false});
+    $("app").innerHTML = `<div class="card" style="margin-top:20px"><h2>Waiting for approval</h2>
+      <p>You are signed in as <b>${esc(S.user.email)}</b>. The owner needs to approve your account before you can see the lorries.</p>
+      <div class="row"><button class="btn" onclick="location.reload()">Check again</button><button class="btn" id="soBtn">Sign out</button></div></div>`;
+    $("soBtn").onclick = () => sb.auth.signOut();
+    return;
+  }
+  await loadMasters();
+  route();
+}
+
+async function loadMasters(){
+  try {
+    const [saws, parts, ppl] = await Promise.all([
+      q(sb.from("sawmills").select("id,name,place,phone").order("name")),
+      q(sb.from("parties").select("id,name,city,phone").order("name")),
+      q(sb.from("profiles").select("id,full_name,email,role,active,created_at").order("created_at"))
+    ]);
+    S.sawmills = saws; S.parties = parts;
+    S.people = Object.fromEntries(ppl.map(p => [p.id, p]));
+  } catch(e) { /* keep whatever we had; list screen shows the network banner */ }
+}
+
+async function loadList(silent){
+  try {
+    S.trips = await q(sb.from("v_trips").select("*").order("trip_date", {ascending:false}).order("id", {ascending:false}).limit(400));
+    S.loadedAt = new Date().toISOString(); S.offline = false;
+    lsSet(cacheKey(), {at:S.loadedAt, me:S.me, trips:S.trips, sawmills:S.sawmills, parties:S.parties, people:S.people});
+  } catch(e) {
+    const c = lsGet(cacheKey());
+    if (c) { S.trips = c.trips || []; S.loadedAt = c.at; }
+    S.offline = true;
+    if (!silent) toast(errText(e), true);
+  }
+  setNet();
+  if ((location.hash || "#/") === "#/") renderList();
+}
+
+/* =====================================================================
+   Router: #/  #/trip/ID  #/new  #/edit/ID  #/export  #/team
+   ===================================================================== */
+function route(){
+  const h = location.hash || "#/";
+  let m;
+  if (h === "#/" ) { renderList(); loadList(true); }
+  else if ((m = h.match(/^#\/trip\/(\d+)$/))) renderTrip(Number(m[1]));
+  else if (h === "#/new") renderForm(null);
+  else if ((m = h.match(/^#\/edit\/(\d+)$/))) renderForm(Number(m[1]));
+  else if (h === "#/export") renderExport();
+  else if (h === "#/team") renderTeam();
+  else location.hash = "#/";
+}
+window.addEventListener("hashchange", () => { if (S.me && S.me.active) route(); });
+$("backBtn").onclick = () => { if (history.length > 1) history.back(); else location.hash = "#/"; };
+$("fab").onclick = () => { location.hash = "#/new"; };
+
+/* =====================================================================
+   1. Lorry list
+   ===================================================================== */
+function renderList(){
+  chrome("Aditya Traders", {fab:true});
+  const needs = S.trips.filter(t => t.my_flag !== "ok");
+  const edited = S.trips.filter(t => t.my_flag === "edited").length;
+  const counts = {all:S.trips.length, check:needs.length};
+  for (const k in STATUS) counts[k] = S.trips.filter(t => t.status === k).length;
+  const pending = S.me.role === "owner" ? Object.values(S.people).filter(p => !p.active).length : 0;
+
+  const qq = S.q.trim().toLowerCase();
+  let rows = S.trips.filter(t =>
+    S.filter === "all" ? true : S.filter === "check" ? t.my_flag !== "ok" : t.status === S.filter);
+  if (qq) rows = rows.filter(t => [t.vehicle_no, t.sawmill_name, t.sawmill_place, t.party_name, t.party_city, t.driver_name, t.driver_phone, t.transporter, t.destination].join(" ").toLowerCase().includes(qq));
+
+  const chip = (k, label) => `<button class="chip" data-f="${k}" aria-pressed="${S.filter === k}">${label}${k === "check" && counts.check ? `<span class="n">${counts.check}</span>` : ` <span class="mut">${counts[k] ?? ""}</span>`}</button>`;
+
+  let html = "";
+  if (pending) html += `<div class="alert info"><span class="grow">${pending} ${pending === 1 ? "person is" : "people are"} waiting for your approval.</span><a class="btn small" href="#/team">Open team</a></div>`;
+  if (edited) html += `<div class="alert red"><span class="grow"><b>${edited} ${edited === 1 ? "lorry was" : "lorries were"} edited</b> since you last checked.</span><button class="btn small" data-f2="check">Show</button></div>`;
+  html += `<div class="chips" role="group" aria-label="Filter">${chip("all","All")}${chip("check","To check")}${chip("order_taken","Order taken")}${chip("on_the_way","On the way")}${chip("completed","Completed")}</div>`;
+  html += `<input class="search" id="search" type="search" placeholder="Search vehicle, sawmill, party, driver" value="${esc(S.q)}" aria-label="Search">`;
+  if (S.filter === "check" && rows.length) html += `<div class="row" style="margin-bottom:8px"><span class="grow small mut">Open each lorry to see what changed, or:</span><button class="btn small" id="markAll">Mark all ${rows.length} as checked</button></div>`;
+
+  if (!rows.length) {
+    html += `<div class="empty">${S.trips.length ? "No lorries match." : "No lorries yet.<br>Tap <b>+ New lorry</b> to add the first one."}</div>`;
+  } else {
+    let lastDay = "";
+    for (const t of rows) {
+      if (t.trip_date !== lastDay) { lastDay = t.trip_date; html += `<div class="day">${esc(dShort(t.trip_date))}</div>`; }
+      const flag = t.my_flag === "edited" ? `<span class="badge b-edited">Edited</span>` : t.my_flag === "new" ? `<span class="badge b-new">New</span>` : "";
+      const q1 = [qty(t.quantity_cft, "CFT"), qty(t.net_weight_t, "T")].filter(Boolean).join(" · ");
+      html += `<button class="trip ${t.my_flag === "ok" ? "" : t.my_flag}" data-id="${t.id}">
+        <div class="l1"><span class="veh">${esc(t.vehicle_no)}</span>${t.lorry_capacity_t ? `<span class="mut small">${t.lorry_capacity_t}T</span>` : ""}${flag}<span class="st st-${t.status}">${STATUS[t.status]}</span></div>
+        <div class="l2">${esc(t.sawmill_name || "Sawmill not set")} → ${esc(t.party_name || "Party not set")}${t.party_city ? ", " + esc(t.party_city) : ""}</div>
+        <div class="l3">${t.wood_type ? `<span>${esc(t.wood_type)}</span>` : ""}${q1 ? `<span>${esc(q1)}</span>` : ""}<span class="money">${inr(t.total_cost)}</span></div>
+      </button>`;
+    }
+  }
+  html += `<footer>Version ${APP_VERSION}${S.loadedAt ? " · updated " + esc(dTime(S.loadedAt)) : ""}</footer>`;
+  $("app").innerHTML = html;
+
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.filter = b.dataset.f; renderList(); });
+  document.querySelectorAll("[data-f2]").forEach(b => b.onclick = () => { S.filter = b.dataset.f2; renderList(); });
+  document.querySelectorAll(".trip").forEach(b => b.onclick = () => { location.hash = "#/trip/" + b.dataset.id; });
+  const s = $("search");
+  s.oninput = () => { S.q = s.value; const pos = s.selectionStart; renderList(); const s2 = $("search"); s2.focus(); s2.setSelectionRange(pos, pos); };
+  const ma = $("markAll");
+  if (ma) ma.onclick = async () => {
+    ma.disabled = true;
+    try { await q(sb.rpc("mark_checked", {p_trip_ids: rows.map(t => t.id)})); toast("Marked as checked."); await loadList(); }
+    catch(e) { toast(errText(e), true); ma.disabled = false; }
+  };
+}
+
+/* =====================================================================
+   2. One lorry: details, costs, what changed, history
+   ===================================================================== */
+async function renderTrip(id){
+  chrome("Lorry", {back:true});
+  $("app").innerHTML = `<div class="empty">Loading…</div>`;
+  let t, costs, log;
+  try {
+    [t, costs, log] = await Promise.all([
+      q(sb.from("v_trips").select("*").eq("id", id).maybeSingle()),
+      q(sb.from("trip_charges").select("*").eq("trip_id", id).order("id")),
+      q(sb.from("change_log").select("*").eq("trip_id", id).order("changed_at", {ascending:false}).limit(200))
+    ]);
+  } catch(e) {
+    t = S.trips.find(x => x.id === id); costs = null; log = [];
+    if (!t) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
+    toast("Offline: showing saved details. Costs and history need signal.", true);
+  }
+  if (!t) { $("app").innerHTML = `<div class="empty">This lorry was deleted.</div>`; return; }
+  chrome(t.vehicle_no, {back:true});
+
+  // What changed since *I* last checked (by other people).
+  const since = t.my_reviewed_at;
+  const fresh = since ? log.filter(l => l.changed_at > since && l.changed_by !== S.user.id) : [];
+  const was = {};                       // field -> oldest "before" value
+  const costChg = new Set();            // charge ids changed/added
+  let costRemoved = 0;
+  for (const l of fresh.slice().reverse()) {
+    if (l.table_name === "trips" && l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) { if (!(k in was)) was[k] = v[0]; }
+    if (l.table_name === "trip_charges") { if (l.action === "delete") costRemoved++; else costChg.add(l.record_id); }
+  }
+  const show = (k, v) => {
+    if (k === "sawmill_id") return sawmillLabel(v);
+    if (k === "party_id") return partyLabel(v);
+    if (k === "status") return STATUS[v] || v;
+    if (k === "freight_amount" || k === "amount") return inr(v);
+    if (k === "trip_date" || k === "paid_on") return dShort(v);
+    return v === null || v === "" ? "—" : String(v);
+  };
+  const row = (label, key, value) => {
+    const c = key in was;
+    return `<dt>${label}</dt><dd class="${c ? "chg" : ""}">${esc(value ?? "—")}${c ? `<span class="was">was ${esc(show(key, was[key]))}</span>` : ""}</dd>`;
+  };
+
+  let h = "";
+  if (t.my_flag === "edited") h += `<div class="alert red"><span class="grow"><b>Changed since you checked it</b> on ${esc(dTime(since))}. Changes are shown in red.${costRemoved ? ` ${costRemoved} cost${costRemoved > 1 ? "s" : ""} removed.` : ""}</span><button class="btn small" id="chk">Mark as checked</button></div>`;
+  if (t.my_flag === "new") h += `<div class="alert info"><span class="grow">You have not checked this lorry yet.</span><button class="btn small" id="chk">Mark as checked</button></div>`;
+
+  h += `<div class="card"><div class="row" style="margin-bottom:10px"><span class="veh grow">${esc(t.vehicle_no)}</span><span class="st st-${t.status}">${STATUS[t.status]}</span></div>
+  <dl class="kv">
+    ${row("Date","trip_date",dShort(t.trip_date))}
+    ${row("Lorry","lorry_capacity_t",t.lorry_capacity_t ? t.lorry_capacity_t + " ton" : null)}
+    ${row("Status","status",STATUS[t.status])}
+    ${row("Sawmill","sawmill_id",t.sawmill_name ? t.sawmill_name + (t.sawmill_place ? ", " + t.sawmill_place : "") : null)}
+    ${row("Wood","wood_type",t.wood_type)}
+    ${row("Quantity","quantity_cft",qty(t.quantity_cft,"CFT"))}
+    ${row("Net weight","net_weight_t",qty(t.net_weight_t,"tons"))}
+    ${row("Party","party_id",t.party_name ? t.party_name + (t.party_city ? ", " + t.party_city : "") : null)}
+    ${row("Destination","destination",t.destination)}
+    ${row("Driver","driver_name",t.driver_name)}
+    ${row("Driver phone","driver_phone",t.driver_phone)}
+    ${row("Transporter","transporter",t.transporter)}
+    ${row("Notes","notes",t.notes)}
+  </dl>
+  ${t.driver_phone ? `<div class="row" style="margin-top:12px"><a class="btn small" href="tel:${esc(String(t.driver_phone).replace(/[^\d+]/g,""))}">Call driver</a></div>` : ""}
+  </div>`;
+
+  // Costs
+  h += `<div class="card"><h3>Costs for this lorry</h3>
+    <div class="tot ${"freight_amount" in was ? "chg" : ""}"><span>Lorry hire (freight)</span><span class="money" ${"freight_amount" in was ? 'style="color:var(--red)"' : ""}>${inr(t.freight_amount)}</span></div>
+    ${"freight_amount" in was ? `<div class="small" style="color:var(--red);text-align:right">was ${esc(inr(was.freight_amount))}</div>` : ""}`;
+  if (costs === null) h += `<p class="mut small">Costs need signal to load.</p>`;
+  else {
+    for (const c of costs) h += `<div class="cost ${costChg.has(c.id) ? "chg" : ""}"><div class="grow"><b>${esc(c.charge_type)}</b>${costChg.has(c.id) ? ` <span class="badge b-edited">${since && c.created_at > since ? "Added" : "Changed"}</span>` : ""}<div class="small mut">${[c.paid_to ? "To " + esc(c.paid_to) : "", c.paid_on ? esc(dShort(c.paid_on)) : "", c.note ? esc(c.note) : ""].filter(Boolean).join(" · ") || "&nbsp;"}</div></div><span class="money">${inr(c.amount)}</span><button class="btn small" data-cost="${c.id}">Edit</button></div>`;
+    h += `<div class="tot"><span>Other costs</span><span class="money">${inr(t.charges_total)}</span></div>
+      <div class="tot big"><span>Total</span><span class="money">${inr(t.total_cost)}</span></div>
+      <button class="btn" style="width:100%;margin-top:10px" id="addCost">+ Add a cost</button>
+      <div id="costForm"></div>`;
+  }
+  h += `</div>`;
+
+  // Actions
+  h += `<div class="row" style="margin-bottom:10px"><a class="btn pri grow" href="#/edit/${t.id}">Edit lorry</a><a class="btn wa grow" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(waText(t, costs))}">Share on WhatsApp</a></div>`;
+
+  // History
+  h += `<div class="card"><h3>History</h3>${log.length ? log.map(l => histItem(l, since)).join("") : `<p class="mut small">No history${costs === null ? " (needs signal)" : ""}.</p>`}</div>`;
+  if (S.me.role === "owner") h += `<button class="btn red" style="width:100%" id="delTrip">Delete this lorry</button>`;
+  $("app").innerHTML = h;
+
+  const chk = $("chk");
+  if (chk) chk.onclick = async () => { chk.disabled = true; try { await q(sb.rpc("mark_checked", {p_trip_ids:[t.id]})); toast("Marked as checked."); renderTrip(id); } catch(e) { toast(errText(e), true); chk.disabled = false; } };
+  const ac = $("addCost"); if (ac) ac.onclick = () => costForm(t.id, null, id);
+  document.querySelectorAll("[data-cost]").forEach(b => b.onclick = () => costForm(t.id, costs.find(c => c.id === Number(b.dataset.cost)), id));
+  const del = $("delTrip");
+  if (del) del.onclick = async () => {
+    if (!confirm("Delete lorry " + t.vehicle_no + " and all its costs? This cannot be undone. (The history keeps a record.)")) return;
+    try { await q(sb.from("trips").delete().eq("id", t.id)); toast("Deleted."); location.hash = "#/"; } catch(e) { toast(errText(e), true); }
+  };
+}
+
+function histItem(l, since){
+  const who = personName(l.changed_by);
+  const isNew = since && l.changed_at > since && l.changed_by !== S.user.id;
+  let what = "";
+  const ch = l.changes || {};
+  const fmt = (k, v) => k === "sawmill_id" ? sawmillLabel(v) : k === "party_id" ? partyLabel(v) : k === "status" ? (STATUS[v] || v) : (k === "freight_amount" || k === "amount") ? inr(v) : (v === null || v === "" ? "—" : String(v));
+  if (l.table_name === "trips") {
+    if (l.action === "insert") what = "Added this lorry";
+    else if (l.action === "delete") what = "Deleted this lorry";
+    else what = Object.entries(ch).map(([k, v]) => `${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("<br>");
+  } else {
+    if (l.action === "insert") what = `Added cost: ${esc(ch.charge_type)} <b>${esc(inr(ch.amount))}</b>`;
+    else if (l.action === "delete") what = `Removed cost: ${esc(ch.charge_type)} ${esc(inr(ch.amount))}`;
+    else what = "Changed a cost: " + Object.entries(ch).map(([k, v]) => `${esc(FIELD[k] || k)} ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join(", ");
+  }
+  return `<div class="hist ${isNew ? "new" : ""}"><div class="when">${esc(dTime(l.changed_at))} · ${esc(who)}</div><div>${what}</div></div>`;
+}
+
+/* Add / edit one cost line, inside the lorry screen. */
+function costForm(tripId, c, backId){
+  const box = $("costForm");
+  box.innerHTML = `<div class="addbox" style="margin-top:12px">
+    <h3>${c ? "Edit cost" : "Add a cost"}</h3>
+    <label class="f"><span>Cost type</span><input class="in" id="cType" list="costTypes" value="${esc(c ? c.charge_type : "")}" placeholder="e.g. Hamali / loading"></label>
+    <datalist id="costTypes">${COST_TYPES.map(x => `<option value="${esc(x)}">`).join("")}</datalist>
+    <div class="two"><label class="f"><span>Amount (₹)</span><input class="in" id="cAmt" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(c ? c.amount : "")}"></label>
+    <label class="f"><span>Paid on</span><input class="in" id="cOn" type="date" value="${esc(c ? (c.paid_on || "") : todayIST())}"></label></div>
+    <label class="f"><span>Paid to</span><input class="in" id="cTo" value="${esc(c ? (c.paid_to || "") : "")}"></label>
+    <label class="f"><span>Note</span><input class="in" id="cNote" value="${esc(c ? (c.note || "") : "")}"></label>
+    <div class="row"><button class="btn pri grow" id="cSave">Save cost</button><button class="btn" id="cCancel">Cancel</button>${c ? `<button class="btn red" id="cDel">Remove</button>` : ""}</div>
+  </div>`;
+  box.scrollIntoView({behavior:"smooth", block:"center"});
+  $("cType").focus();
+  $("cCancel").onclick = () => { box.innerHTML = ""; };
+  $("cSave").onclick = async () => {
+    const rec = {charge_type:$("cType").value.trim(), amount:num($("cAmt").value), paid_on:$("cOn").value || null, paid_to:$("cTo").value.trim() || null, note:$("cNote").value.trim() || null};
+    if (!rec.charge_type) return toast("Write the cost type.", true);
+    if (rec.amount === null || isNaN(rec.amount) || rec.amount < 0) return toast("Write the amount.", true);
+    const b = $("cSave"); b.disabled = true; b.textContent = "Saving…";
+    try {
+      if (c) await q(sb.from("trip_charges").update(rec).eq("id", c.id));
+      else await q(sb.from("trip_charges").insert({...rec, trip_id: tripId}));
+      toast("Cost saved."); renderTrip(backId);
+    } catch(e) { toast(errText(e), true); b.disabled = false; b.textContent = "Save cost"; }
+  };
+  const d = $("cDel");
+  if (d) d.onclick = async () => {
+    if (!confirm("Remove this cost?")) return;
+    try { await q(sb.from("trip_charges").delete().eq("id", c.id)); toast("Cost removed."); renderTrip(backId); } catch(e) { toast(errText(e), true); }
+  };
+}
+
+/* WhatsApp-ready summary of one lorry. */
+function waText(t, costs){
+  const L = [`*Aditya Traders – Lorry ${t.vehicle_no}*`, `Date: ${dShort(t.trip_date)}`, `Status: ${STATUS[t.status]}`];
+  if (t.sawmill_name) L.push(`From: ${t.sawmill_name}${t.sawmill_place ? ", " + t.sawmill_place : ""}`);
+  if (t.party_name) L.push(`To: ${t.party_name}${t.party_city ? ", " + t.party_city : ""}${t.destination ? " (" + t.destination + ")" : ""}`);
+  const load = [t.wood_type, qty(t.quantity_cft, "CFT"), qty(t.net_weight_t, "T")].filter(Boolean).join(" · ");
+  if (load) L.push(`Load: ${load}`);
+  if (t.driver_name || t.driver_phone) L.push(`Driver: ${[t.driver_name, t.driver_phone].filter(Boolean).join(", ")}`);
+  L.push("", `Lorry hire: ${inr(t.freight_amount)}`);
+  if (costs && costs.length) for (const c of costs) L.push(`${c.charge_type}: ${inr(c.amount)}`);
+  L.push(`*Total: ${inr(t.total_cost)}*`);
+  return L.join("\n");
+}
+
+/* =====================================================================
+   3. Add / edit a lorry
+   ===================================================================== */
+async function renderForm(id){
+  chrome(id ? "Edit lorry" : "New lorry", {back:true});
+  let t = null;
+  if (id) {
+    try { t = await q(sb.from("trips").select("*").eq("id", id).maybeSingle()); }
+    catch(e) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
+    if (!t) { $("app").innerHTML = `<div class="empty">This lorry was deleted.</div>`; return; }
+  } else {
+    t = lsGet("at_draft_new") || {trip_date: todayIST(), status: "order_taken"};
+  }
+  const seg = (name, opts, val) => `<div class="seg" data-seg="${name}">${opts.map(([v, l]) => `<button type="button" data-v="${esc(v)}" aria-pressed="${String(val ?? "") === String(v)}">${esc(l)}</button>`).join("")}</div>`;
+  const opt = (list, val, label) => `<option value="">— choose —</option>${list.map(x => `<option value="${x.id}" ${x.id === val ? "selected" : ""}>${esc(label(x))}</option>`).join("")}<option value="__new">+ Add new…</option>`;
+
+  $("app").innerHTML = `<form id="tf" novalidate>
+  <div class="card">
+    <h3>Lorry</h3>
+    <div class="two">
+      <label class="f"><span>Date</span><input class="in" name="trip_date" type="date" value="${esc(t.trip_date || todayIST())}"></label>
+      <label class="f"><span>Vehicle no *</span><input class="in" name="vehicle_no" autocapitalize="characters" autocomplete="off" placeholder="AP39TT1234" value="${esc(t.vehicle_no || "")}"></label>
+    </div>
+    <label class="f"><span>Lorry size</span>${seg("lorry_capacity_t", [["30","30 ton"],["35","35 ton"]], t.lorry_capacity_t)}</label>
+    <div class="two">
+      <label class="f"><span>Driver name</span><input class="in" name="driver_name" value="${esc(t.driver_name || "")}"></label>
+      <label class="f"><span>Driver phone</span><input class="in" name="driver_phone" type="tel" inputmode="tel" value="${esc(t.driver_phone || "")}"></label>
+    </div>
+    <label class="f"><span>Transporter / broker</span><input class="in" name="transporter" value="${esc(t.transporter || "")}"></label>
+    <label class="f"><span>Lorry hire (freight, ₹)</span><input class="in" name="freight_amount" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(t.freight_amount ?? "")}"></label>
+  </div>
+  <div class="card">
+    <h3>Load</h3>
+    <label class="f"><span>Loaded from (sawmill)</span><select class="in" id="selSaw">${opt(S.sawmills, t.sawmill_id, s => s.name + (s.place ? ", " + s.place : ""))}</select></label>
+    <div id="newSaw" class="addbox hidden"><div class="two"><label class="f"><span>Sawmill name</span><input class="in" id="nsName"></label><label class="f"><span>Village / town</span><input class="in" id="nsPlace"></label></div><button type="button" class="btn small" id="nsAdd">Add sawmill</button></div>
+    <label class="f"><span>Wood</span>${seg("wood_type", WOODS.map(w => [w, w]), t.wood_type)}</label>
+    <div class="two">
+      <label class="f"><span>Quantity (CFT)</span><input class="in" name="quantity_cft" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(t.quantity_cft ?? "")}"></label>
+      <label class="f"><span>Net weight (tons)</span><input class="in" name="net_weight_t" type="number" inputmode="decimal" min="0" step="0.001" value="${esc(t.net_weight_t ?? "")}"></label>
+    </div>
+    <p class="small mut" style="margin-top:-4px">Type the CFT from your tally sheet. The app does not calculate CFT yet.</p>
+  </div>
+  <div class="card">
+    <h3>Going to</h3>
+    <label class="f"><span>Party (buyer)</span><select class="in" id="selParty">${opt(S.parties, t.party_id, p => p.name + (p.city ? ", " + p.city : ""))}</select></label>
+    <div id="newParty" class="addbox hidden"><div class="two"><label class="f"><span>Party name</span><input class="in" id="npName"></label><label class="f"><span>City</span><input class="in" id="npCity"></label></div><button type="button" class="btn small" id="npAdd">Add party</button></div>
+    <label class="f"><span>Destination (if different)</span><input class="in" name="destination" value="${esc(t.destination || "")}"></label>
+    <label class="f"><span>Status</span>${seg("status", Object.entries(STATUS), t.status || "order_taken")}</label>
+    <label class="f"><span>Notes</span><textarea class="in" name="notes">${esc(t.notes || "")}</textarea></label>
+  </div>
+  ${id ? "" : `<p class="small mut">Add other costs (hamali, weighbridge…) after saving, on the lorry's page.</p>`}
+  </form>
+  <div class="savebar"><div class="inner"><button class="btn" id="fCancel">Cancel</button><button class="btn pri" id="fSave">${id ? "Save changes" : "Save lorry"}</button></div></div>`;
+
+  const form = $("tf");
+  const segVal = {};
+  document.querySelectorAll("[data-seg]").forEach(g => {
+    const name = g.dataset.seg;
+    const cur = g.querySelector("[aria-pressed=true]"); segVal[name] = cur ? cur.dataset.v : null;
+    g.querySelectorAll("button").forEach(b => b.onclick = () => {
+      const on = b.getAttribute("aria-pressed") === "true";
+      g.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", "false"));
+      // tap again to clear (except status, which always has a value)
+      if (on && name !== "status") segVal[name] = null; else { b.setAttribute("aria-pressed", "true"); segVal[name] = b.dataset.v; }
+      draft();
+    });
+  });
+  const collect = () => {
+    const f = Object.fromEntries(new FormData(form));
+    return {
+      trip_date: f.trip_date || todayIST(),
+      vehicle_no: (f.vehicle_no || "").toUpperCase().replace(/\s+/g, "").trim(),
+      lorry_capacity_t: segVal.lorry_capacity_t ? Number(segVal.lorry_capacity_t) : null,
+      driver_name: (f.driver_name || "").trim() || null,
+      driver_phone: (f.driver_phone || "").trim() || null,
+      transporter: (f.transporter || "").trim() || null,
+      freight_amount: num(f.freight_amount),
+      sawmill_id: $("selSaw").value && $("selSaw").value !== "__new" ? Number($("selSaw").value) : null,
+      wood_type: segVal.wood_type || null,
+      quantity_cft: num(f.quantity_cft),
+      net_weight_t: num(f.net_weight_t),
+      party_id: $("selParty").value && $("selParty").value !== "__new" ? Number($("selParty").value) : null,
+      destination: (f.destination || "").trim() || null,
+      status: segVal.status || "order_taken",
+      notes: (f.notes || "").trim() || null
+    };
+  };
+  // New-lorry drafts survive a dropped signal or an accidental back.
+  const draft = () => { if (!id) lsSet("at_draft_new", collect()); };
+  form.addEventListener("input", draft);
+
+  const wireNew = (selId, boxId, addBtn, nameId, placeId, table, placeCol, listKey, label) => {
+    const sel = $(selId);
+    sel.onchange = () => { $(boxId).classList.toggle("hidden", sel.value !== "__new"); if (sel.value === "__new") $(nameId).focus(); draft(); };
+    $(addBtn).onclick = async () => {
+      const name = $(nameId).value.trim(), place = $(placeId).value.trim();
+      if (!name) return toast("Write the name.", true);
+      const same = S[listKey].find(x => x.name.toLowerCase() === name.toLowerCase() && (x[placeCol] || "").toLowerCase() === place.toLowerCase());
+      let rec = same;
+      if (!rec) {
+        try { rec = await q(sb.from(table).insert({name, [placeCol]: place || null}).select().single()); S[listKey].push(rec); S[listKey].sort((a, b) => a.name.localeCompare(b.name)); }
+        catch(e) { return toast(errText(e), true); }
+      }
+      sel.innerHTML = opt(S[listKey], rec.id, label);
+      $(boxId).classList.add("hidden");
+      toast((same ? "Already in the list: " : "Added: ") + name);
+      draft();
+    };
+  };
+  wireNew("selSaw", "newSaw", "nsAdd", "nsName", "nsPlace", "sawmills", "place", "sawmills", s => s.name + (s.place ? ", " + s.place : ""));
+  wireNew("selParty", "newParty", "npAdd", "npName", "npCity", "parties", "city", "parties", p => p.name + (p.city ? ", " + p.city : ""));
+
+  $("fCancel").onclick = () => { if (!id) lsSet("at_draft_new", null); history.back(); };
+  $("fSave").onclick = async () => {
+    const rec = collect();
+    if (!rec.vehicle_no) { toast("Write the vehicle number.", true); form.vehicle_no.focus(); return; }
+    for (const k of ["freight_amount","quantity_cft","net_weight_t"]) if (rec[k] !== null && (isNaN(rec[k]) || rec[k] < 0)) return toast("Check the number in " + FIELD[k] + ".", true);
+    const b = $("fSave"); b.disabled = true; b.textContent = "Saving…";
+    try {
+      let newId = id;
+      if (id) await q(sb.from("trips").update(rec).eq("id", id));
+      else { const r = await q(sb.from("trips").insert(rec).select("id").single()); newId = r.id; lsSet("at_draft_new", null); }
+      toast("Saved.");
+      history.replaceState(null, "", "#/trip/" + newId);
+      renderTrip(newId);
+    } catch(e) { toast(errText(e), true); b.disabled = false; b.textContent = id ? "Save changes" : "Save lorry"; }
+  };
+}
+
+/* =====================================================================
+   4. Excel export for the accountant
+   ===================================================================== */
+function renderExport(){
+  chrome("Excel export", {back:true});
+  const d = new Date(), y = d.toLocaleDateString("en-CA", {timeZone:"Asia/Kolkata"}).slice(0, 7);
+  $("app").innerHTML = `<div class="card">
+    <h2>Download for the accountant</h2>
+    <p class="mut">One Excel file with three sheets: <b>Lorries</b> (one row per lorry with totals), <b>Costs</b> (every cost line) and <b>Changes</b> (every edit, who and when).</p>
+    <div class="two"><label class="f"><span>From</span><input class="in" type="date" id="xFrom" value="${y}-01"></label><label class="f"><span>To</span><input class="in" type="date" id="xTo" value="${todayIST()}"></label></div>
+    <button class="btn pri" style="width:100%" id="xGo">Download Excel</button>
+    <p class="small mut" id="xMsg"></p>
+  </div>`;
+  $("xGo").onclick = async () => {
+    const from = $("xFrom").value, to = $("xTo").value, b = $("xGo"), msg = $("xMsg");
+    if (!from || !to || from > to) return toast("Check the dates.", true);
+    b.disabled = true; b.textContent = "Preparing…";
+    try {
+      await loadScript(XLSX_URL);
+      const trips = await q(sb.from("v_trips").select("*").gte("trip_date", from).lte("trip_date", to).order("trip_date").order("id"));
+      const ids = trips.map(t => t.id);
+      let costs = [], logs = [];
+      for (let i = 0; i < ids.length; i += 150) {          // keep URLs short
+        const part = ids.slice(i, i + 150);
+        costs = costs.concat(await q(sb.from("trip_charges").select("*").in("trip_id", part).order("id")));
+        logs = logs.concat(await q(sb.from("change_log").select("*").in("trip_id", part).order("changed_at")));
+      }
+      const veh = Object.fromEntries(trips.map(t => [t.id, t]));
+      const n = v => v === null || v === undefined ? null : Number(v);
+      const s1 = trips.map(t => ({"Date":t.trip_date, "Vehicle no":t.vehicle_no, "Lorry (T)":t.lorry_capacity_t, "Status":STATUS[t.status], "Sawmill":t.sawmill_name, "Sawmill place":t.sawmill_place, "Wood":t.wood_type, "Quantity (CFT)":n(t.quantity_cft), "Net weight (T)":n(t.net_weight_t), "Party":t.party_name, "Party city":t.party_city, "Destination":t.destination, "Driver":t.driver_name, "Driver phone":t.driver_phone, "Transporter":t.transporter, "Lorry hire (₹)":n(t.freight_amount), "Other costs (₹)":n(t.charges_total), "Total cost (₹)":n(t.total_cost), "Notes":t.notes, "Times edited":n(t.change_count), "Last change":dFull(t.last_change_at), "Last change by":personName(t.last_change_by), "Trip ID":t.id}));
+      const s2 = costs.map(c => ({"Lorry date":veh[c.trip_id]?.trip_date, "Vehicle no":veh[c.trip_id]?.vehicle_no, "Cost type":c.charge_type, "Amount (₹)":n(c.amount), "Paid to":c.paid_to, "Paid on":c.paid_on, "Note":c.note, "Added by":personName(c.created_by), "Added at":dFull(c.created_at), "Trip ID":c.trip_id}));
+      const s3 = [];
+      for (const l of logs) {
+        const base = {"When":dFull(l.changed_at), "By":personName(l.changed_by), "Vehicle no":veh[l.trip_id]?.vehicle_no, "Trip ID":l.trip_id};
+        const what = (l.table_name === "trips" ? "Lorry " : "Cost ") + ({insert:"added", update:"changed", delete:"removed"}[l.action]);
+        if (l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) s3.push({...base, "What":what, "Field":FIELD[k] || k, "Old value":fmtCell(k, v[0]), "New value":fmtCell(k, v[1])});
+        else s3.push({...base, "What":what, "Field":l.table_name === "trip_charges" ? (l.changes?.charge_type || "") : "", "Old value":l.action === "delete" && l.table_name === "trip_charges" ? n(l.changes?.amount) : "", "New value":l.action === "insert" && l.table_name === "trip_charges" ? n(l.changes?.amount) : ""});
+      }
+      const wb = XLSX.utils.book_new();
+      const add = (rows, name, empty) => { const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [empty]); ws["!cols"] = Object.keys(rows[0] || empty).map(k => ({wch: Math.max(10, k.length + 2)})); XLSX.utils.book_append_sheet(wb, ws, name); };
+      add(s1, "Lorries", {"Date":"No lorries in these dates"});
+      add(s2, "Costs", {"Vehicle no":"No costs in these dates"});
+      add(s3, "Changes", {"When":"No changes in these dates"});
+      XLSX.writeFile(wb, `Aditya_Traders_${from}_to_${to}.xlsx`);
+      msg.textContent = `Downloaded: ${s1.length} lorries, ${s2.length} costs, ${s3.length} changes.`;
+    } catch(e) { toast(errText(e), true); }
+    b.disabled = false; b.textContent = "Download Excel";
+  };
+}
+function fmtCell(k, v){
+  if (k === "sawmill_id") return sawmillLabel(v);
+  if (k === "party_id") return partyLabel(v);
+  if (k === "status") return STATUS[v] || v;
+  return v === null || v === undefined ? "" : v;
+}
+function loadScript(src){
+  return new Promise((ok, bad) => {
+    if (document.querySelector(`script[src="${src}"]`) && window.XLSX) return ok();
+    const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => bad(new Error("Failed to fetch the Excel tool")); document.head.appendChild(s);
+  });
+}
+
+/* =====================================================================
+   5. Team (owner only): approve people, set roles and names
+   ===================================================================== */
+async function renderTeam(){
+  chrome("Team", {back:true});
+  if (S.me.role !== "owner") { $("app").innerHTML = `<div class="empty">Only the owner can manage the team.</div>`; return; }
+  await loadMasters();
+  const ppl = Object.values(S.people);
+  $("app").innerHTML = `<div class="card"><h2>People</h2>
+    <p class="small mut">New people: create their login in Supabase (Authentication → Add user), then approve them here.</p>
+    ${ppl.map(p => `<div class="person" data-p="${p.id}">
+      <div><input class="in" data-k="full_name" value="${esc(p.full_name)}" placeholder="Name" aria-label="Name"><div class="small mut" style="margin-top:4px">${esc(p.email)}${p.active ? "" : ` · <b style="color:var(--red)">waiting for approval</b>`}</div></div>
+      <div style="display:grid;gap:6px">
+        <select class="in" data-k="role" aria-label="Role">${["owner","accountant","staff"].map(r => `<option value="${r}" ${p.role === r ? "selected" : ""}>${r[0].toUpperCase() + r.slice(1)}</option>`).join("")}</select>
+        <button class="btn small ${p.active ? "red" : "pri"}" data-k="active">${p.active ? "Block" : "Approve"}</button>
+      </div></div>`).join("")}
+  </div>`;
+  document.querySelectorAll("[data-p]").forEach(row => {
+    const pid = row.dataset.p, p = S.people[pid];
+    const save = async patch => {
+      if (pid === S.user.id && (patch.active === false || (patch.role && patch.role !== "owner")) && !confirm("This removes your own owner access. Continue?")) return renderTeam();
+      try { await q(sb.from("profiles").update(patch).eq("id", pid)); Object.assign(p, patch); toast("Saved."); renderTeam(); }
+      catch(e) { toast(errText(e), true); }
+    };
+    row.querySelector('[data-k="full_name"]').onchange = e => save({full_name: e.target.value.trim()});
+    row.querySelector('[data-k="role"]').onchange = e => save({role: e.target.value});
+    row.querySelector('[data-k="active"]').onclick = () => save({active: !p.active});
+  });
+}
+
+/* =====================================================================
+   Menu
+   ===================================================================== */
+$("menuBtn").onclick = () => {
+  const m = document.createElement("div");
+  m.className = "menuSheet";
+  m.innerHTML = `<div class="box"><div class="who">${esc(S.me.full_name || S.user.email)} · ${esc(S.me.role)}</div>
+    <button data-go="#/">All lorries</button>
+    <button data-go="#/export">Excel export</button>
+    ${S.me.role === "owner" ? `<button data-go="#/team">Team</button>` : ""}
+    <button data-act="refresh">Refresh</button>
+    <button data-act="out">Sign out</button></div>`;
+  m.onclick = async e => {
+    const b = e.target.closest("button");
+    m.remove();
+    if (!b) return;
+    if (b.dataset.go) location.hash = b.dataset.go;
+    if (b.dataset.act === "refresh") { await loadMasters(); location.hash === "#/" || !location.hash ? loadList() : route(); }
+    if (b.dataset.act === "out") { lsSet(cacheKey(), null); history.replaceState(null, "", "#/"); await sb.auth.signOut(); }
+  };
+  document.body.appendChild(m);
+};
+
+/* =====================================================================
+   Start
+   ===================================================================== */
+sb.auth.onAuthStateChange((event, session) => {
+  const u = session ? session.user : null;
+  if (event === "TOKEN_REFRESHED") { S.user = u; return; }
+  if (u && S.user && u.id === S.user.id && S.me) return;   // same person, already loaded
+  S.user = u; S.me = null;
+  // Run outside the auth callback: supabase-js can deadlock if queries start inside it.
+  setTimeout(() => { if (u) afterLogin(); else showLogin(); }, 0);
+});
+}
+</script>
+</body>
+</html>

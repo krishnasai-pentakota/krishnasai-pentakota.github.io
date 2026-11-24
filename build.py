@@ -6,11 +6,13 @@
 
 Pipeline:  content/*.yaml -> load + validate (Pydantic) -> render (Jinja) -> dist/
            styles/site.css -> Tailwind (standalone binary, no Node) -> dist/static/css/site.css
+           apps/<name>/    -> copied as-is -> dist/<name>/ (standalone client apps)
 """
 
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 from time import perf_counter
@@ -47,6 +49,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     written = render_site(site, ROOT / "templates", ROOT / "static", ROOT / "styles" / "site.css", args.out)
+    # Standalone client apps (apps/<name>/) are copied to the site root as they are:
+    # no templates, no Tailwind. apps/aditya/ is served at /aditya/.
+    apps = ROOT / "apps"
+    if apps.is_dir():
+        shutil.copytree(apps, args.out, dirs_exist_ok=True)
+        written += sorted(p for p in apps.rglob("*") if p.is_file())
     ms = (perf_counter() - started) * 1000
     print(f"[ok] Built {len(written)} files into {args.out} in {ms:.0f} ms")
     print(f"     Open {args.out / 'index.html'} in your browser.")

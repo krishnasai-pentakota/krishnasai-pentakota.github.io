@@ -49,8 +49,10 @@ def parse(html: str) -> LinkCollector:
 
 
 def all_pages(built: Path) -> list[Path]:
-    """Every page we generate. The Studio demos are files we copy in as they are."""
-    return sorted(p for p in built.rglob("*.html") if "demos" not in p.parts)
+    """Every page we generate. The Studio demos and the standalone client apps
+    (apps/<name>/) are files we copy in as they are, so they are left out."""
+    return sorted(p for p in built.rglob("*.html")
+                  if "demos" not in p.parts and not (ROOT / "apps" / p.relative_to(built)).exists())
 
 
 def read(built: Path, rel: str) -> str:
