@@ -26,10 +26,13 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} };
   const diff = (o, n, skip) => { const d = {}; for (const k in n) if (!skip.includes(k) && JSON.stringify(o[k]) !== JSON.stringify(n[k])) d[k] = [o[k], n[k]]; return d; };
   const strip = (r, skip) => { const c = {...r}; skip.forEach(k => delete c[k]); return c; };
-  const log = (trip_id, table_name, record_id, action, changes) => st.DB.change_log.push({id:++st.seq.change_log, trip_id, table_name, record_id, action, changes, changed_by:uid(), changed_at:now()});
+  const statusOf = (trip_id, changes) => { const tr = st.DB.trips.find(x => x.id === trip_id); return tr ? tr.status : (changes && typeof changes.status === "string" ? changes.status : null); };
+  const log = (trip_id, table_name, record_id, action, changes) => st.DB.change_log.push({id:++st.seq.change_log, trip_id, table_name, record_id, action, changes, changed_by:uid(), changed_at:now(), trip_status:statusOf(trip_id, changes)});
   const touch = t => { const DB = st.DB; if (!DB.trips.some(x => x.id === t)) return; const r = DB.trip_reviews.find(x => x.trip_id === t && x.user_id === uid()); const ts = now(); if (r) r.reviewed_at = ts; else DB.trip_reviews.push({trip_id:t, user_id:uid(), reviewed_at:ts}); };
   const bump = t => { const tr = st.DB.trips.find(x => x.id === t); if (tr) { tr.last_change_at = now(); tr.last_change_by = uid(); } touch(t); };
 
+  const seesPrices = () => { const m = st.DB.profiles.find(p => p.id === uid()); return !!(m && m.active && (m.role === "owner" || m.role === "accountant")); };
+  const eff = t => { const pr = seesPrices() ? (st.DB.trip_prices || []).find(x => x.trip_id === t.id) : null; return pr && pr.updated_at > t.last_change_at ? {at: pr.updated_at, by: pr.updated_by} : {at: t.last_change_at, by: t.last_change_by}; };
   function vtrips(){
     const DB = st.DB;
     return DB.trips.map(t => {
@@ -38,7 +41,7 @@
       const r = DB.trip_reviews.find(x => x.trip_id === t.id && x.user_id === uid());
       return {...t, sawmill_name:s?.name ?? null, sawmill_place:s?.place ?? null, party_name:p?.name ?? null, party_city:p?.city ?? null,
         charges_total:ch, total_cost:Number(t.freight_amount || 0) + ch, my_reviewed_at:r ? r.reviewed_at : null,
-        my_flag: !r ? "new" : (t.last_change_at > r.reviewed_at ? "edited" : "ok"),
+        my_flag: !r ? "new" : (eff(t).at > r.reviewed_at ? "edited" : "ok"), my_change_at: eff(t).at, my_change_by: eff(t).by,
         change_count: DB.change_log.filter(l => l.trip_id === t.id && !(l.table_name === "trips" && l.action === "insert")).length};
     });
   }
@@ -67,10 +70,17 @@
     // Owner's answer E5: the accountant may not change costs (same rule as the real database).
     if (me && me.role === "accountant" && this.op !== "select" && (t === "trip_charges" || (t === "trips" && this.op === "update" && this.val && "freight_amount" in this.val)))
       return {data:null, error:{message:"The accountant cannot change costs."}};
-    // Purchase/sale prices: owner only (same as the real database)
+    // Purchase/sale prices: owner and accountant read, owner writes (same as the real database)
+    if (t === "price_log" && !(me && (me.role === "owner" || me.role === "accountant"))) return {data: this.one ? null : [], error: null};
     if (t === "trip_prices") {
-      if (!(me && me.role === "owner")) return {data: this.op === "select" ? (this.one ? null : []) : null, error: this.op === "select" ? null : {message:"row-level security"}};
-      if (this.op === "upsert") { const ex = DB.trip_prices.find(x => x.trip_id === this.val.trip_id); if (ex) Object.assign(ex, this.val); else DB.trip_prices.push({...this.val}); return {data:null, error:null}; }
+      if (!(me && (me.role === "owner" || (me.role === "accountant" && this.op === "select")))) return {data: this.op === "select" ? (this.one ? null : []) : null, error: this.op === "select" ? null : {message:"row-level security"}};
+      if (this.op === "upsert") {
+        const ex = DB.trip_prices.find(x => x.trip_id === this.val.trip_id), before = ex ? {...ex} : {}, ts = now();
+        const row = ex || {}; Object.assign(row, this.val, {updated_at: ts, updated_by: uid()}); if (!ex) DB.trip_prices.push(row);
+        const d = {}; for (const k in this.val) if (k !== "trip_id" && JSON.stringify(before[k] ?? null) !== JSON.stringify(this.val[k] ?? null)) d[k] = [before[k] ?? null, this.val[k]];
+        if (Object.keys(d).length) { DB.price_log.push({id: DB.price_log.length + 1, trip_id: row.trip_id, action: ex ? "update" : "insert", changes: d, changed_by: uid(), changed_at: ts, trip_status: statusOf(row.trip_id)}); touch(row.trip_id); }
+        return {data:null, error:null};
+      }
     }
     if (this.op === "select") {
       let rows = t === "v_trips" ? vtrips() : DB[t].slice();
@@ -129,7 +139,7 @@
           {id:"d-acc", email:"accountant@demo", full_name:"Accountant (sample)", role:"accountant", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-staff", email:"staff@demo", full_name:"Field staff (sample)", role:"staff", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-new", email:"new.person@demo", full_name:"", role:"staff", active:false, created_at:new Date(Date.now() - 864e5).toISOString()}],
-        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[], trip_prices:[]}};
+        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[], trip_prices:[], price_log:[]}};
     seeding = true;
     const q = t => new Q(t);
     as("owner@demo"); at(3.2);
@@ -149,13 +159,15 @@
     const t3 = trip({trip_date:istDate(1), vehicle_no:"AP31TC3003", lorry_capacity_t:35, driver_name:"Naresh (sample)", driver_phone:"90000 00003", transporter:null, sawmill_id:s1.id, wood_type:"Mango", quantity_cft:1205, net_weight_t:34.9, freight_amount:52500, party_id:p1.id, destination:null, status:"on_the_way", notes:"Tally paper photo sent on WhatsApp"});
     cost(t3.id, "Hamali / loading", 3500);
     // accountant checks the first three lorries in the evening
+    as("owner@demo"); at(1.0);
+    run(q("trip_prices").upsert({trip_id:t1.id, purchase_rate:610, purchase_basis:"per CFT", purchase_amount:719800, purchase_note:"Sample: small difference 2,000 agreed", sale_rate:null, sale_basis:null, sale_amount:812000, sale_note:null}));
+    run(q("trips").update({invoice_no:"AT/25-26/339", eway_bill_no:"3712 4567 8901".replace(/ /g, "")}).eq("id", t1.id));
     as("accountant@demo"); at(0.9); markChecked([t1.id, t2.id, t3.id]);
     // next morning the owner corrects freight and adds a toll -> red flag for the accountant
     as("owner@demo"); at(0.45);
     run(q("trips").update({freight_amount:48500}).eq("id", t2.id));
     cost(t2.id, "Toll", 850);
     markChecked([t1.id, t2.id]);
-    st.DB.trip_prices.push({trip_id:t1.id, purchase_rate:610, purchase_basis:"per CFT", purchase_amount:719800, purchase_note:"Sample: small difference 2,000 agreed", sale_rate:null, sale_basis:null, sale_amount:812000, sale_note:null});
     at(0.1);
     trip({trip_date:istDate(0), vehicle_no:"AP05TD4004", lorry_capacity_t:35, driver_name:null, driver_phone:"90000 00004", transporter:null, sawmill_id:s3.id, wood_type:"Acacia", quantity_cft:null, net_weight_t:null, freight_amount:51000, party_id:p2.id, destination:null, status:"order_taken", notes:"Loading today"});
     seeding = false; session = null;
@@ -166,6 +178,7 @@
   if (!st || !st.DB) seed();
   if (!st.DB.trip_files) { st.DB.trip_files = []; st.seq.trip_files = 0; }
   if (!st.DB.trip_prices) st.DB.trip_prices = [];
+  if (!st.DB.price_log) st.DB.price_log = [];
 
   const FKEY = "aditya_demo_files_v1";
   const fget = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "{}"); } catch(e) { return {}; } };

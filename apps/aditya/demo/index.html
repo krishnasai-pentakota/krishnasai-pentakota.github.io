@@ -160,10 +160,13 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} };
   const diff = (o, n, skip) => { const d = {}; for (const k in n) if (!skip.includes(k) && JSON.stringify(o[k]) !== JSON.stringify(n[k])) d[k] = [o[k], n[k]]; return d; };
   const strip = (r, skip) => { const c = {...r}; skip.forEach(k => delete c[k]); return c; };
-  const log = (trip_id, table_name, record_id, action, changes) => st.DB.change_log.push({id:++st.seq.change_log, trip_id, table_name, record_id, action, changes, changed_by:uid(), changed_at:now()});
+  const statusOf = (trip_id, changes) => { const tr = st.DB.trips.find(x => x.id === trip_id); return tr ? tr.status : (changes && typeof changes.status === "string" ? changes.status : null); };
+  const log = (trip_id, table_name, record_id, action, changes) => st.DB.change_log.push({id:++st.seq.change_log, trip_id, table_name, record_id, action, changes, changed_by:uid(), changed_at:now(), trip_status:statusOf(trip_id, changes)});
   const touch = t => { const DB = st.DB; if (!DB.trips.some(x => x.id === t)) return; const r = DB.trip_reviews.find(x => x.trip_id === t && x.user_id === uid()); const ts = now(); if (r) r.reviewed_at = ts; else DB.trip_reviews.push({trip_id:t, user_id:uid(), reviewed_at:ts}); };
   const bump = t => { const tr = st.DB.trips.find(x => x.id === t); if (tr) { tr.last_change_at = now(); tr.last_change_by = uid(); } touch(t); };
 
+  const seesPrices = () => { const m = st.DB.profiles.find(p => p.id === uid()); return !!(m && m.active && (m.role === "owner" || m.role === "accountant")); };
+  const eff = t => { const pr = seesPrices() ? (st.DB.trip_prices || []).find(x => x.trip_id === t.id) : null; return pr && pr.updated_at > t.last_change_at ? {at: pr.updated_at, by: pr.updated_by} : {at: t.last_change_at, by: t.last_change_by}; };
   function vtrips(){
     const DB = st.DB;
     return DB.trips.map(t => {
@@ -172,7 +175,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
       const r = DB.trip_reviews.find(x => x.trip_id === t.id && x.user_id === uid());
       return {...t, sawmill_name:s?.name ?? null, sawmill_place:s?.place ?? null, party_name:p?.name ?? null, party_city:p?.city ?? null,
         charges_total:ch, total_cost:Number(t.freight_amount || 0) + ch, my_reviewed_at:r ? r.reviewed_at : null,
-        my_flag: !r ? "new" : (t.last_change_at > r.reviewed_at ? "edited" : "ok"),
+        my_flag: !r ? "new" : (eff(t).at > r.reviewed_at ? "edited" : "ok"), my_change_at: eff(t).at, my_change_by: eff(t).by,
         change_count: DB.change_log.filter(l => l.trip_id === t.id && !(l.table_name === "trips" && l.action === "insert")).length};
     });
   }
@@ -201,10 +204,17 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
     // Owner's answer E5: the accountant may not change costs (same rule as the real database).
     if (me && me.role === "accountant" && this.op !== "select" && (t === "trip_charges" || (t === "trips" && this.op === "update" && this.val && "freight_amount" in this.val)))
       return {data:null, error:{message:"The accountant cannot change costs."}};
-    // Purchase/sale prices: owner only (same as the real database)
+    // Purchase/sale prices: owner and accountant read, owner writes (same as the real database)
+    if (t === "price_log" && !(me && (me.role === "owner" || me.role === "accountant"))) return {data: this.one ? null : [], error: null};
     if (t === "trip_prices") {
-      if (!(me && me.role === "owner")) return {data: this.op === "select" ? (this.one ? null : []) : null, error: this.op === "select" ? null : {message:"row-level security"}};
-      if (this.op === "upsert") { const ex = DB.trip_prices.find(x => x.trip_id === this.val.trip_id); if (ex) Object.assign(ex, this.val); else DB.trip_prices.push({...this.val}); return {data:null, error:null}; }
+      if (!(me && (me.role === "owner" || (me.role === "accountant" && this.op === "select")))) return {data: this.op === "select" ? (this.one ? null : []) : null, error: this.op === "select" ? null : {message:"row-level security"}};
+      if (this.op === "upsert") {
+        const ex = DB.trip_prices.find(x => x.trip_id === this.val.trip_id), before = ex ? {...ex} : {}, ts = now();
+        const row = ex || {}; Object.assign(row, this.val, {updated_at: ts, updated_by: uid()}); if (!ex) DB.trip_prices.push(row);
+        const d = {}; for (const k in this.val) if (k !== "trip_id" && JSON.stringify(before[k] ?? null) !== JSON.stringify(this.val[k] ?? null)) d[k] = [before[k] ?? null, this.val[k]];
+        if (Object.keys(d).length) { DB.price_log.push({id: DB.price_log.length + 1, trip_id: row.trip_id, action: ex ? "update" : "insert", changes: d, changed_by: uid(), changed_at: ts, trip_status: statusOf(row.trip_id)}); touch(row.trip_id); }
+        return {data:null, error:null};
+      }
     }
     if (this.op === "select") {
       let rows = t === "v_trips" ? vtrips() : DB[t].slice();
@@ -263,7 +273,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
           {id:"d-acc", email:"accountant@demo", full_name:"Accountant (sample)", role:"accountant", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-staff", email:"staff@demo", full_name:"Field staff (sample)", role:"staff", active:true, created_at:new Date(Date.now() - 5 * 864e5).toISOString()},
           {id:"d-new", email:"new.person@demo", full_name:"", role:"staff", active:false, created_at:new Date(Date.now() - 864e5).toISOString()}],
-        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[], trip_prices:[]}};
+        sawmills:[], parties:[], trips:[], trip_charges:[], change_log:[], trip_reviews:[], trip_files:[], trip_prices:[], price_log:[]}};
     seeding = true;
     const q = t => new Q(t);
     as("owner@demo"); at(3.2);
@@ -283,13 +293,15 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
     const t3 = trip({trip_date:istDate(1), vehicle_no:"AP31TC3003", lorry_capacity_t:35, driver_name:"Naresh (sample)", driver_phone:"90000 00003", transporter:null, sawmill_id:s1.id, wood_type:"Mango", quantity_cft:1205, net_weight_t:34.9, freight_amount:52500, party_id:p1.id, destination:null, status:"on_the_way", notes:"Tally paper photo sent on WhatsApp"});
     cost(t3.id, "Hamali / loading", 3500);
     // accountant checks the first three lorries in the evening
+    as("owner@demo"); at(1.0);
+    run(q("trip_prices").upsert({trip_id:t1.id, purchase_rate:610, purchase_basis:"per CFT", purchase_amount:719800, purchase_note:"Sample: small difference 2,000 agreed", sale_rate:null, sale_basis:null, sale_amount:812000, sale_note:null}));
+    run(q("trips").update({invoice_no:"AT/25-26/339", eway_bill_no:"3712 4567 8901".replace(/ /g, "")}).eq("id", t1.id));
     as("accountant@demo"); at(0.9); markChecked([t1.id, t2.id, t3.id]);
     // next morning the owner corrects freight and adds a toll -> red flag for the accountant
     as("owner@demo"); at(0.45);
     run(q("trips").update({freight_amount:48500}).eq("id", t2.id));
     cost(t2.id, "Toll", 850);
     markChecked([t1.id, t2.id]);
-    st.DB.trip_prices.push({trip_id:t1.id, purchase_rate:610, purchase_basis:"per CFT", purchase_amount:719800, purchase_note:"Sample: small difference 2,000 agreed", sale_rate:null, sale_basis:null, sale_amount:812000, sale_note:null});
     at(0.1);
     trip({trip_date:istDate(0), vehicle_no:"AP05TD4004", lorry_capacity_t:35, driver_name:null, driver_phone:"90000 00004", transporter:null, sawmill_id:s3.id, wood_type:"Acacia", quantity_cft:null, net_weight_t:null, freight_amount:51000, party_id:p2.id, destination:null, status:"order_taken", notes:"Loading today"});
     seeding = false; session = null;
@@ -300,6 +312,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
   if (!st || !st.DB) seed();
   if (!st.DB.trip_files) { st.DB.trip_files = []; st.seq.trip_files = 0; }
   if (!st.DB.trip_prices) st.DB.trip_prices = [];
+  if (!st.DB.price_log) st.DB.price_log = [];
 
   const FKEY = "aditya_demo_files_v1";
   const fget = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "{}"); } catch(e) { return {}; } };
@@ -336,7 +349,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
    ===================================================================== */
 const SUPABASE_URL = "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "1.3 DEMO (sample data)";
+const APP_VERSION = "1.4 DEMO (sample data)";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 
 /* Status names are the three stages the owner named on the 24 Nov call. */
@@ -349,8 +362,10 @@ const BUCKET = "lorry-files";
 /* Owner's voice note (25 Nov): the purchase rate is seen by the owner only. The database hides it from everyone else. */
 const BASES = ["per CFT","per ton","per lorry"];
 const isOwner = () => !!S.me && S.me.role === "owner";
+/* 25 Nov: the accountant also sees prices (read only). The database enforces both rules. */
+const canSeePrices = () => !!S.me && (S.me.role === "owner" || S.me.role === "accountant");
 /* Friendly names for the history screen and the Excel "History" sheet. */
-const FIELD = {trip_date:"Date",vehicle_no:"Vehicle no",lorry_capacity_t:"Lorry (tons)",driver_name:"Driver name",driver_phone:"Driver phone",transporter:"Transporter / broker",sawmill_id:"Sawmill",wood_type:"Wood",quantity_cft:"Quantity (CFT)",net_weight_t:"Net weight (tons)",freight_amount:"Lorry hire (₹)",party_id:"Party",destination:"Destination",status:"Status",notes:"Notes",charge_type:"Cost type",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note"};
+const FIELD = {invoice_no:"Invoice no",eway_bill_no:"E-way bill no",purchase_rate:"Purchase rate (₹)",purchase_basis:"Purchase rate is",purchase_amount:"Purchase amount (₹)",purchase_note:"Purchase note",sale_rate:"Sale rate (₹)",sale_basis:"Sale rate is",sale_amount:"Sale amount (₹)",sale_note:"Sale note",trip_date:"Date",vehicle_no:"Vehicle no",lorry_capacity_t:"Lorry (tons)",driver_name:"Driver name",driver_phone:"Driver phone",transporter:"Transporter / broker",sawmill_id:"Sawmill",wood_type:"Wood",quantity_cft:"Quantity (CFT)",net_weight_t:"Net weight (tons)",freight_amount:"Lorry hire (₹)",party_id:"Party",destination:"Destination",status:"Status",notes:"Notes",charge_type:"Cost type",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note"};
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true}});
 
@@ -364,6 +379,9 @@ const num = v => (v === null || v === undefined || v === "") ? null : Number(v);
 const inr = v => v === null || v === undefined || v === "" ? "—" : "₹" + Number(v).toLocaleString("en-IN", {maximumFractionDigits:2});
 const qty = (v, unit) => v === null || v === undefined || v === "" ? null : Number(v).toLocaleString("en-IN", {maximumFractionDigits:3}) + " " + unit;
 const dShort = d => d ? new Date(d + (d.length === 10 ? "T00:00:00+05:30" : "")).toLocaleDateString("en-IN", {day:"numeric", month:"short", year:"numeric", timeZone:"Asia/Kolkata"}) : "—";
+/* Owner's rule (25 Nov): every change shows its exact time. */
+const dExact = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", month:"short", year:"numeric", hour:"numeric", minute:"2-digit", second:"2-digit", timeZone:"Asia/Kolkata"}) : "—";
+const stPill = st => st ? `<span class="st st-${esc(st)}" style="margin-left:0">${esc(STATUS[st] || st)}</span>` : "";
 const dTime = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", month:"short", hour:"numeric", minute:"2-digit", timeZone:"Asia/Kolkata"}) : "—";
 const dFull = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", month:"short", year:"numeric", hour:"numeric", minute:"2-digit", timeZone:"Asia/Kolkata"}) : "";
 const todayIST = () => new Date().toLocaleDateString("en-CA", {timeZone:"Asia/Kolkata"});
@@ -514,7 +532,7 @@ function renderList(){
   const qq = S.q.trim().toLowerCase();
   let rows = S.trips.filter(t =>
     S.filter === "all" ? true : S.filter === "check" ? t.my_flag !== "ok" : t.status === S.filter);
-  if (qq) rows = rows.filter(t => [t.vehicle_no, t.sawmill_name, t.sawmill_place, t.party_name, t.party_city, t.driver_name, t.driver_phone, t.transporter, t.destination].join(" ").toLowerCase().includes(qq));
+  if (qq) rows = rows.filter(t => [t.vehicle_no, t.sawmill_name, t.sawmill_place, t.party_name, t.party_city, t.driver_name, t.driver_phone, t.transporter, t.destination, t.invoice_no, t.eway_bill_no].join(" ").toLowerCase().includes(qq));
 
   const chip = (k, label) => `<button class="chip" data-f="${k}" aria-pressed="${S.filter === k}">${label}${k === "check" && counts.check ? `<span class="n">${counts.check}</span>` : ` <span class="mut">${counts[k] ?? ""}</span>`}</button>`;
 
@@ -537,6 +555,8 @@ function renderList(){
         <div class="l1"><span class="veh">${esc(t.vehicle_no)}</span>${t.lorry_capacity_t ? `<span class="mut small">${t.lorry_capacity_t}T</span>` : ""}${flag}<span class="st st-${t.status}">${STATUS[t.status]}</span></div>
         <div class="l2">${esc(t.sawmill_name || "Sawmill not set")} → ${esc(t.party_name || "Party not set")}${t.party_city ? ", " + esc(t.party_city) : ""}</div>
         <div class="l3">${t.wood_type ? `<span>${esc(t.wood_type)}</span>` : ""}${q1 ? `<span>${esc(q1)}</span>` : ""}<span class="money">${inr(t.total_cost)}</span></div>
+        ${t.my_flag === "edited" ? `<div class="small" style="margin-top:6px;color:var(--red)">Changed ${esc(dExact(t.my_change_at || t.last_change_at))} · ${esc(personName(t.my_change_by || t.last_change_by))}</div>`
+          : t.my_flag === "new" ? `<div class="small mut" style="margin-top:6px">Added ${esc(dExact(t.created_at))} · ${esc(personName(t.created_by))}</div>` : ""}
       </button>`;
     }
   }
@@ -562,7 +582,7 @@ function renderList(){
 async function renderTrip(id){
   chrome("Lorry", {back:true});
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
-  let t, costs, log, files, price = null;
+  let t, costs, log, files, price = null, plog = [];
   try {
     [t, costs, log, files] = await Promise.all([
       q(sb.from("v_trips").select("*").eq("id", id).maybeSingle()),
@@ -570,7 +590,10 @@ async function renderTrip(id){
       q(sb.from("change_log").select("*").eq("trip_id", id).order("changed_at", {ascending:false}).limit(200)),
       q(sb.from("trip_files").select("*").eq("trip_id", id).order("id"))
     ]);
-    if (isOwner()) price = await q(sb.from("trip_prices").select("*").eq("trip_id", id).maybeSingle());
+    if (canSeePrices()) [price, plog] = await Promise.all([
+      q(sb.from("trip_prices").select("*").eq("trip_id", id).maybeSingle()),
+      q(sb.from("price_log").select("*").eq("trip_id", id).order("changed_at", {ascending:false}).limit(100))
+    ]);
   } catch(e) {
     t = S.trips.find(x => x.id === id); costs = null; log = []; files = null;
     if (!t) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
@@ -583,11 +606,12 @@ async function renderTrip(id){
   const since = t.my_reviewed_at;
   const fresh = since ? log.filter(l => l.changed_at > since && l.changed_by !== S.user.id) : [];
   const was = {};                       // field -> oldest "before" value
+  const wasAt = {};                     // field -> {at, by} of the latest change
   const costChg = new Set();            // charge ids changed/added
   const fileNew = new Set();            // file ids added since my check
   let costRemoved = 0, filesRemoved = 0;
   for (const l of fresh.slice().reverse()) {
-    if (l.table_name === "trips" && l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) { if (!(k in was)) was[k] = v[0]; }
+    if (l.table_name === "trips" && l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) { if (!(k in was)) was[k] = v[0]; wasAt[k] = {at: l.changed_at, by: l.changed_by}; }
     if (l.table_name === "trip_charges") { if (l.action === "delete") costRemoved++; else costChg.add(l.record_id); }
     if (l.table_name === "trip_files") { if (l.action === "delete") filesRemoved++; else fileNew.add(l.record_id); }
   }
@@ -601,11 +625,11 @@ async function renderTrip(id){
   };
   const row = (label, key, value) => {
     const c = key in was;
-    return `<dt>${label}</dt><dd class="${c ? "chg" : ""}">${esc(value ?? "—")}${c ? `<span class="was">was ${esc(show(key, was[key]))}</span>` : ""}</dd>`;
+    return `<dt>${label}</dt><dd class="${c ? "chg" : ""}">${esc(value ?? "—")}${c ? `<span class="was">was ${esc(show(key, was[key]))} · changed ${esc(dExact(wasAt[key].at))} by ${esc(personName(wasAt[key].by))}</span>` : ""}</dd>`;
   };
 
   let h = "";
-  if (t.my_flag === "edited") h += `<div class="alert red"><span class="grow"><b>Changed since you checked it</b> on ${esc(dTime(since))}. Changes are shown in red.${costRemoved ? ` ${costRemoved} cost${costRemoved > 1 ? "s" : ""} removed.` : ""}${filesRemoved ? ` ${filesRemoved} file${filesRemoved > 1 ? "s" : ""} removed.` : ""}</span><button class="btn small" id="chk">Mark as checked</button></div>`;
+  if (t.my_flag === "edited") h += `<div class="alert red"><span class="grow"><b>Changed since you checked it</b> (${esc(dExact(since))}).<br>Last change: <b>${esc(dExact(t.my_change_at || t.last_change_at))}</b> by ${esc(personName(t.my_change_by || t.last_change_by))}. Status now: ${esc(STATUS[t.status])}. Changes are shown in red.${costRemoved ? ` ${costRemoved} cost${costRemoved > 1 ? "s" : ""} removed.` : ""}${filesRemoved ? ` ${filesRemoved} file${filesRemoved > 1 ? "s" : ""} removed.` : ""}</span><button class="btn small" id="chk">Mark as checked</button></div>`;
   if (t.my_flag === "new") h += `<div class="alert info"><span class="grow">You have not checked this lorry yet.</span><button class="btn small" id="chk">Mark as checked</button></div>`;
 
   h += `<div class="card"><div class="row" style="margin-bottom:10px"><span class="veh grow">${esc(t.vehicle_no)}</span><span class="st st-${t.status}">${STATUS[t.status]}</span></div>
@@ -622,22 +646,26 @@ async function renderTrip(id){
     ${row("Driver","driver_name",t.driver_name)}
     ${row("Driver phone","driver_phone",t.driver_phone)}
     ${row("Transporter","transporter",t.transporter)}
+    ${row("Invoice no","invoice_no",t.invoice_no)}
+    ${row("E-way bill no","eway_bill_no",t.eway_bill_no)}
     ${row("Notes","notes",t.notes)}
   </dl>
   ${t.driver_phone ? `<div class="row" style="margin-top:12px"><a class="btn small" href="tel:${esc(String(t.driver_phone).replace(/[^\d+]/g,""))}">Call driver</a></div>` : ""}
   </div>`;
 
-  // Purchase and sale price: owner only
-  if (isOwner()) {
+  // Purchase and sale price: owner and accountant see it; only the owner changes it
+  if (canSeePrices()) {
     const pr = price || {};
+    const pfresh = since ? plog.filter(l => l.changed_at > since && l.changed_by !== S.user.id) : [];
     const line = (rate, basis, amt) => [rate != null ? inr(rate) + (basis ? " " + basis : "") : "", amt != null ? "Amount " + inr(amt) : ""].filter(Boolean).join(" · ") || "—";
-    h += `<div class="card" style="border-color:var(--mango)"><div class="row"><h3 class="grow" style="margin:0">Purchase and sale price</h3><span class="badge" style="background:#fff6dc;color:#7a5200">Only you see this</span></div>
+    h += `<div class="card" style="border:${pfresh.length ? "2px solid var(--red)" : "1px solid var(--mango)"}"><div class="row"><h3 class="grow" style="margin:0">Purchase and sale price</h3><span class="badge" style="background:#fff6dc;color:#7a5200">Owner and accountant only</span></div>
+      ${pfresh.length ? `<div class="small" style="margin-top:8px;color:var(--red)"><b>Price changed since you checked:</b>${pfresh.map(l => `<br>${esc(dExact(l.changed_at))} · ${esc(personName(l.changed_by))} · ${Object.entries(l.changes || {}).map(([k, v]) => `${esc(FIELD[k] || k)}: ${esc(fmtPrice(k, v[0]))} → <b>${esc(fmtPrice(k, v[1]))}</b>`).join(", ")}`).join("")}</div>` : ""}
       <dl class="kv" style="margin-top:10px">
         <dt>Purchase</dt><dd>${esc(line(pr.purchase_rate, pr.purchase_basis, pr.purchase_amount))}${pr.purchase_note ? `<span class="small mut" style="display:block;font-weight:400">${esc(pr.purchase_note)}</span>` : ""}</dd>
         <dt>Sale</dt><dd>${esc(line(pr.sale_rate, pr.sale_basis, pr.sale_amount))}${pr.sale_note ? `<span class="small mut" style="display:block;font-weight:400">${esc(pr.sale_note)}</span>` : ""}</dd>
       </dl>
-      <button class="btn small" style="margin-top:10px" id="editPrice">${price ? "Edit prices" : "+ Add prices"}</button>
-      <div id="priceForm"></div></div>`;
+      ${pr.updated_at ? `<p class="small mut" style="margin:8px 0 0">Last price change: ${esc(dExact(pr.updated_at))} · ${esc(personName(pr.updated_by))}</p>` : ""}
+      ${isOwner() ? `<button class="btn small" style="margin-top:10px" id="editPrice">${price ? "Edit prices" : "+ Add prices"}</button><div id="priceForm"></div>` : ""}</div>`;
   }
 
   // Costs
@@ -674,7 +702,8 @@ async function renderTrip(id){
   h += `<div class="row" style="margin-bottom:10px"><a class="btn pri grow" href="#/edit/${t.id}">Edit lorry</a><a class="btn wa grow" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(waText(t, costs))}">Share on WhatsApp</a></div>`;
 
   // History
-  h += `<div class="card"><h3>History</h3>${log.length ? log.map(l => histItem(l, since)).join("") : `<p class="mut small">No history${costs === null ? " (needs signal)" : ""}.</p>`}</div>`;
+  const allLog = log.concat(plog.map(l => ({...l, table_name: "trip_prices"}))).sort((x, y) => x.changed_at < y.changed_at ? 1 : -1);
+  h += `<div class="card"><h3>History</h3><p class="small mut" style="margin-top:-4px">Every change with its exact time, who made it, and the lorry's status at that moment.</p>${allLog.length ? allLog.map(l => histItem(l, since)).join("") : `<p class="mut small">No history${costs === null ? " (needs signal)" : ""}.</p>`}</div>`;
   if (S.me.role === "owner") h += `<button class="btn red" style="width:100%" id="delTrip">Delete this lorry</button>`;
   $("app").innerHTML = h;
 
@@ -742,6 +771,10 @@ async function uploadFile(tripId, original, kind){
   catch(e) { await sb.storage.from(BUCKET).remove([path]); throw e; }
 }
 
+function fmtPrice(k, v){
+  if (v === null || v === undefined || v === "") return "—";
+  return /_rate$|_amount$/.test(k) ? inr(v) : String(v);
+}
 function histItem(l, since){
   const who = personName(l.changed_by);
   const isNew = since && l.changed_at > since && l.changed_by !== S.user.id;
@@ -752,6 +785,8 @@ function histItem(l, since){
     if (l.action === "insert") what = "Added this lorry";
     else if (l.action === "delete") what = "Deleted this lorry";
     else what = Object.entries(ch).map(([k, v]) => `${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("<br>");
+  } else if (l.table_name === "trip_prices") {
+    what = (l.action === "insert" ? "Price added: " : l.action === "delete" ? "Price removed: " : "Price changed: ") + Object.entries(ch).map(([k, v]) => Array.isArray(v) ? `${esc(FIELD[k] || k)} ${esc(fmtPrice(k, v[0]))} → <b>${esc(fmtPrice(k, v[1]))}</b>` : `${esc(FIELD[k] || k)} ${esc(fmtPrice(k, v))}`).join(", ");
   } else if (l.table_name === "trip_files") {
     what = (l.action === "insert" ? "Added photo/file: " : "Removed photo/file: ") + `<b>${esc(ch.kind)}</b>`;
   } else {
@@ -759,7 +794,7 @@ function histItem(l, since){
     else if (l.action === "delete") what = `Removed cost: ${esc(ch.charge_type)} ${esc(inr(ch.amount))}`;
     else what = "Changed a cost: " + Object.entries(ch).map(([k, v]) => `${esc(FIELD[k] || k)} ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join(", ");
   }
-  return `<div class="hist ${isNew ? "new" : ""}"><div class="when">${esc(dTime(l.changed_at))} · ${esc(who)}</div><div>${what}</div></div>`;
+  return `<div class="hist ${isNew ? "new" : ""}"><div class="when"><b>${esc(dExact(l.changed_at))}</b> · ${esc(who)} ${l.trip_status ? "· status " + stPill(l.trip_status) : ""}</div><div>${what}</div></div>`;
 }
 
 /* Add / edit one cost line, inside the lorry screen. */
@@ -835,6 +870,8 @@ function waText(t, costs){
   const load = [t.wood_type, qty(t.quantity_cft, "CFT"), qty(t.net_weight_t, "T")].filter(Boolean).join(" · ");
   if (load) L.push(`Load: ${load}`);
   if (t.driver_name || t.driver_phone) L.push(`Driver: ${[t.driver_name, t.driver_phone].filter(Boolean).join(", ")}`);
+  if (t.invoice_no) L.push(`Invoice: ${t.invoice_no}`);
+  if (t.eway_bill_no) L.push(`E-way bill: ${t.eway_bill_no}`);
   L.push("", `Lorry hire: ${inr(t.freight_amount)}`);
   if (costs && costs.length) for (const c of costs) L.push(`${c.charge_type}: ${inr(c.amount)}`);
   L.push(`*Total: ${inr(t.total_cost)}*`);
@@ -888,6 +925,10 @@ async function renderForm(id){
     <label class="f"><span>Party (buyer)</span><select class="in" id="selParty">${opt(S.parties, t.party_id, p => p.name + (p.city ? ", " + p.city : ""))}</select></label>
     <div id="newParty" class="addbox hidden"><div class="two"><label class="f"><span>Party name</span><input class="in" id="npName"></label><label class="f"><span>City</span><input class="in" id="npCity"></label></div><button type="button" class="btn small" id="npAdd">Add party</button></div>
     <label class="f"><span>Destination (if different)</span><input class="in" name="destination" value="${esc(t.destination || "")}"></label>
+    <div class="two">
+      <label class="f"><span>Invoice no</span><input class="in" name="invoice_no" autocomplete="off" value="${esc(t.invoice_no || "")}"></label>
+      <label class="f"><span>E-way bill no</span><input class="in" name="eway_bill_no" inputmode="numeric" autocomplete="off" value="${esc(t.eway_bill_no || "")}"></label>
+    </div>
     <label class="f"><span>Status</span>${seg("status", Object.entries(STATUS), t.status || "order_taken")}</label>
     <label class="f"><span>Notes</span><textarea class="in" name="notes">${esc(t.notes || "")}</textarea></label>
   </div>
@@ -924,6 +965,8 @@ async function renderForm(id){
       net_weight_t: num(f.net_weight_t),
       party_id: $("selParty").value && $("selParty").value !== "__new" ? Number($("selParty").value) : null,
       destination: (f.destination || "").trim() || null,
+      invoice_no: (f.invoice_no || "").trim() || null,
+      eway_bill_no: (f.eway_bill_no || "").replace(/\s+/g, "") || null,
       status: segVal.status || "order_taken",
       notes: (f.notes || "").trim() || null
     };
@@ -979,7 +1022,7 @@ function renderExport(){
   const d = new Date(), y = d.toLocaleDateString("en-CA", {timeZone:"Asia/Kolkata"}).slice(0, 7);
   $("app").innerHTML = `<div class="card">
     <h2>Download for the accountant</h2>
-    <p class="mut">One Excel file with three sheets: <b>Lorries</b> (one row per lorry with totals), <b>Costs</b> (every cost line) and <b>Changes</b> (every edit, who and when).${isOwner() ? " As owner you also get a <b>Prices</b> sheet." : ""}</p>
+    <p class="mut">One Excel file with three sheets: <b>Lorries</b> (one row per lorry with totals), <b>Costs</b> (every cost line) and <b>Changes</b> (every edit, who and when).${canSeePrices() ? " You also get a <b>Prices</b> sheet." : ""}</p>
     <div class="two"><label class="f"><span>From</span><input class="in" type="date" id="xFrom" value="${y}-01"></label><label class="f"><span>To</span><input class="in" type="date" id="xTo" value="${todayIST()}"></label></div>
     <button class="btn pri" style="width:100%" id="xGo">Download Excel</button>
     <p class="small mut" id="xMsg"></p>
@@ -998,27 +1041,36 @@ function renderExport(){
         costs = costs.concat(await q(sb.from("trip_charges").select("*").in("trip_id", part).order("id")));
         logs = logs.concat(await q(sb.from("change_log").select("*").in("trip_id", part).order("changed_at")));
       }
-      let prices = [];
-      if (isOwner()) for (let i = 0; i < ids.length; i += 150) prices = prices.concat(await q(sb.from("trip_prices").select("*").in("trip_id", ids.slice(i, i + 150))));
+      let prices = [], plogs = [];
+      if (canSeePrices()) for (let i = 0; i < ids.length; i += 150) {
+        prices = prices.concat(await q(sb.from("trip_prices").select("*").in("trip_id", ids.slice(i, i + 150))));
+        plogs = plogs.concat(await q(sb.from("price_log").select("*").in("trip_id", ids.slice(i, i + 150)).order("changed_at")));
+      }
       const veh = Object.fromEntries(trips.map(t => [t.id, t]));
       const n = v => v === null || v === undefined ? null : Number(v);
-      const s1 = trips.map(t => ({"Date":t.trip_date, "Vehicle no":t.vehicle_no, "Lorry (T)":t.lorry_capacity_t, "Status":STATUS[t.status], "Sawmill":t.sawmill_name, "Sawmill place":t.sawmill_place, "Wood":t.wood_type, "Quantity (CFT)":n(t.quantity_cft), "Net weight (T)":n(t.net_weight_t), "Party":t.party_name, "Party city":t.party_city, "Destination":t.destination, "Driver":t.driver_name, "Driver phone":t.driver_phone, "Transporter":t.transporter, "Lorry hire (₹)":n(t.freight_amount), "Other costs (₹)":n(t.charges_total), "Total cost (₹)":n(t.total_cost), "Notes":t.notes, "Times edited":n(t.change_count), "Last change":dFull(t.last_change_at), "Last change by":personName(t.last_change_by), "Trip ID":t.id}));
+      const s1 = trips.map(t => ({"Date":t.trip_date, "Vehicle no":t.vehicle_no, "Lorry (T)":t.lorry_capacity_t, "Status":STATUS[t.status], "Sawmill":t.sawmill_name, "Sawmill place":t.sawmill_place, "Wood":t.wood_type, "Quantity (CFT)":n(t.quantity_cft), "Net weight (T)":n(t.net_weight_t), "Party":t.party_name, "Party city":t.party_city, "Destination":t.destination, "Invoice no":t.invoice_no, "E-way bill no":t.eway_bill_no, "Driver":t.driver_name, "Driver phone":t.driver_phone, "Transporter":t.transporter, "Lorry hire (₹)":n(t.freight_amount), "Other costs (₹)":n(t.charges_total), "Total cost (₹)":n(t.total_cost), "Notes":t.notes, "Times edited":n(t.change_count), "Last change (exact)":dExact(t.my_change_at || t.last_change_at), "Last change by":personName(t.my_change_by || t.last_change_by), "Trip ID":t.id}));
       const s2 = costs.map(c => ({"Lorry date":veh[c.trip_id]?.trip_date, "Vehicle no":veh[c.trip_id]?.vehicle_no, "Cost type":c.charge_type, "Amount (₹)":n(c.amount), "Paid to":c.paid_to, "Paid on":c.paid_on, "Note":c.note, "Added by":personName(c.created_by), "Added at":dFull(c.created_at), "Trip ID":c.trip_id}));
       const s3 = [];
       for (const l of logs) {
-        const base = {"When":dFull(l.changed_at), "By":personName(l.changed_by), "Vehicle no":veh[l.trip_id]?.vehicle_no, "Trip ID":l.trip_id};
+        const base = {"When (exact)":dExact(l.changed_at), "By":personName(l.changed_by), "Vehicle no":veh[l.trip_id]?.vehicle_no, "Lorry status then":STATUS[l.trip_status] || l.trip_status || "", "Trip ID":l.trip_id, _t:l.changed_at};
         const what = ({trips:"Lorry ", trip_charges:"Cost ", trip_files:"Photo/file "}[l.table_name] || "") + ({insert:"added", update:"changed", delete:"removed"}[l.action]);
         if (l.action === "update") for (const [k, v] of Object.entries(l.changes || {})) s3.push({...base, "What":what, "Field":FIELD[k] || k, "Old value":fmtCell(k, v[0]), "New value":fmtCell(k, v[1])});
         else s3.push({...base, "What":what, "Field":l.table_name === "trip_charges" ? (l.changes?.charge_type || "") : l.table_name === "trip_files" ? (l.changes?.kind || "") : "", "Old value":l.action === "delete" && l.table_name === "trip_charges" ? n(l.changes?.amount) : "", "New value":l.action === "insert" && l.table_name === "trip_charges" ? n(l.changes?.amount) : ""});
       }
+      for (const l of plogs) {
+        const base = {"When (exact)":dExact(l.changed_at), "By":personName(l.changed_by), "Vehicle no":veh[l.trip_id]?.vehicle_no, "Lorry status then":STATUS[l.trip_status] || l.trip_status || "", "Trip ID":l.trip_id, _t:l.changed_at};
+        for (const [k, v] of Object.entries(l.changes || {})) s3.push({...base, "What":"Price " + ({insert:"added", update:"changed", delete:"removed"}[l.action]), "Field":FIELD[k] || k, "Old value":Array.isArray(v) ? v[0] : (l.action === "delete" ? v : ""), "New value":Array.isArray(v) ? v[1] : (l.action === "insert" ? v : "")});
+      }
+      s3.sort((x, y) => (x["Trip ID"] - y["Trip ID"]) || (x._t < y._t ? -1 : x._t > y._t ? 1 : 0));   // per lorry, in time order
+      s3.forEach(r => delete r._t);
       const wb = XLSX.utils.book_new();
       const add = (rows, name, empty) => { const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [empty]); ws["!cols"] = Object.keys(rows[0] || empty).map(k => ({wch: Math.max(10, k.length + 2)})); XLSX.utils.book_append_sheet(wb, ws, name); };
       add(s1, "Lorries", {"Date":"No lorries in these dates"});
       add(s2, "Costs", {"Vehicle no":"No costs in these dates"});
-      add(s3, "Changes", {"When":"No changes in these dates"});
-      if (isOwner()) {
+      add(s3, "Changes", {"When (exact)":"No changes in these dates"});
+      if (canSeePrices()) {
         const s4 = prices.map(pr => ({"Lorry date":veh[pr.trip_id]?.trip_date, "Vehicle no":veh[pr.trip_id]?.vehicle_no, "Quantity (CFT)":n(veh[pr.trip_id]?.quantity_cft), "Purchase rate (₹)":n(pr.purchase_rate), "Purchase basis":pr.purchase_basis, "Purchase amount (₹)":n(pr.purchase_amount), "Purchase note":pr.purchase_note, "Sale rate (₹)":n(pr.sale_rate), "Sale basis":pr.sale_basis, "Sale amount (₹)":n(pr.sale_amount), "Sale note":pr.sale_note, "Trip ID":pr.trip_id}));
-        add(s4, "Prices (owner)", {"Vehicle no":"No prices in these dates"});
+        add(s4, "Prices", {"Vehicle no":"No prices in these dates"});
       }
       XLSX.writeFile(wb, `Aditya_Traders_${from}_to_${to}.xlsx`);
       msg.textContent = `Downloaded: ${s1.length} lorries, ${s2.length} costs, ${s3.length} changes.`;
