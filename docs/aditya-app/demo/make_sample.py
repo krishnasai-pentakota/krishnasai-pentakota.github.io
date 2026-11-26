@@ -1,4 +1,4 @@
-"""Builds the SAMPLE data for the Aditya Traders demo (app 3.2).
+"""Builds the SAMPLE data for the Aditya Traders demo (app 3.3).
 
 Every action runs as a named person through the REAL migrations (001-012) on
 the local test Postgres, so history, flags, stage rules, permissions and money
@@ -38,13 +38,33 @@ conn.execute("update public.profiles set created_at = '2026-10-30 10:00+05:30'")
 CLOCK = [dt.datetime(2026, 11, 1, 9, 0, tzinfo=IST)]
 STAMPED = {"activity": ["at"], "load_reviews": ["reviewed_at"], "loads": ["created_at", "updated_at"], "load_allocations": ["created_at", "updated_at"],
            "load_lines": ["created_at", "updated_at"], "line_prices": ["updated_at"], "load_costs": ["created_at", "updated_at"], "load_billing": ["updated_at"],
-           "payments": ["created_at", "updated_at"], "load_files": ["created_at"], "sawmill_rates": ["created_at"]}
+           "payments": ["created_at", "updated_at"], "load_files": ["created_at"], "sawmill_rates": ["created_at"], "load_tallies": ["created_at", "updated_at"]}
+
+# Piece tallies are built from the owner's own workbook counts (Mango; tests/db/workbook_tally_counts.json),
+# shuffled a little so no two sample trucks are the same.
+WBK = json.load(open("/home/claude/aditya-app/tests/db/workbook_tally_counts.json"))
+SHEETS = {t: [v["counts"] for v in WBK["sheets"].values() if v["thickness"] == t] for t in ("1", "2")}
+
+
+def tally_counts(target):
+    c = {"1": {}, "2": {}}; total = 0
+    def add(t, sheet):
+        for k, n in sheet.items():
+            n2 = max(0, n + random.randint(-2, 2)) if n > 3 else n
+            if n2: c[t][k] = c[t].get(k, 0) + n2
+    while total < target - 160:
+        add("2", random.choice(SHEETS["2"])); total += 305
+    for sh in random.sample(SHEETS["1"], random.randint(1, 3)):
+        add("1", sh)
+    return {k: v for k, v in c.items() if v}
 
 
 def fix_times(t):
+    conn.execute("set session_replication_role = replica")     # moving sample timestamps is not a business change: no triggers
     for tbl, cols in STAMPED.items():
         for c in cols:
             conn.execute(f"update public.{tbl} set {c} = %s where {c} > now() - interval '10 minutes'", (t,))
+    conn.execute("set session_replication_role = origin")
 
 
 def run(who, sql, params=(), t=None):
@@ -70,7 +90,7 @@ def step(h):
     CLOCK[0] = CLOCK[0] + dt.timedelta(hours=h); return CLOCK[0]
 
 # ---------------------------------------------------------------- masters (owner)
-run("owner", "insert into public.wood_types (name, sort) values ('Mango', 4), ('Neem', 5)")
+run("owner", "insert into public.wood_types (name, sort) values ('Neem', 5) on conflict (name) do nothing")
 mills = [("Sri Lakshmi Saw Mill", "Rajanagaram", "Appa Rao"), ("Durga Saw Mill", "Peddapuram", "Satyanarayana"), ("Venkateswara Timber Depot", "Peddapuram", "Ramana"),
          ("Sai Ram Saw Mill", "Narsipatnam", "Chinna Rao"), ("Annapurna Saw Mill", "Rajam", "Krishna"), ("Sri Rama Wood Works", "Anandapuram", "Ramu"),
          ("Kanaka Durga Saw Mill", "Yelamanchili", "Nookaraju"), ("Satya Sai Saw Mill", "Pendurthi", "Babji"), ("Padmavathi Saw Mill", "Pithapuram", "Suri Babu"),
@@ -148,7 +168,14 @@ def build(target, start, bill=None, cancel=False, single=False, staff_registered
         run(who, "update public.load_allocations set reached_at=%s, change_reason=%s where id=%s", (CLOCK[0], f"Truck reached {mills[M.index(mid)][0]}", a))
         if j == 0: run(who, "update public.loads set truck_stage='under_loading', change_reason=%s where id=%s", (f"Truck reached {mills[M.index(mid)][0]}", lid))
         share = guide / n_m
-        if random.random() < .15:
+        if random.random() < .35:      # piece tally (Mango): the database makes the Small / Medium / Large items
+            step(.6)
+            tid = one(who, "insert into public.load_tallies (allocation_id, wood_type, counts, change_reason) values (%s,'Mango',%s,'Piece tally from the paper sheet') returning id",
+                      (a, json.dumps(tally_counts(share))))
+            for ln, g in run("owner", "select id, size_grade from public.load_lines where tally_id=%s", (tid,)):
+                run("owner", "insert into public.line_prices (line_id, rate, adjustment, change_reason) values (%s,%s,0,'From rate card')", (ln, card_rate(mid, "Country Wood", g, "CFT", start.date()) or 350))
+            items = []
+        elif random.random() < .15:
             items = [("Teak", "small", round(random.uniform(4, 9), 2), "Tons", None, None)]
         else:
             big = round(share * random.uniform(.55, .7))
@@ -229,7 +256,7 @@ for who, when in [("owner", "2026-11-25 20:30+05:30"), ("acc", "2026-11-25 19:00
     conn.execute("""insert into public.load_reviews (load_id, user_id, reviewed_at) select id, %s, %s from public.loads where created_at < %s
                     on conflict (load_id, user_id) do update set reviewed_at = greatest(public.load_reviews.reviewed_at, excluded.reviewed_at)""", (P[who], when, when))
 
-tables = ["profiles", "sawmills", "parties", "app_settings", "wood_types", "expense_categories", "loads", "load_allocations", "load_lines", "line_prices", "load_costs",
+tables = ["profiles", "sawmills", "parties", "app_settings", "wood_types", "expense_categories", "loads", "load_allocations", "load_tallies", "load_lines", "line_prices", "load_costs",
           "load_billing", "payments", "load_files", "sawmill_rates", "activity", "load_reviews"]
 data = {"generated": dt.datetime.now(IST).isoformat(), "now": END.isoformat(), "people": P, "tables": {}}
 for t in tables:
@@ -242,5 +269,6 @@ with conn.cursor() as c:
     print("bill stages:", c.execute("select bill_stage, count(*) from public.v_loads group by 1 order by 1").fetchall())
     print("owner flags:", c.execute("select my_flag, count(*) from public.v_loads group by 1").fetchall())
     print("single-sawmill loads:", c.execute("select count(*) from public.v_loads where mills_count = 1").fetchone()[0])
+    print("tallies:", c.execute("select count(*), sum(x.cft)::int from public.load_tallies t, lateral (select sum(cft) cft from public.v2_tally_totals(t.counts)) x").fetchone())
     c.execute("reset role")
 print("activity rows:", conn.execute("select count(*) from public.activity").fetchone()[0], " size:", round(len(json.dumps(data)) / 1024), "KB")

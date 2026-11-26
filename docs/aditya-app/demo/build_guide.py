@@ -1,4 +1,4 @@
-"""Builds the stage-by-stage walkthrough page (out/guide.html) for app 3.2 from the demo screenshots.
+"""Builds the stage-by-stage walkthrough page (out/guide.html) for app 3.3 from the demo screenshots.
 Run test_demo.py first (it writes shots/*.png and shots/staff_loading_details.pdf)."""
 import html, os, subprocess
 from PIL import Image
@@ -50,6 +50,17 @@ SECTIONS = [
    "Staff never see rates or amounts."],
   [("10_list_under_loading", "Six trucks being loaded"),
    ("11b_load_under_loading_mills", "Owner's view: “Truck reached” time, wood items with purchase rate and amount")]),
+ ("Piece tally: CFT from the piece count", None, "Staff at the sawmill, or in the office from the paper sheet",
+  ["On a sawmill, tap + Piece tally. Mango is chosen; pick the thickness: 1\", 1.5\" or 2\".",
+   "Each row is a length (1'6\" to 8'6\", with the paper style under it: 2.3 = 2'3\"), each column a width (4\" to 11\"). Type the count from the paper, or tap a box and use +1 / +5 / +10.",
+   "The total updates as you type: pieces and CFT for Small, Medium and Large, and the CBM.",
+   "Save: the app makes the Small, Medium and Large wood items for that sawmill, in CFT, with the piece count. To change them, open the tally again (a reason is asked)."],
+  ["CFT = thickness × width × length × pieces ÷ 144, exactly as in the owner's Excel workbook. Checked against it: every sheet gives the same total, and the full truck comes to 1,350.00 CFT.",
+   "Sizes for every wood: Small 1'6\" to 2'9\", Medium 3'0\" to 4'9\", Large 5'0\" and up.",
+   "Counts stay on the phone if the signal drops before saving. After Loaded the tally is locked."],
+  [("27_tally_screen", "New tally: wood, thickness, grid of length × width"), ("28_tally_grid", "Counts typed from the paper (the workbook's sheet 1-1)"),
+   ("29_tally_summary", "Total: 477 pieces, 36.91 CFT, split by size"), ("30_load_with_tally", "Saved: the tally and its Small / Medium / Large items"),
+   ("19b_sample_tally_summary", "A sample truck's tally")]),
  ("5 · Loading done and weigh slip at each sawmill", 5, "Staff",
   ["When loading finishes at a sawmill, tap Loading done here + weigh slip. Take the photo of that sawmill's weigh slip (net weight optional).",
    "Each sawmill has its own weigh-slip box. A second slip for the same sawmill can be added.",
@@ -151,16 +162,16 @@ figcaption{{font-size:13.5px;color:#6b6058;margin-top:6px}}
 table{{border-collapse:collapse;width:100%;font-size:15px}}td,th{{border-bottom:1px solid #e6dfd5;padding:7px 6px;text-align:left;vertical-align:top}}
 footer{{text-align:center;color:#6b6058;font-size:13px;padding:16px}}
 </style></head><body>
-<header><h1>How each stage works</h1><p>Aditya Traders app 3.2 · sample data · who does what at every stage</p></header>
+<header><h1>How each stage works</h1><p>Aditya Traders app 3.3 · sample data · who does what at every stage</p></header>
 <main>
 <div class="try"><span style="flex:1;min-width:200px"><b>Try it yourself.</b> The demo has the same sample loads. Switch between Owner, Accountant and Staff at the top and watch each other's changes turn red.</span><a href="./">Open the demo</a></div>
 <section><h2>The people in the sample</h2><table>
 <tr><th>Login</th><th>Who</th><th>Can do</th></tr>
 <tr><td>Owner</td><td>Aditya and Bharat (one shared login)</td><td>Everything: Planning, Truck fixed, sawmill rates, freight and other charges, bills, payments, team and settings</td></tr>
 <tr><td>Accountant</td><td>Lakshmi</td><td>Bills, payments and balances. Can view rates and expenses but not enter them</td></tr>
-<tr><td>Staff</td><td>Ravi, Suresh, Prasad, Naidu, Kiran, Srinu, Raju, Venkat, Murali, Gopi</td><td>Register trucks, sawmills, wood items, weigh slips, loading PDF, stage moves, updates. Never Planning, Truck fixed or any money</td></tr>
+<tr><td>Staff</td><td>Ravi, Suresh, Prasad, Naidu, Kiran, Srinu, Raju, Venkat, Murali, Gopi</td><td>Register trucks, sawmills, wood items, piece tallies, weigh slips, loading PDF, stage moves, updates. Never Planning, Truck fixed or any money</td></tr>
 </table><p style="margin:8px 0 0;font-size:14px;color:#6b6058">All names, sawmills, buyers, rates and amounts are invented sample values. The sample was made by running every step as these people through the real database rules, 1 to 26 Nov 2026. Sample photos and weigh slips are placeholder pictures marked SAMPLE.</p></section>
 {''.join(parts)}
-</main><footer>Aditya Traders · app version 3.2 · sample walkthrough</footer></body></html>"""
+</main><footer>Aditya Traders · app version 3.3 · sample walkthrough</footer></body></html>"""
 open(os.path.join(HERE, "out", "guide.html"), "w", encoding="utf-8").write(page)
 print("guide built:", len(used), "pictures")

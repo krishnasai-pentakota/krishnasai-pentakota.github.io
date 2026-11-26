@@ -1,7 +1,7 @@
 """Browser test of the DEMO page (app 3.2) + screenshots for the walkthrough guide.
 Serves demo2/out on localhost; supabase-js, SheetJS and jsPDF are served from local copies.
 Phone-sized screens (390 x 844)."""
-import os, re, subprocess, sys, time
+import json, os, re, subprocess, sys, time
 from pypdf import PdfReader
 from playwright.sync_api import sync_playwright, expect
 
@@ -14,6 +14,7 @@ AUTOT = "/home/claude/apptest/pdf/jspdf-autotable-3.8.2/package/dist/jspdf.plugi
 IMG = os.path.join(HERE, "test_assets", "sample_slip.png")       # drawn test pictures marked SAMPLE
 DRIVER = os.path.join(HERE, "test_assets", "sample_driver.png")
 PORT = 8877; BASE = f"http://127.0.0.1:{PORT}/"
+WB = json.load(open("/home/claude/aditya-app/tests/db/workbook_tally_counts.json"))
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "-d", OUT, "-b", "127.0.0.1"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(.8)
 res = []; errs = []
@@ -130,6 +131,13 @@ try:
     pg.select_option("#rMill", label="Sri Lakshmi Saw Mill, Rajanagaram"); pg.wait_for_timeout(500); shot("15_rates")
     shot("15b_rates_history", ".card:has(h3:has-text('Rate history'))")
     ok("rate card keeps history (the 15 Nov large-size rise and the earlier rate)", lambda: truthy(pg.locator(".tl").count() >= 2, pg.locator(".tl").count()))
+    tl = pg.evaluate("JSON.parse(localStorage.getItem('at3_demo_db_v2')).t.load_tallies.map(t => [t.load_id, t.allocation_id, t.id])")
+    ok("sample data has piece tallies", lambda: truthy(len(tl) >= 10, len(tl)))
+    pg.goto(BASE + f"#/load/{tl[0][0]}"); wait_load()
+    ok("a sample load shows its piece tally and From-tally items", lambda: (expect(pg.locator(".tally").first).to_contain_text("CFT"), expect(pg.locator(".item .na-pill", has_text="From tally").first).to_be_visible()))
+    shot("19_sample_tally_items", ".tally")
+    pg.goto(BASE + f"#/tally/{tl[0][1]}/{tl[0][2]}"); pg.wait_for_selector("#tGrid")
+    shot("19b_sample_tally_summary", "#tSum")
     pg.goto(BASE + "#/team"); pg.wait_for_selector("#addPerson"); shot("16_team")
     ok("Team: one owner login, accountant and 10 staff", lambda: (expect(pg.locator("main")).to_contain_text("Owner (Aditya & Bharat)"), expect(pg.locator("main")).to_contain_text("Lakshmi"), expect(pg.locator("main")).to_contain_text("Gopi")))
     pg.goto(BASE + "#/parties"); pg.wait_for_selector(".loadc"); shot("17_parties_buyers")
@@ -169,6 +177,17 @@ try:
     add_item("Sai Ram Saw Mill", {"wood_type": "Teak", "size_grade": "Small", "quantity": "100", "unit": "Pieces", "pieces": "100", "change_reason": "Counted"})
     ok("one truck, two sawmills, three wood items", lambda: (expect(pg.locator(".alloc")).to_have_count(2), expect(pg.locator(".item")).to_have_count(3)))
     shot("22_staff_sawmills", ".card:has(h3:has-text('Sawmills'))")
+    # piece tally at Durga: the workbook's sheet 1-1 typed in (1 inch)
+    pg.locator(".alloc:has-text('Durga Saw Mill') [data-newtally]").click(); pg.wait_for_selector("#tGrid")
+    shot("27_tally_screen")
+    for k, n in WB["sheets"]["1-1"]["counts"].items(): pg.locator(f'#tGrid input[data-k="{k}"]').fill(str(n))
+    ok("tally: the workbook's sheet 1-1 gives 36.91 CFT and 477 pieces", lambda: (expect(pg.locator("#tTotal")).to_have_text("36.91"), expect(pg.locator('#tTh [data-th="1"] .c')).to_have_text("477")))
+    pg.locator('#tGrid input[data-k="2.5|5"]').click()
+    shot("28_tally_grid", ".tgrid")
+    shot("29_tally_summary", "#tSum")
+    pg.click("#tSave"); wait_load()
+    ok("tally saved: Small / Medium / Large Mango items from tally", lambda: (expect(pg.locator(".alloc:has-text('Durga Saw Mill') .tally")).to_contain_text("36.91 CFT · 477 pcs"), expect(pg.locator(".alloc:has-text('Durga Saw Mill') .item .na-pill", has_text="From tally")).to_have_count(3)))
+    shot("30_load_with_tally", ".alloc:has-text('Durga Saw Mill') .tally")
 
     pg.click("#nextStage"); sheet({"a": "Durga Saw Mill"}); sheet({})
     pg.wait_for_selector(".sect .pill.s-under_loading", timeout=8000); wait_load()
@@ -201,6 +220,7 @@ try:
     pos = [text.find(h) for h in ["Sl. No.", "Saw Mill Name", "Name of Product", "Size", "Quantity", "Unit"]]
     ok("PDF: TRUCK LOADING / DISPATCH DETAILS, Sl. No. then Saw Mill Name", lambda: truthy("TRUCK LOADING / DISPATCH DETAILS" in text and all(p >= 0 for p in pos) and pos == sorted(pos), pos))
     ok("PDF rows carry sawmill, wood, size, quantity, unit", lambda: truthy(all(t in text for t in ["Durga Saw Mill", "Sai Ram Saw Mill", "Country Wood", "Acacia", "Teak", "Large", "700", "Pieces", "AP39TB5678", "Sankar"]), text[:300]))
+    ok("PDF has the piece tally table (36.91 CFT, 477 pcs)", lambda: truthy("Piece tally - Small 1'6\" to 2'9\"" in text and "36.91 CFT" in text and "477 pcs" in text, text[-700:]))
     bad = [w for w in ["Rate", "Amount", "GST", "Taxable", "Total", "Balance", "Freight", "Bank", "Payment", "₹", "Rs."] if w in text]
     ok("PDF has no financial values or fields", lambda: truthy(not bad, bad))
 
@@ -241,9 +261,9 @@ try:
     pg.click("#addExp"); sheet({"cost_type": "Truck Freight", "amount": "95000", "change_reason": "Freight agreed"}); wait_load()
     pg.click("#addExp"); sheet({"cost_type": "Hamali / Loading", "amount": "6000", "allocation_id": "Durga Saw Mill", "receipt": IMG, "change_reason": "Paid loading gang"})
     pg.wait_for_selector(".tot:has-text('Hamali / Loading')", timeout=10000); wait_load()
-    pg.locator(".alloc:has-text('Durga Saw Mill') .item:has-text('Large') [data-rate]").click()
+    pg.locator(".alloc:has-text('Durga Saw Mill') .item:has-text('Country Wood'):has-text('Large') [data-rate]").click()
     sheet({"rate": "350"}); wait_load()
-    ok("owner: freight + hamali recorded; 700 × ₹350 = ₹2,45,000 on the item", lambda: (expect(pg.locator(".tot", has_text="Truck Freight")).to_be_visible(), expect(pg.locator(".item:has-text('Large') .price")).to_contain_text("₹2,45,000")))
+    ok("owner: freight + hamali recorded; 700 × ₹350 = ₹2,45,000 on the item", lambda: (expect(pg.locator(".tot", has_text="Truck Freight")).to_be_visible(), expect(pg.locator(".item:has-text('Country Wood'):has-text('Large') .price")).to_contain_text("₹2,45,000")))
     shot("40_owner_money_on_truck", ".card:has(h3:has-text('Freight and expenses'))")
     shot("40b_owner_rate_on_item", ".card:has(h3:has-text('Sawmills'))")
     as_person("accounts@adityatraders.demo")
@@ -251,7 +271,7 @@ try:
     ok("accountant's list shows Ravi's truck as Changed after the owner's entries", lambda: expect(pg.locator(".loadc.edited", has_text="AP39TB5678")).to_be_visible())
     pg.locator(".loadc", has_text="AP39TB5678").first.click(); wait_load()
     ok("accountant sees the owner's freight, charge and rate in red, with the reason", lambda: (expect(pg.locator(".banner.red")).to_contain_text("since you checked"), expect(pg.locator(".tl.new", has_text="Freight agreed").first).to_be_visible(), truthy(pg.locator(".tl.new").count() >= 3, pg.locator(".tl.new").count())))
-    ok("accountant views the owner's rate and freight on the truck", lambda: (expect(pg.locator(".item:has-text('Large') .price")).to_contain_text("₹2,45,000"), expect(pg.locator(".tot", has_text="Truck Freight")).to_be_visible()))
+    ok("accountant views the owner's rate and freight on the truck", lambda: (expect(pg.locator(".item:has-text('Country Wood'):has-text('Large') .price")).to_contain_text("₹2,45,000"), expect(pg.locator(".tot", has_text="Truck Freight")).to_be_visible()))
     shot("42_accountant_red_flags")
     shot("42b_accountant_red_history", ".card:has(h3:has-text('Updates and history'))")
     as_person("owner@adityatraders.demo")

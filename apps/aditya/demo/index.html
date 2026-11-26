@@ -199,6 +199,24 @@ table.t td.r,table.t th.r{text-align:right}
 footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
 @media(max-width:420px){.three{grid-template-columns:1fr 1fr}}
 @media(max-width:360px){.two{grid-template-columns:1fr}}
+/* piece tally grid */
+.tgrid{overflow:auto;max-height:62vh;border:1px solid var(--line);border-radius:12px;background:var(--card);margin:8px 0 10px}
+.tgrid table{border-collapse:separate;border-spacing:0;font-size:14px}
+.tgrid th,.tgrid td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0;text-align:center}
+.tgrid thead th{position:sticky;top:0;z-index:2;background:var(--soft);padding:6px 2px;min-width:42px;font-weight:700}
+.tgrid tbody th{position:sticky;left:0;z-index:1;background:var(--soft);padding:3px 7px;text-align:left;white-space:nowrap;line-height:1.1;font-weight:700}
+.tgrid thead th:first-child{left:0;z-index:3}
+.tgrid tbody th small{display:block;font-weight:400;color:var(--mut);font-size:11px}
+.tgrid tr.band>*{border-top:2px solid var(--brand)}
+.tgrid input{width:42px;height:38px;border:0;padding:0;text-align:center;background:transparent;font-variant-numeric:tabular-nums;font-size:15px}
+.tgrid input:focus{outline:2px solid var(--act);outline-offset:-2px;background:var(--amberbg)}
+.tgrid td.has input{background:var(--greenbg);font-weight:700}
+.tgrid td.rt{padding:0 6px;font-size:12px;color:var(--mut);white-space:nowrap;text-align:right;min-width:40px}
+.tqa{position:sticky;bottom:76px;z-index:20;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.12);display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.tqa .cell{flex:1;min-width:0;font-size:13px;line-height:1.2}
+.tqa button{min-width:46px;padding-left:6px;padding-right:6px}
+.tsum td,.tsum th{padding:6px 4px}
+.tally{border:1px dashed var(--brand);border-radius:12px;padding:8px 10px;margin:6px 0;background:var(--soft)}
 </style>
 </head>
 <body>
@@ -270,7 +288,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
 const CFG = window.ADITYA_CONFIG || {};
 const SUPABASE_URL = CFG.url || "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = CFG.key || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "3.2.1 (26 Nov 2026)";
+const APP_VERSION = "3.3 (26 Nov 2026)";
 const JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 const AUTOTABLE_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
@@ -285,6 +303,7 @@ const LINE_ST = {planned:"Planned", loading:"Loading", done:"Done"};
 /* Units used by sawmills (owner, 26 Nov). */
 const UNITS = ["CFT","CBM","RFT","SFT","Tons","Pieces","Quintal","Kg"];
 const GRADES = {small:"Small", medium:"Medium", large:"Large"};
+const TALLY_TH = [1, 1.5, 2];   // thickness classes in the client's workbook (inches)
 /* Planning and Truck fixed belong to the owner (and anyone given the "plan" permission). */
 const OWNER_STAGES = ["planning","truck_fixed"];
 /* Driver documents: the photo is mandatory, the other two are optional. */
@@ -301,7 +320,7 @@ const FIELD = {load_date:"Date",truck_stage:"Stage",vehicle_no:"Truck no",capaci
   rate:"Rate (₹)",adjustment:"Adjustment (₹)",line_id:"Item",cost_type:"Category",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note",
   invoice_no:"Invoice no",invoice_date:"Invoice date",sale_unit:"Sale unit",sale_qty:"Sale qty",sale_rate:"Sale rate (₹)",sale_adjustment:"Sale adjustment (₹)",gst_amount:"GST (₹)",credit_days:"Credit days",
   party_kind:"Paid by/to",mode:"Mode",reference:"Reference",kind:"Document",file_name:"File",storage_path:"File",mime_type:"Type",size_bytes:"Size",load_id:"Load"};
-const ENTITY = {loads:"Load", load_allocations:"Sawmill", load_lines:"Wood item", line_prices:"Purchase rate", load_costs:"Expense", load_billing:"Bill", payments:"Payment", load_files:"Document", sawmill_rates:"Rate card", note:"Update"};
+const ENTITY = {load_tallies:"Piece tally", loads:"Load", load_allocations:"Sawmill", load_lines:"Wood item", line_prices:"Purchase rate", load_costs:"Expense", load_billing:"Bill", payments:"Payment", load_files:"Document", sawmill_rates:"Rate card", note:"Update"};
 
 // CFG.fetch is only set by the demo page (sample data in the browser); the live app uses the network.
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true}, ...(CFG.fetch ? {global:{fetch: CFG.fetch}} : {})});
@@ -338,7 +357,25 @@ const millName = id => { const m = S.sawmills.find(x => x.id === id); return m ?
 const partyName = id => { const p = S.parties.find(x => x.id === id); return p ? p.name + (p.city ? ", " + p.city : "") : (id ? "#" + id : "—"); };
 const stagePill = s => s ? `<span class="pill s-${esc(s)}">${esc(STAGE[s] || s)}</span>` : "";
 const billPill = s => s ? `<span class="pill b-${esc(s)}">${esc(BILL[s] || s)}</span>` : "";
-const gradeFor = len => { if (!len) return null; const lo = S.settings.size_small_below_ft ?? 4, hi = S.settings.size_large_above_ft ?? 6; return len < lo ? "small" : len > hi ? "large" : "medium"; };
+const gradeFor = len => { if (!len) return null; const lo = S.settings.size_small_below_ft ?? 3, hi = S.settings.size_large_from_ft ?? 5; return len < lo ? "small" : len >= hi ? "large" : "medium"; };
+/* Lengths are kept in decimal feet like the workbook (2.25 = 2 ft 3 in); shown as 2'3" and in the paper style 2.3. */
+const ftIn = L => { const f = Math.floor(L + 1e-9), i = Math.round((L - f) * 12); return `${f}'${i}"`; };
+const paperLen = L => { const f = Math.floor(L + 1e-9), i = Math.round((L - f) * 12); return i ? `${f}.${i}` : `${f}`; };
+const cft2 = v => Number(v || 0).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+const pcsTxt = v => Number(v || 0).toLocaleString("en-IN");
+/* Same formula as the client's workbook: CFT = thickness (in) x width (in) x length (ft) x pieces / 144. No rounding inside. */
+function tallyTotals(counts){
+  const blank = () => ({pcs:0, cft:0, th:{}});
+  const out = {...blank(), size:{small:blank(), medium:blank(), large:blank()}};
+  for (const [t, cells] of Object.entries(counts || {})) for (const [k, n0] of Object.entries(cells || {})) {
+    const n = Number(n0) || 0; if (!n) continue;
+    const [len, w] = k.split("|").map(Number), th = Number(t), c = th * w * len * n / 144, g = gradeFor(len) || "small";
+    for (const o of [out, out.size[g]]) { o.pcs += n; o.cft += c; o.th[th] = o.th[th] || {pcs:0, cft:0}; o.th[th].pcs += n; o.th[th].cft += c; }
+  }
+  return out;
+}
+const sizeBand = g => { const lo = S.settings.size_small_below_ft ?? 3, hi = S.settings.size_large_from_ft ?? 5; return g === "small" ? `${ftIn(1.5)} to ${ftIn(lo - .25)}` : g === "medium" ? `${ftIn(lo)} to ${ftIn(hi - .25)}` : `${ftIn(hi)} and up`; };
+const thTxt = t => `${Number(t)}"`;
 const toLoginEmail = s => { s = s.trim(); if (s.includes("@")) return s.toLowerCase(); const d = s.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, ""); return d + "@" + STAFF_DOMAIN; };
 const phoneOf = email => email && email.endsWith("@" + STAFF_DOMAIN) ? email.split("@")[0] : null;
 function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }
@@ -502,11 +539,12 @@ let lastHash = null;
 const here = () => location.hash || "#/";
 async function route(soft){
   const h = location.hash || "#/"; let m;
-  if (soft && /^#\/(new|register|edit\/)/.test(h)) return;          // never wipe a form being typed
+  if (soft && /^#\/(new|register|edit\/|tally\/)/.test(h)) return;          // never wipe a form being typed
   lastHash = h;
   if (h === "#/") { if (!S.loadedAt || !soft) await loadLoads(true); return here() === h ? renderHome() : undefined; }
   if (h === "#/loads") { if (!S.loadedAt || !soft) await loadLoads(true); return here() === h ? renderLoads() : undefined; }
   if ((m = h.match(/^#\/load\/(\d+)$/))) return renderLoad(Number(m[1]));
+  if ((m = h.match(/^#\/tally\/(\d+)\/(\d+|new)$/))) return renderTally(Number(m[1]), m[2] === "new" ? null : Number(m[2]));
   if (h === "#/new") return can("plan") ? renderLoadForm(null) : (location.hash = "#/register");
   if (h === "#/register") return renderLoadForm(null, true);
   if (h === "#/expenses") return canSeeExp() ? renderExpenses() : (location.hash = "#/");
@@ -646,15 +684,16 @@ async function renderLoad(id){
   const h0 = here();
   chrome("Load", {back:true, nav:"loads"});
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
-  let L, allocs, lines, acts, files, costs = [], bill = null, pays = [], sets;
+  let L, allocs, lines, acts, files, costs = [], bill = null, pays = [], sets, tallies = [];
   try {
-    [L, allocs, lines, acts, files, sets] = await Promise.all([
+    [L, allocs, lines, acts, files, sets, tallies] = await Promise.all([
       q(sb.from("v_loads").select("*").eq("id", id).maybeSingle()),
       q(sb.from("v_allocations").select("*").eq("load_id", id).order("id")),
       q(sb.from("v_lines").select("*").eq("load_id", id).order("id")),
       q(sb.from("activity").select("*").eq("load_id", id).order("at", {ascending:false}).order("id", {ascending:false}).limit(300)),
       q(sb.from("load_files").select("*").eq("load_id", id).order("id")),
-      q(sb.from("app_settings").select("*"))   // loading rules may have changed on another phone
+      q(sb.from("app_settings").select("*")),   // loading rules may have changed on another phone
+      q(sb.from("load_tallies").select("*").eq("load_id", id).order("id"))
     ]);
     S.settings = Object.fromEntries(sets.map(x => [x.key, Number(x.value)]));
     if (canSeeExp()) costs = await q(sb.from("load_costs").select("*").eq("load_id", id).order("id"));
@@ -666,7 +705,7 @@ async function renderLoad(id){
     if (here() !== h0) return;
     L = S.loads.find(x => x.id === id);
     if (!L) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
-    allocs = []; lines = []; acts = []; files = [];
+    allocs = []; lines = []; acts = []; files = []; tallies = [];
     toast("Offline: showing saved summary only.", true);
   }
   if (here() !== h0) return;
@@ -723,15 +762,18 @@ async function renderLoad(id){
       <div class="sub">Owner: ${esc(a.owner_name || "—")} · Party name: ${esc(a.party_name || "—")}</div>
       <div class="small" style="margin-bottom:6px">${a.reached_at ? `<span class="ok-pill">Truck reached · ${esc(dShort(a.reached_at))}</span>` : `<span class="na-pill">Truck not here yet</span>`} ${a.loading_done_at ? `<span class="ok-pill">Loading done · ${esc(dShort(a.loading_done_at))}${a.slip_net_weight_t ? " · slip " + esc(Number(a.slip_net_weight_t)) + " T" : ""}</span>` : ""}</div>
       ${!a.reached_at && !OWNER_STAGES.includes(L.truck_stage) && L.truck_stage !== "cancelled" ? `<button class="btn pri block" data-reached="${a.id}" style="margin-bottom:8px">Truck reached ${esc(a.sawmill_name)}</button>` : ""}
+      ${tallies.filter(t => t.allocation_id === a.id).map(t => { const tt = tallyTotals(t.counts), chgT = freshIds.has("load_tallies:" + t.id);
+        return `<div class="tally" ${chgT ? 'style="background:#fff7f6"' : ""}><div class="row"><b class="grow">Piece tally · ${esc(t.wood_type)}</b>${chgT ? `<span class="flag edited">Changed</span>` : ""}<a class="btn sm" href="#/tally/${a.id}/${t.id}" data-opentally="${t.id}">Open tally</a></div>
+          <div class="small"><b class="num">${esc(cft2(tt.cft))} CFT</b> · ${esc(pcsTxt(tt.pcs))} pcs · ${esc(Object.keys(tt.th).sort((x, y) => x - y).map(thTxt).join(", "))} thick</div></div>`; }).join("")}
       ${its.length ? its.map(ln => {
         const chg = freshIds.has("load_lines:" + ln.id) || freshIds.has("line_prices:" + ln.id);
-        return `<div class="item" ${chg ? 'style="background:#fff7f6"' : ""}><div class="row"><b class="grow">${esc(ln.wood_type)}${ln.dimensions ? ` <span class="mut small">${esc(ln.dimensions)}</span>` : ""}</b>${chg ? `<span class="flag edited">Changed</span>` : ""}<span class="pill l-${ln.line_status}">${LINE_ST[ln.line_status]}</span></div>
-          <div class="small"><b class="num">${esc(qty(ln.quantity, ln.unit))}</b>${ln.pieces ? ` · ${esc(Number(ln.pieces).toLocaleString("en-IN"))} pcs` : ""} · ${esc(GRADES[ln.size_grade] || "Size not set")}${ln.length_ft ? " · " + esc(Number(ln.length_ft)) + " ft" : ""}${ln.loaded_on ? " · loaded " + esc(dDay(ln.loaded_on)) : ""}</div>
+        return `<div class="item" ${chg ? 'style="background:#fff7f6"' : ""}><div class="row"><b class="grow">${esc(ln.wood_type)}${ln.dimensions ? ` <span class="mut small">${esc(ln.dimensions)}</span>` : ""}</b>${chg ? `<span class="flag edited">Changed</span>` : ""}${ln.tally_id ? `<span class="na-pill" style="margin-right:4px">From tally</span>` : ""}<span class="pill l-${ln.line_status}">${LINE_ST[ln.line_status]}</span></div>
+          <div class="small"><b class="num">${esc(ln.tally_id ? cft2(ln.quantity) + " CFT" : qty(ln.quantity, ln.unit))}</b>${ln.pieces ? ` · ${esc(Number(ln.pieces).toLocaleString("en-IN"))} pcs` : ""} · ${esc(GRADES[ln.size_grade] || "Size not set")}${ln.length_ft ? " · " + esc(Number(ln.length_ft)) + " ft" : ""}${ln.loaded_on ? " · loaded " + esc(dDay(ln.loaded_on)) : ""}</div>
           ${ln.notes ? `<div class="small mut">${esc(ln.notes)}</div>` : ""}
           ${canSeeRates() ? `<div class="price">Purchase: ${ln.rate != null ? `<b class="num">${inr(ln.rate)}</b> per ${esc(ln.unit)}${Number(ln.adjustment) ? ` ${Number(ln.adjustment) < 0 ? "−" : "+"} ${inr(Math.abs(Number(ln.adjustment)))} adj.` : ""} = <b class="num">${inr(ln.amount)}</b>` : `<span class="mut">no rate yet</span>`} ${can("rates") ? `<button class="btn sm" data-rate="${ln.id}" style="margin-left:6px">${ln.rate != null ? "Change rate" : "Set rate"}</button>` : ""}</div>` : ""}
-          <div class="row" style="margin-top:6px">${ln.line_status !== "done" ? `<button class="btn sm" data-done="${ln.id}">Mark done</button>` : ""}<button class="btn sm" data-item="${ln.id}">Edit</button></div></div>`;
+          <div class="row" style="margin-top:6px">${ln.line_status !== "done" ? `<button class="btn sm" data-done="${ln.id}">Mark done</button>` : ""}${ln.tally_id ? `<a class="btn sm" href="#/tally/${a.id}/${ln.tally_id}">Open tally</a>` : `<button class="btn sm" data-item="${ln.id}">Edit</button>`}</div></div>`;
       }).join("") : `<p class="small mut">No wood items yet.</p>`}
-      <div class="row" style="margin-top:8px"><button class="btn sm ${a.reached_at ? "" : "pri"}" data-additem="${a.id}">+ Add wood item</button>${a.reached_at && !a.loading_done_at && its.length ? `<button class="btn sm pri" data-ldone="${a.id}">Loading done here + weigh slip</button>` : ""}<button class="btn sm" data-alloc="${a.id}">Edit sawmill</button></div></div>`;
+      <div class="row" style="margin-top:8px"><button class="btn sm ${a.reached_at ? "" : "pri"}" data-additem="${a.id}">+ Add wood item</button>${["loaded","in_transit","delivered","cancelled"].includes(L.truck_stage) ? "" : `<a class="btn sm" href="#/tally/${a.id}/new" data-newtally="${a.id}">+ Piece tally</a>`}${a.reached_at && !a.loading_done_at && its.length ? `<button class="btn sm pri" data-ldone="${a.id}">Loading done here + weigh slip</button>` : ""}<button class="btn sm" data-alloc="${a.id}">Edit sawmill</button></div></div>`;
   }).join("") : `<p class="mut small">No sawmills yet. Add each sawmill the truck loads from, then its wood items.</p>`;
   if (can("finance") && L.purchase_total != null) h += `<div class="tot big"><span>Purchase total</span><span class="num">${inr(L.purchase_total)}</span></div>`;
   h += `</div>`;
@@ -856,13 +898,19 @@ async function renderLoad(id){
   document.querySelectorAll("[data-item]").forEach(b => b.onclick = () => { const ln = lines.find(x => x.id === Number(b.dataset.item)); itemForm(allocs.find(a => a.id === ln.allocation_id), ln, reload); });
   document.querySelectorAll("[data-done]").forEach(b => b.onclick = async () => {
     const ln = lines.find(x => x.id === Number(b.dataset.done));
+    if (ln.tally_id) {
+      const w = await sheet({title:"Mark done · " + ln.sawmill_name, intro: esc(`${ln.wood_type} · ${GRADES[ln.size_grade] || ""} · ${cft2(ln.quantity)} CFT · ${pcsTxt(ln.pieces)} pcs (from the piece tally)`), fields:[reasonField(false, "Loading finished")], ok:"Mark done"});
+      if (!w) return;
+      try { await q(sb.from("load_lines").update({line_status:"done", loaded_on: today(), change_reason: w.change_reason || "Loading finished"}).eq("id", ln.id)); toast("Item done."); reload(); } catch(e) { toast(errText(e), true); }
+      return;
+    }
     const v = await sheet({title:"Mark done · " + ln.sawmill_name, intro: esc(ln.wood_type + (ln.dimensions ? " " + ln.dimensions : "")), fields:[{id:"quantity", label:"Final quantity (" + ln.unit + ")", type:"number", value:ln.quantity ?? "", required:true, min:0}, {id:"pieces", label:"Pieces (optional)", type:"number", value:ln.pieces ?? "", min:0, step:"1"}, {id:"loaded_on", label:"Loaded on", type:"date", value:ln.loaded_on || today()}, reasonField(false, "Loading finished at this sawmill")], ok:"Mark done"});
     if (!v) return;
     try { await q(sb.from("load_lines").update({line_status:"done", quantity:num(v.quantity), pieces: v.pieces === "" ? null : Math.round(num(v.pieces)), loaded_on:v.loaded_on || null, change_reason:v.change_reason || "Loading finished"}).eq("id", ln.id)); toast("Item done."); reload(); } catch(e) { toast(errText(e), true); }
   });
   document.querySelectorAll("[data-rate]").forEach(b => b.onclick = () => rateForm(L, lines.find(x => x.id === Number(b.dataset.rate)), reload));
   // PDF
-  $("pdfBtn").onclick = async () => { const b = $("pdfBtn"); b.disabled = true; b.textContent = "Preparing PDF…"; try { await exportStaffPdf(L, allocs, lines, files); toast("PDF ready."); } catch(e) { toast(errText(e), true); } b.disabled = false; b.textContent = "Export Staff PDF"; };
+  $("pdfBtn").onclick = async () => { const b = $("pdfBtn"); b.disabled = true; b.textContent = "Preparing PDF…"; try { await exportStaffPdf(L, allocs, lines, files, tallies); toast("PDF ready."); } catch(e) { toast(errText(e), true); } b.disabled = false; b.textContent = "Export Staff PDF"; };
   // weigh slips: each upload goes to its own sawmill
   document.querySelectorAll("input[data-alloc]").forEach(inp => inp.onchange = async () => {
     const list = [...inp.files]; if (!list.length) return;
@@ -918,6 +966,17 @@ function describe(a, lines){
   const lineLabel = () => { const ln = (lines || []).find(x => String(x.id) === String(a.entity_id)); return ln ? " (" + ln.sawmill_name + " · " + ln.wood_type + ")" : ""; };
   if (a.action === "note") return `<b>${esc(person(a.actor))}:</b> ${esc(a.reason)}`;
   if (a.action === "stage") return `Stage: <b>${esc(fmt("truck_stage", ch.truck_stage?.[0]))} → ${esc(fmt("truck_stage", ch.truck_stage?.[1]))}</b>` + Object.entries(ch).filter(([k]) => k !== "truck_stage").map(([k, v]) => `<br>${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("");
+  if (a.entity === "load_tallies") {
+    const tt = c => { const t = tallyTotals(c); return `${cft2(t.cft)} CFT · ${pcsTxt(t.pcs)} pcs`; };
+    if (a.action === "update") {
+      const parts = [];
+      if (ch.counts) parts.push(`${esc(tt(ch.counts[0]))} → <b>${esc(tt(ch.counts[1]))}</b>`);
+      if (ch.wood_type) parts.push(`Wood: ${esc(fmt("wood_type", ch.wood_type[0]))} → <b>${esc(fmt("wood_type", ch.wood_type[1]))}</b>`);
+      if (ch.notes) parts.push(`Notes: ${esc(fmt("notes", ch.notes[0]))} → <b>${esc(fmt("notes", ch.notes[1]))}</b>`);
+      return "Piece tally changed:" + parts.map(x => "<br>" + x).join("");
+    }
+    return `${a.action === "insert" ? "Added" : "Removed"} piece tally${ch.wood_type ? " (" + esc(ch.wood_type) + ")" : ""}: <b>${esc(tt(ch.counts || {}))}</b>`;
+  }
   if (a.action === "update") return `${esc(ent)}${a.entity === "load_lines" || a.entity === "line_prices" ? esc(lineLabel()) : ""} changed:` + Object.entries(ch).map(([k, v]) => `<br>${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("");
   const keyBits = {loads: ["vehicle_no","truck_stage"], load_allocations:["sawmill_id","owner_name"], sawmill_rates:["sawmill_id","wood_type","rate","unit","effective_from"], load_lines:["sawmill_id","wood_type","size_grade","quantity","unit"], line_prices:["rate","adjustment"], load_costs:["cost_type","amount"], load_billing:["invoice_no","sale_rate","gst_amount"], payments:["party_kind","amount","mode"], load_files:["kind"]}[a.entity] || [];
   const bits = keyBits.filter(k => ch[k] !== undefined && !(k === "adjustment" && !Number(ch[k]))).map(k => k === "unit" ? "" : (k === "quantity" ? fmt(k, ch[k]) + " " + (ch.unit || "") : fmt(k, ch[k]))).filter(Boolean).join(" · ");
@@ -1122,12 +1181,127 @@ async function signedUrl(path){
 function loadJs(src, ready){ return new Promise((ok, bad) => { if (ready()) return ok(); const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => bad(new Error("Could not load the PDF tool. Check the signal and try again.")); document.head.appendChild(s); }); }
 
 /* =====================================================================
+   Piece tally (one wood at one sawmill): piece counts by thickness, length and width,
+   as in the owner's Excel workbook. The database works out CFT and makes the
+   Small / Medium / Large wood items.
+   ===================================================================== */
+async function renderTally(allocId, tallyId){
+  const h0 = here();
+  chrome("Piece tally", {back:true, nav:"loads"});
+  $("app").innerHTML = `<div class="empty">Loading…</div>`;
+  let A = null, L = null, T = null;
+  try {
+    await loadMasters();   // size bands, grid and wood list may have changed on another phone
+    A = await q(sb.from("v_allocations").select("*").eq("id", allocId).maybeSingle());
+    if (A) L = await q(sb.from("v_loads").select("*").eq("id", A.load_id).maybeSingle());
+    if (A && tallyId) T = await q(sb.from("load_tallies").select("*").eq("id", tallyId).eq("allocation_id", allocId).maybeSingle());
+  } catch(e) { if (here() !== h0) return; $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
+  if (here() !== h0) return;
+  if (!A || !L || (tallyId && !T)) { $("app").innerHTML = `<div class="empty">This tally is not available to you, or it was removed.</div>`; return; }
+  chrome("Piece tally · " + A.sawmill_name, {back:true, nav:"loads", sub: L.load_no + (L.vehicle_no ? " · " + L.vehicle_no : "")});
+  const locked = ["loaded","in_transit","delivered","cancelled"].includes(L.truck_stage);
+  const dk = "at3_tally_" + allocId + "_" + (tallyId || "new");
+  const draft = locked ? null : lsGet(dk);
+  let counts = JSON.parse(JSON.stringify((draft && draft.counts) || (T && T.counts) || {}));
+  let th = String((draft && draft.th) || Object.keys((T && T.counts) || {}).sort((x, y) => x - y)[0] || "1");
+  let active = null;
+  const woods = [...new Set([...(T ? [T.wood_type] : []), ...S.woods])];
+  const wood0 = (draft && draft.wood) || (T && T.wood_type) || (S.woods.includes("Mango") ? "Mango" : "");
+  // grid: the owner's range, widened to any saved counts outside it
+  const cells = Object.values(counts).flatMap(c => Object.keys(c)).map(k => k.split("|").map(Number));
+  const lenMax = Math.max(Number(S.settings.tally_len_max_ft ?? 8.5), ...cells.map(c => c[0]));
+  const wMin = Math.min(Number(S.settings.tally_width_min_in ?? 4), ...cells.map(c => c[1])), wMax = Math.max(Number(S.settings.tally_width_max_in ?? 11), ...cells.map(c => c[1]));
+  const LENS = []; for (let x = 1.5; x <= lenMax + 1e-9; x += 0.25) LENS.push(Math.round(x * 100) / 100);
+  const WS = []; for (let w = wMin; w <= wMax; w++) WS.push(w);
+  const lo = Number(S.settings.size_small_below_ft ?? 3), hi = Number(S.settings.size_large_from_ft ?? 5);
+  const rid = len => "rp-" + String(len).replace(".", "_");
+
+  const gridHtml = () => {
+    const cur = counts[th] || {};
+    return `<table><thead><tr><th>Length</th>${WS.map(w => `<th>${w}"</th>`).join("")}<th>Pcs</th></tr></thead><tbody>${LENS.map(len => {
+      let rp = 0;
+      const tds = WS.map(w => { const n = Number(cur[len + "|" + w] || 0); rp += n; return `<td class="${n ? "has" : ""}"><input inputmode="numeric" pattern="[0-9]*" maxlength="5" data-k="${len}|${w}" value="${n || ""}" aria-label="${ftIn(len)} by ${w} inch" ${locked ? "disabled" : ""}></td>`; }).join("");
+      return `<tr class="${len === lo || len === hi ? "band" : ""}"><th>${ftIn(len)}<small>${paperLen(len)}</small></th>${tds}<td class="rt" id="${rid(len)}">${rp ? pcsTxt(rp) : ""}</td></tr>`;
+    }).join("")}</tbody></table>`;
+  };
+  const sumHtml = () => {
+    const tt = tallyTotals(counts);
+    const thLine = o => Object.keys(o.th).sort((x, y) => x - y).map(t => `${thTxt(t)} ${cft2(o.th[t].cft)}`).join(" · ");
+    return `<h3>Total</h3><table class="t tsum"><tr><th>Size</th><th class="r">Pieces</th><th class="r">CFT</th></tr>
+      ${["small","medium","large"].map(g => { const o = tt.size[g]; return `<tr><td><b>${GRADES[g]}</b> <span class="tiny mut">${esc(sizeBand(g))}</span>${o.pcs ? `<div class="tiny mut">${esc(thLine(o))}</div>` : ""}</td><td class="r num">${pcsTxt(o.pcs)}</td><td class="r num">${cft2(o.cft)}</td></tr>`; }).join("")}
+      <tr><td><b>Total</b>${tt.pcs ? `<div class="tiny mut">${esc(thLine(tt))}</div>` : ""}</td><td class="r num"><b>${pcsTxt(tt.pcs)}</b></td><td class="r num"><b id="tTotal">${cft2(tt.cft)}</b></td></tr></table>
+      <p class="small mut" style="margin-bottom:0">= ${(tt.cft / 35.3147).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2})} CBM (CFT ÷ 35.3147, as in the workbook). CFT = thickness × width × length × pieces ÷ 144.${locked ? "" : " Saving makes the Small, Medium and Large wood items for this sawmill, in CFT."}</p>`;
+  };
+  const chipsHtml = () => { const tt = tallyTotals(counts); return TALLY_TH.map(t => `<button class="chip" data-th="${t}" aria-pressed="${String(t) === th}">${t}" thick<span class="c">${tt.th[t] ? pcsTxt(tt.th[t].pcs) : 0}</span></button>`).join(""); };
+
+  $("app").innerHTML = `${draft ? `<div class="banner amber"><span class="grow">Unsaved counts from this phone were brought back.</span><button class="btn sm" id="tDiscard">Discard</button></div>` : ""}
+    ${locked ? `<div class="banner amber"><span class="grow">This load is ${esc(STAGE[L.truck_stage])}. The tally can be changed only after moving it back to Under loading.</span></div>` : ""}
+    <div class="card"><label class="f" style="margin:0"><span>Wood</span><select class="in" id="tWood" ${locked ? "disabled" : ""}><option value="">— choose wood —</option>${woods.map(w => `<option ${w === wood0 ? "selected" : ""}>${esc(w)}</option>`).join("")}</select></label>
+      <p class="small mut" style="margin:8px 0 0">Count each piece once: pick the thickness, then the box for its length (down) and width (across). A piece between two sizes goes under the smaller one.</p></div>
+    <div class="chips" id="tTh" role="group" aria-label="Thickness">${chipsHtml()}</div>
+    <div class="tgrid" id="tGrid">${gridHtml()}</div>
+    ${locked ? "" : `<div class="tqa"><span class="cell" id="tCell">Tap a box, then type the count or add pieces.</span><button class="btn sm" data-add="-1" aria-label="Remove one">−1</button><button class="btn sm" data-add="1">+1</button><button class="btn sm" data-add="5">+5</button><button class="btn sm" data-add="10">+10</button></div>`}
+    <div class="card" id="tSum">${sumHtml()}</div>
+    ${locked ? "" : `<div class="card"><label class="f"><span>Notes (optional)</span><input class="in" id="tNotes" value="${esc((T && T.notes) || "")}"></label>
+      <label class="f"><span>Reason for this entry${T ? " (required)" : ""}</span><input class="in" id="tReason" placeholder="${T ? "e.g. Recounted 2 inch pieces" : "e.g. Tally from the paper sheet"}"></label>
+      <button class="btn pri block" id="tSave">${T ? "Save tally" : "Save tally and make wood items"}</button>
+      ${T ? `<button class="btn red block" id="tDel" style="margin-top:8px">Remove this tally</button>` : ""}</div>`}`;
+
+  const keep = () => lsSet(dk, {counts, th, wood: $("tWood").value, at: new Date().toISOString()});
+  const refresh = () => { $("tSum").innerHTML = sumHtml(); const ch = $("tTh"); ch.innerHTML = chipsHtml(); bindChips(); };
+  const label = k => { const [len, w] = k.split("|").map(Number); return `${ftIn(len)} long × ${w}" wide · ${th}" thick`; };
+  const setCount = (k, n, inp) => {
+    n = Math.max(0, Math.min(100000, Math.floor(Number(n) || 0)));
+    counts[th] = counts[th] || {};
+    if (n) counts[th][k] = n; else delete counts[th][k];
+    if (!Object.keys(counts[th]).length) delete counts[th];
+    if (inp) { inp.value = n || ""; inp.parentElement.classList.toggle("has", !!n); }
+    const len = Number(k.split("|")[0]), cur = counts[th] || {};
+    const rp = WS.reduce((a, w) => a + Number(cur[len + "|" + w] || 0), 0); const cell = $(rid(len)); if (cell) cell.textContent = rp ? pcsTxt(rp) : "";
+    keep(); refresh();
+  };
+  const bindGrid = () => document.querySelectorAll("#tGrid input").forEach(inp => {
+    inp.onfocus = () => { active = inp; const c = $("tCell"); if (c) c.textContent = label(inp.dataset.k); };
+    inp.oninput = () => { const d = inp.value.replace(/\D/g, ""); if (d !== inp.value) inp.value = d; setCount(inp.dataset.k, d, inp); };
+  });
+  const bindChips = () => document.querySelectorAll("#tTh [data-th]").forEach(b => b.onclick = () => { th = b.dataset.th; active = null; $("tGrid").innerHTML = gridHtml(); bindGrid(); refresh(); keep(); const c = $("tCell"); if (c) c.textContent = "Tap a box, then type the count or add pieces."; });
+  bindGrid(); bindChips();
+  document.querySelectorAll("[data-add]").forEach(b => b.onclick = () => {
+    if (!active || !document.body.contains(active)) return toast("Tap a box in the grid first.", true);
+    setCount(active.dataset.k, Number(active.value || 0) + Number(b.dataset.add), active);
+  });
+  if (locked) return;
+  $("tWood").onchange = keep;
+  const dc = $("tDiscard"); if (dc) dc.onclick = () => { lsSet(dk, null); renderTally(allocId, tallyId); };
+  $("tSave").onclick = async () => {
+    const wood = $("tWood").value, reason = $("tReason").value.trim(), tt = tallyTotals(counts);
+    if (!wood) return toast("Choose the wood.", true);
+    if (!tt.pcs) return toast("Enter at least one piece.", true);
+    if (T && !reason) return toast("Write the reason for the change.", true);
+    const b = $("tSave"); b.disabled = true;
+    const rec = {allocation_id: allocId, wood_type: wood, counts, notes: $("tNotes").value.trim() || null, change_reason: reason || "Piece tally entered"};
+    try {
+      if (T) await q(sb.from("load_tallies").update(rec).eq("id", T.id));
+      else await q(sb.from("load_tallies").insert(rec));
+      lsSet(dk, null); toast(`Tally saved: ${cft2(tt.cft)} CFT, ${pcsTxt(tt.pcs)} pieces.`); loadLoads(true); location.hash = "#/load/" + L.id;
+    } catch(e) { b.disabled = false; toast(/duplicate|unique/i.test(String(e.message || e)) ? `${A.sawmill_name} already has a ${wood} tally on this truck. Open it from the load page.` : errText(e), true); }
+  };
+  const del = $("tDel"); if (del) del.onclick = async () => {
+    const reason = $("tReason").value.trim();
+    if (!reason) return toast("Write the reason for removing the tally.", true);
+    if (!confirm(`Remove the ${T.wood_type} tally and its wood items from ${A.sawmill_name}?`)) return;
+    try { await q(sb.from("load_tallies").update({change_reason: reason}).eq("id", T.id)); await q(sb.from("load_tallies").delete().eq("id", T.id)); lsSet(dk, null); toast("Tally removed."); loadLoads(true); location.hash = "#/load/" + L.id; }
+    catch(e) { toast(errText(e), true); }
+  };
+}
+
+/* =====================================================================
    Staff PDF: TRUCK LOADING / DISPATCH DETAILS
    Operational only. Built from an explicit list of non-money fields, so a
    rate, amount, tax, freight, expense or payment can never reach it.
    Columns: Sl. No. | Saw Mill Name | Name of Product | Size | Quantity | Unit
    ===================================================================== */
-async function exportStaffPdf(L, allocs, lines, files){
+async function exportStaffPdf(L, allocs, lines, files, tallies){
   await loadJs(JSPDF_URL, () => window.jspdf && window.jspdf.jsPDF);
   await loadJs(AUTOTABLE_URL, () => window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable);
   const { jsPDF } = window.jspdf;
@@ -1162,7 +1336,7 @@ async function exportStaffPdf(L, allocs, lines, files){
   const rows = [];
   allocs.forEach(a => lines.filter(x => x.allocation_id === a.id).forEach(x => {
     const product = [x.wood_type, x.dimensions, x.length_ft ? nf(x.length_ft) + " ft long" : "", x.pieces ? nf(x.pieces) + " pcs" : ""].filter(Boolean).join(" - ");
-    rows.push([String(rows.length + 1), plain(a.sawmill_name + (a.owner_name ? "\nOwner: " + a.owner_name : "")), plain(product), GRADES[x.size_grade] || "-", nf(x.quantity), x.unit]);
+    rows.push([String(rows.length + 1), plain(a.sawmill_name + (a.owner_name ? "\nOwner: " + a.owner_name : "")), plain(product), GRADES[x.size_grade] || "-", x.tally_id ? cft2(x.quantity) : nf(x.quantity), x.unit]);
   }));
   doc.autoTable({...grid, startY:doc.lastAutoTable.finalY + 3, showHead:"everyPage",
     head:[["Sl. No.", "Saw Mill Name", "Name of Product / Wood Details", "Size", "Quantity", "Unit"]],
@@ -1170,6 +1344,22 @@ async function exportStaffPdf(L, allocs, lines, files){
     body:rows,
     columnStyles:{0:{cellWidth:17, halign:"center"}, 1:{cellWidth:45}, 2:{cellWidth:65}, 3:{cellWidth:19, halign:"center"}, 4:{cellWidth:22, halign:"right"}, 5:{cellWidth:18, halign:"center"}}});
 
+  // Piece tally summary (operational numbers only): CFT and pieces by size and thickness
+  if ((tallies || []).length) {
+    const trow = [];
+    tallies.forEach(t => {
+      const a = allocs.find(x => x.id === t.allocation_id) || {}, tt = tallyTotals(t.counts);
+      const cell = (o, k) => o.th[k] ? nf(Math.round(o.th[k].cft * 100) / 100) + " CFT\n" + nf(o.th[k].pcs) + " pcs" : "-";
+      Object.keys(tt.th).sort((x, y) => x - y).forEach(k => trow.push([plain(a.sawmill_name || ""), plain(t.wood_type), k + '"', cell(tt.size.small, k), cell(tt.size.medium, k), cell(tt.size.large, k), nf(Math.round(tt.th[k].cft * 100) / 100) + " CFT\n" + nf(tt.th[k].pcs) + " pcs"]));
+      trow.push([{content: plain((a.sawmill_name || "") + " - " + t.wood_type + ", all thicknesses"), colSpan:3, styles:{fontStyle:"bold"}}, ...["small", "medium", "large"].map(g => tt.size[g].pcs ? nf(Math.round(tt.size[g].cft * 100) / 100) + " CFT\n" + nf(tt.size[g].pcs) + " pcs" : "-"), {content: nf(Math.round(tt.cft * 100) / 100) + " CFT\n" + nf(tt.pcs) + " pcs", styles:{fontStyle:"bold"}}]);
+    });
+    doc.autoTable({...grid, startY:doc.lastAutoTable.finalY + 3, showHead:"everyPage",
+      head:[[{content: plain("Piece tally - Small " + sizeBand("small") + ", Medium " + sizeBand("medium") + ", Large " + sizeBand("large")), colSpan:7, styles:{halign:"left"}}],
+            ["Saw Mill Name", "Wood", "Thick", "Small", "Medium", "Large", "All sizes"]],
+      headStyles:{fillColor:[27, 67, 50], textColor:255, fontStyle:"bold", halign:"center"},
+      body:trow,
+      columnStyles:{0:{cellWidth:38}, 1:{cellWidth:24}, 2:{cellWidth:14, halign:"center"}, 3:{cellWidth:27, halign:"right"}, 4:{cellWidth:27, halign:"right"}, 5:{cellWidth:27, halign:"right"}, 6:{cellWidth:29, halign:"right"}}});
+  }
   // Operational summary: quantity per unit (units are never added together), weigh slips, remarks
   const byUnit = {}; lines.forEach(x => { if (x.quantity != null) byUnit[x.unit] = (byUnit[x.unit] || 0) + Number(x.quantity); });
   const slips = allocs.map(a => { const n = files.filter(f => f.kind === "Weigh slip" && f.allocation_id === a.id).length; return a.sawmill_name + ": " + (n ? n + " uploaded" : "not uploaded") + (a.slip_net_weight_t ? " (net " + nf(a.slip_net_weight_t) + " T)" : ""); }).join("; ");
@@ -1573,11 +1763,16 @@ async function renderSettings(){
   await loadMasters();
   if (here() !== "#/settings") return;
   const auto = Number(S.settings.size_auto || 0) === 1;
-  $("app").innerHTML = `<div class="card"><h3>Size grades</h3><p class="small mut">Staff choose Small / Medium / Large by hand. Switch on automatic grading only after the owner confirms the length limits.</p>
+  $("app").innerHTML = `<div class="card"><h3>Size grades</h3><p class="small mut">From the owner's workbook, for every wood: Small ${esc(sizeBand("small"))}, Medium ${esc(sizeBand("medium"))}, Large ${esc(sizeBand("large"))}. The piece tally always uses these. For typed items, staff choose the size by hand unless automatic grading is on.</p>
     <label class="row" style="margin-bottom:12px"><input type="checkbox" id="sAuto" ${auto ? "checked" : ""} style="width:22px;height:22px"> <span>Set the size from the length automatically</span></label>
-    <div class="two"><label class="f"><span>Small: shorter than (ft)</span><input class="in" id="sLo" type="number" inputmode="decimal" value="${esc(S.settings.size_small_below_ft ?? 4)}"></label>
-    <label class="f"><span>Large: longer than (ft)</span><input class="in" id="sHi" type="number" inputmode="decimal" value="${esc(S.settings.size_large_above_ft ?? 6)}"></label></div>
+    <div class="two"><label class="f"><span>Small: shorter than (ft)</span><input class="in" id="sLo" type="number" inputmode="decimal" value="${esc(S.settings.size_small_below_ft ?? 3)}"></label>
+    <label class="f"><span>Large: from (ft)</span><input class="in" id="sHi" type="number" inputmode="decimal" value="${esc(S.settings.size_large_from_ft ?? 5)}"></label></div>
     <button class="btn pri block" id="sSave">Save</button></div>
+    <div class="card"><h3>Piece tally grid</h3><p class="small mut">Sizes shown on the tally screen, from the workbook's data. Rare bigger pieces: widen here. Thickness: 1, 1.5 and 2 inch.</p>
+    <div class="two"><label class="f"><span>Longest length (ft)</span><input class="in" id="gLen" type="number" inputmode="decimal" step="0.25" value="${esc(S.settings.tally_len_max_ft ?? 8.5)}"></label>
+    <label class="f"><span>Widths from (in)</span><input class="in" id="gW1" type="number" inputmode="numeric" value="${esc(S.settings.tally_width_min_in ?? 4)}"></label></div>
+    <label class="f"><span>Widths up to (in)</span><input class="in" id="gW2" type="number" inputmode="numeric" value="${esc(S.settings.tally_width_max_in ?? 11)}"></label>
+    <button class="btn pri block" id="gSave">Save tally grid</button></div>
     <div class="card"><h3>Loading rules</h3>
     <label class="row" style="margin-bottom:10px"><input type="checkbox" id="sPhoto" ${photoRequired() ? "checked" : ""} style="width:22px;height:22px"> <span>Driver photo with truck is compulsory</span></label>
     <label class="row" style="margin-bottom:12px"><input type="checkbox" id="sSlip" ${slipRequired() ? "checked" : ""} style="width:22px;height:22px"> <span>Every sawmill needs a weigh slip before the truck is Loaded</span></label>
@@ -1586,10 +1781,19 @@ async function renderSettings(){
     ${can("expenses") ? `<div class="card"><h3>Expense categories</h3><p class="small">${S.expCats.map(esc).join(" · ")}</p><button class="btn sm" id="addCat">+ Add category</button></div>` : ""}`;
   $("sSave").onclick = async () => {
     const lo = num($("sLo").value), hi = num($("sHi").value);
-    if (lo === null || hi === null || lo <= 0 || hi < lo) return toast("Large must be at least the small limit.", true);
+    if (lo === null || hi === null || lo <= 0 || hi <= lo) return toast("Large must start above the small limit.", true);
     try {
-      await q(sb.from("app_settings").update({value:lo}).eq("key", "size_small_below_ft")); await q(sb.from("app_settings").update({value:hi}).eq("key", "size_large_above_ft"));
+      await q(sb.from("app_settings").update({value:lo}).eq("key", "size_small_below_ft")); await q(sb.from("app_settings").update({value:hi}).eq("key", "size_large_from_ft"));
       await q(sb.from("app_settings").update({value: $("sAuto").checked ? 1 : 0}).eq("key", "size_auto"));
+      await loadMasters(); toast("Saved.");
+    } catch(e) { toast(errText(e), true); }
+  };
+  $("gSave").onclick = async () => {
+    const len = num($("gLen").value), w1 = num($("gW1").value), w2 = num($("gW2").value);
+    if (!(len >= 1.5 && len <= 11 && len * 4 === Math.round(len * 4))) return toast("Longest length: 1.5 to 11 ft, in quarter feet (3-inch steps).", true);
+    if (!(w1 >= 3 && w2 <= 18 && w1 <= w2 && Number.isInteger(w1) && Number.isInteger(w2))) return toast("Widths: whole inches from 3 to 18.", true);
+    try {
+      for (const [k, v] of [["tally_len_max_ft", len], ["tally_width_min_in", w1], ["tally_width_max_in", w2]]) await q(sb.from("app_settings").update({value:v}).eq("key", k));
       await loadMasters(); toast("Saved.");
     } catch(e) { toast(errText(e), true); }
   };
@@ -1604,7 +1808,7 @@ async function renderSettings(){
 /* ---------- Excel ---------- */
 function renderExport(){
   chrome("Excel export", {back:true, nav:"more"});
-  $("app").innerHTML = `<div class="card"><h2>Download Excel</h2><p class="mut small">Sheets: Loads, Sawmill items, Documents, History${canSeeExp() ? ", Expenses" : ""}${can("finance") ? ", Payments, Balances (prices included)" : ""}.</p>
+  $("app").innerHTML = `<div class="card"><h2>Download Excel</h2><p class="mut small">Sheets: Loads, Sawmill items, Piece tally, Documents, History${canSeeExp() ? ", Expenses" : ""}${can("finance") ? ", Payments, Balances (prices included)" : ""}.</p>
     <div class="two"><label class="f"><span>From</span><input class="in" type="date" id="xFrom" value="${today().slice(0, 7)}-01"></label><label class="f"><span>To</span><input class="in" type="date" id="xTo" value="${today()}"></label></div>
     <button class="btn pri block" id="xGo">Download Excel</button><p class="small mut" id="xMsg"></p></div>`;
   $("xGo").onclick = async () => {
@@ -1614,12 +1818,13 @@ function renderExport(){
     try {
       await loadScript(XLSX_URL);
       const loads = await q(sb.from("v_loads").select("*").gte("load_date", from).lte("load_date", to).order("load_date").order("id"));
-      const ids = loads.map(l => l.id); let lines = [], acts = [], pays = [], exps = [], files = [];
+      const ids = loads.map(l => l.id); let lines = [], acts = [], pays = [], exps = [], files = [], tallies = [];
       for (let i = 0; i < ids.length; i += 150) {
         const part = ids.slice(i, i + 150);
         lines = lines.concat(await q(sb.from("v_lines").select("*").in("load_id", part).order("id")));
         acts = acts.concat(await q(sb.from("activity").select("*").in("load_id", part).order("at")));
         files = files.concat(await q(sb.from("load_files").select("load_id,allocation_id,kind,created_at,created_by").in("load_id", part).order("id")));
+        tallies = tallies.concat(await q(sb.from("load_tallies").select("*").in("load_id", part).order("id")));
         if (canSeeExp()) exps = exps.concat(await q(sb.from("load_costs").select("*").in("load_id", part).order("id")));
         if (can("finance")) pays = pays.concat(await q(sb.from("payments").select("*").in("load_id", part).order("paid_on")));
       }
@@ -1633,7 +1838,10 @@ function renderExport(){
       const s4 = acts.map(a => ({"When (exact)":dExact(a.at), "Load":byId[a.load_id]?.load_no, "Who":person(a.actor), "Stage then":STAGE[a.truck_stage] || "", "What":(ENTITY[a.entity] || a.entity) + " " + a.action, "Details":a.action === "note" ? a.reason : JSON.stringify(a.changes || {}), "Reason":a.action === "note" ? "" : (a.reason || "")}));
       const wb = XLSX.utils.book_new();
       const add = (rows, name) => { const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{"Info":"Nothing in these dates"}]); XLSX.utils.book_append_sheet(wb, ws, name); };
-      add(s1, "Loads"); add(s2, "Sawmill items"); add(s3, "Documents"); add(s4, "History");
+      const s5 = [];
+      tallies.forEach(t => Object.entries(t.counts || {}).sort((x, y) => x[0] - y[0]).forEach(([th, cells]) => Object.entries(cells).map(([k, n]) => [...k.split("|").map(Number), Number(n)]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).forEach(([len, w, n]) =>
+        s5.push({"Load":byId[t.load_id]?.load_no, "Saw Mill Name":(lines.find(x => x.allocation_id === t.allocation_id) || {}).sawmill_name || millName(t.sawmill_id), "Wood":t.wood_type, "Thickness (in)":Number(th), "Length (ft)":len, "Length":ftIn(len), "Width (in)":w, "Pieces":n, "Size":GRADES[gradeFor(len)], "CFT":Number(th) * w * len * n / 144}))));
+      add(s1, "Loads"); add(s2, "Sawmill items"); add(s5, "Piece tally"); add(s3, "Documents"); add(s4, "History");
       if (X) add(exps.map(c => ({"Date":c.paid_on, "Load":byId[c.load_id]?.load_no, "Category":c.cost_type, "Saw Mill Name":c.allocation_id ? (lines.find(x => x.allocation_id === c.allocation_id) || {}).sawmill_name : "Whole trip", "Amount (₹)":n(c.amount), "Paid to":c.paid_to, "Description":c.note, "Entered by":person(c.created_by)})), "Expenses");
       if (F) {
         add(pays.map(p => ({"Date":p.paid_on, "Load":byId[p.load_id]?.load_no, "Type":p.party_kind === "buyer" ? "Received" : "Paid", "Party":p.party_kind === "mill" ? millName(p.sawmill_id) : partyName(p.party_id), "Amount (₹)":n(p.amount), "Mode":MODES[p.mode], "Reference":p.reference, "Note":p.note})), "Payments");

@@ -1,4 +1,4 @@
-/* Aditya Traders: DEMO backend (app 3.2).
+/* Aditya Traders: DEMO backend (app 3.3).
    Runs inside the browser and answers the same requests the real app sends to
    Supabase, so the demo page is the real app page with sample data.
 
@@ -11,12 +11,14 @@
        weigh-slip rules from the owner's settings; Loaded needs every item done
      * every change logged (who, exact time, what, reason, stage); red flags per person
      * rate cards are insert-only (history kept)
+     * piece tally: CFT = thickness x width x length x pieces / 144 (the owner's workbook);
+       Small / Medium / Large items made from it and changed only through it
    Data is kept on this phone/browser only (localStorage). "Reset" restores the sample.
    Sample data: sample_data.json, generated through the REAL database rules. */
 (function () {
   "use strict";
   const BASE = "https://demo.adityatraders.local";
-  const KEY = "at3_demo_db_v1";
+  const KEY = "at3_demo_db_v2";
   const PASSWORD = "demo1234";               // every demo login uses this (sample data only)
   const SKIP = ["id", "created_at", "created_by", "updated_at", "updated_by", "change_reason"];
   const OWNER_STAGES = ["planning", "truck_fixed"];
@@ -24,8 +26,8 @@
   const LOADED_PLUS = ["loaded", "in_transit", "delivered"];
   const UNITS = ["CFT", "CBM", "RFT", "SFT", "Tons", "Pieces", "Quintal", "Kg"];
   const PK = {line_prices: "line_id", load_billing: "load_id", app_settings: "key", wood_types: "name", expense_categories: "name"};
-  const LOG_VIS = {loads: "all", load_allocations: "all", load_lines: "all", load_files: "all", load_costs: "expenses", line_prices: "finance", load_billing: "finance", payments: "finance", sawmill_rates: "finance"};
-  let D = null, ready = null; const blobs = {};
+  const LOG_VIS = {load_tallies: "all", loads: "all", load_allocations: "all", load_lines: "all", load_files: "all", load_costs: "expenses", line_prices: "finance", load_billing: "finance", payments: "finance", sawmill_rates: "finance"};
+  let D = null, ready = null, tallyWrite = false; const blobs = {};
 
   /* ---------------- storage ---------------- */
   function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { /* demo still works this session */ } }
@@ -35,6 +37,7 @@
     for (const rows of Object.values(j.tables)) for (const r of rows) for (const k of Object.keys(r))
       if ((k === "at" || k.endsWith("_at")) && r[k]) r[k] = new Date(r[k]).toISOString();   // compare as text
     D = {t: j.tables, auth: {}, files: {}, seq: {}};
+    D.t.load_tallies = D.t.load_tallies || [];
     for (const p of D.t.profiles) D.auth[p.email] = {id: p.id, pw: PASSWORD};
     for (const [t, rows] of Object.entries(D.t)) D.seq[t] = rows.reduce((m, r) => Math.max(m, typeof r.id === "number" ? r.id : 0), 0);
     D.seq.load_no = D.t.loads.length;
@@ -162,6 +165,7 @@
     expense_categories: c => () => c.money,
     loads: c => r => loadVisible(c, r),
     load_allocations: c => r => c.member && visLoad(c, r.load_id), load_lines: c => r => c.member && visLoad(c, r.load_id), load_files: c => r => c.member && visLoad(c, r.load_id),
+    load_tallies: c => r => c.member && visLoad(c, r.load_id),
     load_costs: c => () => c.money, line_prices: c => () => c.seeRates, sawmill_rates: c => () => c.seeRates,
     load_billing: c => () => c.has("finance"), payments: c => () => c.has("finance"),
     activity: c => r => c.member && (!OWNER_STAGES.includes(r.truck_stage || "") || c.has("plan")) &&
@@ -169,18 +173,18 @@
     load_reviews: c => r => r.user_id === c.uid,
   };
   const CAN = {
-    insert: {sawmills: c => c.member, parties: c => c.member, loads: c => c.member, load_allocations: c => c.member, load_lines: c => c.member, load_files: c => c.member,
+    insert: {load_tallies: c => c.member, sawmills: c => c.member, parties: c => c.member, loads: c => c.member, load_allocations: c => c.member, load_lines: c => c.member, load_files: c => c.member,
       load_costs: c => c.has("expenses"), line_prices: c => c.has("rates"), sawmill_rates: c => c.has("rates"), load_billing: c => c.has("finance"), payments: c => c.has("finance"),
       wood_types: c => c.has("plan"), expense_categories: c => c.has("expenses"), app_settings: c => c.has("people")},
-    update: {sawmills: c => c.member, parties: c => c.member, loads: c => c.member, load_allocations: c => c.member, load_lines: c => c.member, load_costs: c => c.has("expenses"),
+    update: {load_tallies: c => c.member, sawmills: c => c.member, parties: c => c.member, loads: c => c.member, load_allocations: c => c.member, load_lines: c => c.member, load_costs: c => c.has("expenses"),
       line_prices: c => c.has("rates"), load_billing: c => c.has("finance"), payments: c => c.has("finance"), profiles: c => c.has("people"), app_settings: c => c.has("people"), wood_types: c => c.has("plan")},
-    delete: {sawmills: c => c.owner, parties: c => c.owner, loads: c => c.owner, load_files: c => c.member, load_allocations: c => c.member, load_lines: c => c.member,
+    delete: {load_tallies: c => c.member, sawmills: c => c.owner, parties: c => c.owner, loads: c => c.owner, load_files: c => c.member, load_allocations: c => c.member, load_lines: c => c.member,
       load_costs: c => c.has("expenses"), line_prices: c => c.has("rates"), load_billing: c => c.has("finance"), payments: c => c.has("finance")},
   };
   const allowed = (c, op, t, row) => {
     const f = CAN[op][t]; if (!f || !f(c)) return false;
     if (op !== "insert" && t === "load_files" && op === "delete") return c.owner || row.created_by === c.uid;
-    if (["load_allocations", "load_lines", "load_files"].includes(t) && row && row.load_id && !visLoad(c, row.load_id)) return false;
+    if (["load_allocations", "load_lines", "load_files", "load_tallies"].includes(t) && row && row.load_id && !visLoad(c, row.load_id)) return false;
     return true;
   };
 
@@ -242,10 +246,76 @@
     const L = D.t.loads.find(l => l.id === (newR || oldR).load_id);
     if (L && LOADED_PLUS.includes(L.truck_stage) && (op !== "update" || newR.line_status !== "done"))
       throw ruleErr(`This load is already ${L.truck_stage.replace("_", " ")}. Move it back to Under loading first to change its mill lines.`);
-    if (newR && !newR.size_grade && newR.length_ft && setting("size_auto") === 1) {
-      const lo = setting("size_small_below_ft") || 4, hi = setting("size_large_above_ft") || 6;
-      newR.size_grade = newR.length_ft < lo ? "small" : newR.length_ft > hi ? "large" : "medium";
+    if (!tallyWrite) {   // items made by a piece tally change only through the tally
+      if (op === "insert" && newR.tally_id) throw ruleErr("Items from a piece tally are made by the tally.");
+      if (op === "update" && (oldR.tally_id || newR.tally_id) && ["quantity", "pieces", "size_grade", "wood_type", "unit", "tally_id", "allocation_id", "dimensions", "length_ft"].some(k => !same(oldR[k], newR[k])))
+        throw ruleErr("This item comes from the piece tally. Change the tally instead.");
+      if (op === "delete" && oldR.tally_id && D.t.load_tallies.some(x => x.id === oldR.tally_id) && D.t.load_allocations.some(x => x.id === oldR.allocation_id))
+        throw ruleErr("This item comes from the piece tally. Remove the tally instead.");
     }
+    if (newR && !newR.size_grade && newR.length_ft && setting("size_auto") === 1) newR.size_grade = gradeFor(newR.length_ft);
+  }
+  const gradeFor = len => len < (setting("size_small_below_ft") || 3) ? "small" : len >= (setting("size_large_from_ft") || 5) ? "large" : "medium";
+  /* ---------- piece tally (same checks and formula as migration 013) ---------- */
+  function tallyClean(p) {
+    const res = {};
+    if (p === null || p === undefined) return res;
+    if (typeof p !== "object" || Array.isArray(p)) throw ruleErr("The tally is not in the right form.");
+    for (const [t, cells] of Object.entries(p)) {
+      if (!/^[0-9]+(\.[0-9]+)?$/.test(t) || ![1, 1.5, 2].includes(Number(t))) throw ruleErr(`Thickness ${t} inch is not on the tally (1, 1.5 or 2 inch).`);
+      if (!cells || typeof cells !== "object" || Array.isArray(cells)) throw ruleErr("The tally is not in the right form.");
+      const tk = String(Number(t)), o = res[tk] || {};
+      for (const [k, v] of Object.entries(cells)) {
+        const m = /^([0-9]+(?:\.[0-9]+)?)\|([0-9]+)$/.exec(k);
+        if (!m) throw ruleErr(`Tally cell "${k}" is not a length|width.`);
+        const len = Number(m[1]), w = Number(m[2]);
+        if (len < 1.5 || len > 11 || len * 4 !== Math.trunc(len * 4)) throw ruleErr(`Length ${len} ft is not on the tally (1 ft 6 in to 11 ft, in 3-inch steps).`);
+        if (w < 3 || w > 18) throw ruleErr(`Width ${w} inch is not on the tally (3 to 18 inches).`);
+        if (typeof v !== "number") throw ruleErr("Piece counts must be numbers.");
+        if (v < 0 || v > 100000 || v !== Math.trunc(v)) throw ruleErr("Piece counts must be whole numbers (0 to 100000).");
+        const ck = String(len) + "|" + w;
+        if (v > 0) o[ck] = v; else delete o[ck];
+      }
+      if (Object.keys(o).length) res[tk] = o; else delete res[tk];
+    }
+    return res;
+  }
+  function tallyTotals(p) {
+    const out = {};
+    for (const [t, cells] of Object.entries(p || {})) for (const [k, n] of Object.entries(cells)) {
+      const [len, w] = k.split("|").map(Number), g = gradeFor(len), key = g + "|" + t;
+      out[key] = out[key] || {g, t: Number(t), pcs: 0, cft: 0}; out[key].pcs += n; out[key].cft += Number(t) * w * len * n / 144;
+    }
+    return Object.values(out);
+  }
+  function tallyRules(op, oldR, newR) {
+    if (op !== "delete") {
+      if (op === "update" && newR.allocation_id !== oldR.allocation_id) throw ruleErr("A tally cannot move to another sawmill.");
+      const a = D.t.load_allocations.find(x => x.id === newR.allocation_id);
+      if (!a) throw ruleErr("Sawmill allocation not found.");
+      newR.load_id = a.load_id; newR.sawmill_id = a.sawmill_id; newR.wood_type = String(newR.wood_type || "").trim();
+      newR.counts = tallyClean(newR.counts);
+    }
+    const L = D.t.loads.find(l => l.id === (newR || oldR).load_id);
+    if (L && LOADED_PLUS.includes(L.truck_stage)) throw ruleErr(`This load is already ${L.truck_stage.replace("_", " ")}. Move it back to Under loading first to change its tally.`);
+    if (op === "insert" && D.t.load_tallies.some(x => x.allocation_id === newR.allocation_id && x.wood_type === newR.wood_type)) throw new ApiErr(409, "23505", "duplicate key value violates unique constraint");
+    if (op === "update" && D.t.load_tallies.some(x => x !== oldR && x.id !== newR.id && x.allocation_id === newR.allocation_id && x.wood_type === newR.wood_type)) throw new ApiErr(409, "23505", "duplicate key value violates unique constraint");
+  }
+  function tallyItems(c, T) {   // Small / Medium / Large items in CFT, like the trigger
+    tallyWrite = true;
+    try {
+      const tot = tallyTotals(T.counts);
+      for (const g of ["small", "medium", "large"]) {
+        const parts = tot.filter(x => x.g === g).sort((x, y) => x.t - y.t);
+        const pcs = parts.reduce((a, x) => a + x.pcs, 0), cf = r3(parts.reduce((a, x) => a + x.cft, 0));
+        const dims = "Piece tally, " + parts.map(x => x.t + '"').join(", ") + " thick";
+        const ln = D.t.load_lines.find(x => x.tally_id === T.id && x.size_grade === g);
+        if (pcs > 0) {
+          if (!ln) insert(c, "load_lines", {allocation_id: T.allocation_id, wood_type: T.wood_type, unit: "CFT", quantity: cf, pieces: pcs, size_grade: g, dimensions: dims, tally_id: T.id, change_reason: T.change_reason ?? null});
+          else if (!same([ln.wood_type, ln.quantity, ln.pieces, ln.dimensions], [T.wood_type, cf, pcs, dims])) update(c, "load_lines", ln, {wood_type: T.wood_type, quantity: cf, pieces: pcs, dimensions: dims, change_reason: T.change_reason ?? null});
+        } else if (ln) deleteRow(c, "load_lines", ln);
+      }
+    } finally { tallyWrite = false; }
   }
   function checkRow(c, t, r, op, old) {
     const need = (cond, what) => { if (!cond) throw new ApiErr(400, "23514", `new row for relation "${t}" violates check constraint (${what})`); };
@@ -267,6 +337,7 @@
     if (t === "sawmill_rates") { need(r.rate >= 0, "rate"); need(UNITS.includes(r.unit), "unit"); }
     if (t === "profiles" && old && !c.owner && (r.role === "owner" || old.role === "owner" || r.perm_people !== old.perm_people)) throw ruleErr("Only the owner can change owner accounts or the people permission.");
     if (["sawmills", "parties", "wood_types", "expense_categories"].includes(t)) need(String(r.name || "").trim(), "name");
+    if (t === "load_tallies") need(String(r.wood_type || "").trim(), "wood");
     if (t === "load_allocations") need(r.slip_net_weight_t == null || (r.slip_net_weight_t > 0 && r.slip_net_weight_t < 100), "slip weight");
   }
   const NUM2 = ["rate", "adjustment", "amount", "sale_rate", "sale_adjustment", "gst_amount", "value"], NUM3 = ["quantity", "sale_qty", "net_weight_t", "slip_net_weight_t"];
@@ -282,8 +353,9 @@
   function defaults(c, t, r) {
     const n = nowIso(), base = {};
     if (!PK[t] && t !== "load_reviews") base.id = ++D.seq[t];
-    if (["loads", "load_allocations", "load_lines", "load_costs", "payments", "load_files", "sawmills", "parties", "sawmill_rates"].includes(t)) { base.created_at = n; base.created_by = c.uid; }
-    if (["loads", "load_allocations", "load_lines", "load_costs", "payments", "line_prices", "load_billing"].includes(t)) { base.updated_at = n; base.updated_by = ["line_prices", "load_billing"].includes(t) ? c.uid : null; }
+    if (["loads", "load_allocations", "load_lines", "load_costs", "payments", "load_files", "sawmills", "parties", "sawmill_rates", "load_tallies"].includes(t)) { base.created_at = n; base.created_by = c.uid; }
+    if (t === "load_tallies") Object.assign(base, {counts: {}, notes: null});
+    if (["loads", "load_allocations", "load_lines", "load_costs", "payments", "line_prices", "load_billing", "load_tallies"].includes(t)) { base.updated_at = n; base.updated_by = ["line_prices", "load_billing"].includes(t) ? c.uid : null; }
     if (t === "loads") Object.assign(base, {load_no: "L-" + String(++D.seq.load_no).padStart(4, "0"), load_date: todayIST(), truck_stage: "planning"});
     if (t === "load_lines") Object.assign(base, {line_status: "planned", size_grade: null});
     if (t === "line_prices") base.adjustment = 0;
@@ -356,10 +428,12 @@
   function deleteRow(c, t, r) {
     if (t === "load_lines") lineRules("delete", r, null);
     if (t === "load_allocations") allocRules("delete", r, null);
+    if (t === "load_tallies") tallyRules("delete", r, null);
     D.t[t] = D.t[t].filter(x => x !== r);
+    if (t === "load_tallies") D.t.load_lines.filter(x => x.tally_id === r.id).forEach(x => deleteRow(c, "load_lines", x));
     log(c, t, "delete", r, null);
     if (t === "loads") {
-      ["load_allocations", "load_lines", "load_costs", "load_billing", "load_files"].forEach(ct => D.t[ct].filter(x => x.load_id === r.id).forEach(x => {
+      ["load_allocations", "load_tallies", "load_lines", "load_costs", "load_billing", "load_files"].forEach(ct => D.t[ct].filter(x => x.load_id === r.id).forEach(x => {
         if (ct === "load_lines") D.t.line_prices = D.t.line_prices.filter(p => p.line_id !== x.id);
         D.t[ct] = D.t[ct].filter(y => y !== x); log(c, ct, "delete", x, null);
       }));
@@ -369,17 +443,20 @@
     if (t === "load_allocations") {
       D.t.load_lines.filter(x => x.allocation_id === r.id).forEach(x => { D.t.load_lines = D.t.load_lines.filter(y => y !== x); D.t.line_prices = D.t.line_prices.filter(p => p.line_id !== x.id); log(c, "load_lines", "delete", x, null); });
       D.t.load_files = D.t.load_files.filter(f => f.allocation_id !== r.id);
+      D.t.load_tallies.filter(x => x.allocation_id === r.id).forEach(x => { D.t.load_tallies = D.t.load_tallies.filter(y => y !== x); log(c, "load_tallies", "delete", x, null); });
       D.t.load_costs.forEach(x => { if (x.allocation_id === r.id) x.allocation_id = null; });
     }
     if (t === "load_lines") D.t.line_prices = D.t.line_prices.filter(p => p.line_id !== r.id);
   }
   function update(c, t, row, patch) {
     const old = clone(row), next = {...row, ...patch};
-    if (["loads", "load_allocations", "load_lines", "load_costs", "payments", "line_prices", "load_billing"].includes(t)) { next.updated_at = nowIso(); next.updated_by = c.uid; }
+    if (["loads", "load_allocations", "load_lines", "load_costs", "payments", "line_prices", "load_billing", "load_tallies"].includes(t)) { next.updated_at = nowIso(); next.updated_by = c.uid; }
     if (t === "load_lines") lineRules("update", old, next);
     if (t === "load_allocations") allocRules("update", old, next);
+    if (t === "load_tallies") tallyRules("update", old, next);
     checkRow(c, t, next, "update", old);
     Object.assign(row, next);
+    if (t === "load_tallies") tallyItems(c, row);
     log(c, t, "update", old, row);
     return row;
   }
@@ -388,11 +465,14 @@
     if (PK[t] && D.t[t].some(r => String(r[PK[t]]) === String(row[PK[t]]))) throw new ApiErr(409, "23505", "duplicate key value violates unique constraint");
     if (t === "load_files" && D.t.load_files.some(r => r.storage_path === row.storage_path)) throw new ApiErr(409, "23505", "duplicate key value violates unique constraint");
     if (["load_allocations", "load_lines", "load_files", "load_costs"].includes(t) && !visLoad(c, t === "load_lines" && row.allocation_id ? (D.t.load_allocations.find(a => a.id === row.allocation_id) || {}).load_id : row.load_id)) throw deny();
+    if (t === "load_tallies" && !visLoad(c, (D.t.load_allocations.find(a => a.id === row.allocation_id) || {}).load_id)) throw deny();
     if (t === "load_lines") lineRules("insert", null, row);
     if (t === "load_allocations") allocRules("insert", null, row);
+    if (t === "load_tallies") tallyRules("insert", null, row);
     if (t === "line_prices" && !D.t.load_lines.some(l => l.id === row.line_id)) throw new ApiErr(409, "23503", "item not found");
     checkRow(c, t, row, "insert", null);
     D.t[t].push(row);
+    if (t === "load_tallies") tallyItems(c, row);
     log(c, t, "insert", null, row);
     return row;
   }
