@@ -3,8 +3,11 @@
 One place for every load. It replaces phone calls and WhatsApp messages between owner, staff and accountant: **each change records what changed, who made it, the exact time (to the second), why, and the load's stage at that moment.** Anything changed since you last checked shows in red.
 
 - **App:** `apps/aditya/index.html`. Plain HTML/CSS/JS, phone-first. Published at https://krishnasai-pentakota.github.io/aditya/
-- **Database:** Supabase project `aditya-traders` (Mumbai). The schema and security rules are in `docs/aditya-app/supabase/`; version 2 is `007_v2_loads.sql` and `008_lock_size_grade_fn.sql`. The database enforces every rule below, not just the screens.
+- **Database:** Supabase project `aditya-traders` (Mumbai). The schema and security rules are in `docs/aditya-app/supabase/`; version 2 is `007_v2_loads.sql`, `008_lock_size_grade_fn.sql` and `009_qty_summary_format.sql`. The database enforces every rule below, not just the screens.
 - **Login service:** the Supabase function `team-admin` (`docs/aditya-app/supabase/functions/team-admin/index.ts`) lets the owner or accountant create logins from inside the app.
+- **Demo with sample data:** https://krishnasai-pentakota.github.io/aditya/demo/ and its walkthrough: https://krishnasai-pentakota.github.io/aditya/demo/guide.html
+  - The demo is the real app page plus a small in-browser backend (`docs/aditya-app/demo/demo_backend.js`) that copies the database rules. Changes stay on that phone; **Reset** restores the sample.
+  - Sample data (58 loads, 5–6 at every stage, 718 history entries by owner, accountant and 7 staff) is made by `make_sample.py`, which runs every step through the real migrations on a local Postgres. Rebuild: `make_sample.py` → `build_demo.py` → `build_guide.py`; test: `test_demo.py`.
 - **Tests:** `docs/aditya-app/tests/`
   - 98 database checks: the real migrations on a local Postgres.
   - 67 browser checks: the real page, supabase-js and database through a local stand-in, on a phone-sized screen.

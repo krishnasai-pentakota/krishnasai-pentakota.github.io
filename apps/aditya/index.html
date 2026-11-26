@@ -216,7 +216,8 @@ const FIELD = {load_date:"Date",truck_stage:"Stage",vehicle_no:"Truck no",capaci
   party_kind:"Paid by/to",mode:"Mode",reference:"Reference",kind:"Photo type",file_name:"File",storage_path:"File",mime_type:"Type",size_bytes:"Size",load_id:"Load"};
 const ENTITY = {loads:"Load", load_lines:"Mill line", line_prices:"Purchase rate", load_costs:"Cost", load_billing:"Bill", payments:"Payment", load_files:"Photo", note:"Update"};
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true}});
+// CFG.fetch is only set by the demo page (sample data in the browser); the live app uses the network.
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true}, ...(CFG.fetch ? {global:{fetch: CFG.fetch}} : {})});
 
 /* ---------- state ---------- */
 const S = {user:null, me:null, loads:[], sawmills:[], parties:[], people:{}, settings:{}, filter:"all", q:"", loadedAt:null, offline:false};
@@ -457,7 +458,7 @@ function renderLoads(){
   chrome("Loads", {nav:"loads"});
   const L = S.loads;
   const filters = [["all","All"],["check","To check"],...STAGES,["cancelled","Cancelled"]];
-  if (isAdmin()) filters.push(["ready_to_bill","Ready to bill"],["payment_pending","Payment pending"],["paid","Paid"]);
+  if (isAdmin()) filters.push(["ready_to_bill","Ready to bill"],["billed","Billed"],["payment_pending","Payment pending"],["paid","Paid"]);
   const match = (l, f) => f === "all" ? l.truck_stage !== "cancelled" : f === "check" ? l.my_flag !== "ok" : (BILL[f] ? l.bill_stage === f : l.truck_stage === f);
   const qq = S.q.trim().toLowerCase();
   let rows = L.filter(l => match(l, S.filter));
@@ -612,7 +613,7 @@ async function renderLoad(id){
   document.querySelectorAll("[data-rate]").forEach(b => b.onclick = () => rateForm(lines.find(x => x.id === Number(b.dataset.rate)), reload));
   $("addCost").onclick = () => costForm(id, null, reload);
   document.querySelectorAll("[data-cost]").forEach(b => b.onclick = () => costForm(id, costs.find(x => x.id === Number(b.dataset.cost)), reload));
-  const eb = $("editBill"); if (eb) eb.onclick = () => billForm(L, bill, reload);
+  const eb = $("editBill"); if (eb) eb.onclick = () => billForm(L, bill, reload, lines);
   const ap = $("addPay"); if (ap) ap.onclick = () => payForm({load: L, lines}, null, reload);
   document.querySelectorAll("[data-pay]").forEach(b => b.onclick = () => payForm({load: L, lines}, pays.find(x => x.id === Number(b.dataset.pay)), reload));
   if (files.length) showFileLinks(files);
@@ -730,13 +731,16 @@ async function costForm(loadId, c, done){
     toast("Saved."); done();
   } catch(e) { toast(errText(e), true); }
 }
-async function billForm(L, b, done){
+async function billForm(L, b, done, lines = []){
   const buyer = S.parties.find(p => p.id === L.party_id);
+  // Default sale unit/quantity: CFT if the load has CFT lines, else the unit its lines use (e.g. Teak in Tons).
+  const unit0 = L.cft_total != null ? "CFT" : ((lines.find(x => x.quantity != null) || {}).unit || "CFT");
+  const qty0 = L.cft_total != null ? L.cft_total : Math.round(lines.filter(x => x.unit === unit0).reduce((a, x) => a + Number(x.quantity || 0), 0) * 1000) / 1000 || "";
   const v = await sheet({title: b ? "Edit bill" : "Create bill", intro:`Invoice total = quantity × rate ± adjustment + GST. Due date = invoice date + credit days.`, fields:[
     {id:"invoice_no", label:"Invoice no", type:"text", value:b?.invoice_no ?? "", required:true},
     {id:"invoice_date", label:"Invoice date", type:"date", value:b?.invoice_date ?? today(), required:true},
-    {id:"sale_unit", label:"Sale unit", type:"select", options:UNITS.map(u => [u, u]), value:b?.sale_unit ?? "CFT"},
-    {id:"sale_qty", label:"Sale quantity", type:"number", value:b?.sale_qty ?? L.cft_total ?? "", required:true, min:0},
+    {id:"sale_unit", label:"Sale unit", type:"select", options:UNITS.map(u => [u, u]), value:b?.sale_unit ?? unit0},
+    {id:"sale_qty", label:"Sale quantity", type:"number", value:b?.sale_qty ?? qty0, required:true, min:0},
     {id:"sale_rate", label:"Sale rate (₹ per unit)", type:"number", value:b?.sale_rate ?? "", required:true, min:0},
     {id:"sale_adjustment", label:"Adjustment (₹, + or −)", type:"number", value:b?.sale_adjustment ?? 0},
     {id:"gst_amount", label:"GST amount (₹)", type:"number", value:b?.gst_amount ?? 0, min:0},
@@ -779,6 +783,10 @@ async function payForm(ctx, p, done){
 
 /* ---------- photos ---------- */
 async function showFileLinks(files){
+  if (CFG.fileUrl) {   // demo page only: photos live in the browser
+    for (const f of files) { const url = await CFG.fileUrl(f.storage_path); const a = $("fl-" + f.id), i = $("fi-" + f.id); if (a) a.href = url; if (i) i.src = url; }
+    return;
+  }
   try {
     const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(files.map(f => f.storage_path), 3600);
     if (error) throw error;

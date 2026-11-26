@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Aditya Traders · How each stage works</title>
+<style>
+body{margin:0;background:#f4f1ec;color:#1f1a15;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:#4a2a12;color:#fbf3e9;padding:22px 16px}header h1{margin:0 0 4px;font-size:24px}header p{margin:0;opacity:.9}
+main{max-width:1100px;margin:0 auto;padding:12px}
+.try{background:#f3b733;border-radius:14px;padding:14px 16px;margin:12px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.try a{background:#4a2a12;color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
+section{background:#fff;border:1px solid #e6dfd5;border-radius:14px;padding:16px;margin:14px 0}
+h2{margin:0 0 6px;font-size:20px}.n{font-size:13px;background:#efe9e2;border-radius:999px;padding:2px 9px;vertical-align:middle;color:#5b4a3a}
+.who{margin:0 0 6px;color:#6d4220}ol{margin:6px 0;padding-left:22px}li{margin:3px 0}
+.rules{background:#fdecea;border-radius:10px;padding:8px 10px 8px 28px;color:#7f1d1d;margin:8px 0}
+.shots{display:flex;gap:14px;overflow-x:auto;padding:8px 2px 4px}
+figure{margin:0;flex:0 0 260px}figure img{width:260px;border-radius:12px;border:1px solid #e6dfd5;display:block;background:#eee}
+figcaption{font-size:13.5px;color:#6b6058;margin-top:6px}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px solid #e6dfd5;padding:7px 6px;text-align:left}
+footer{text-align:center;color:#6b6058;font-size:13px;padding:16px}
+</style></head><body>
+<header><h1>How each stage works</h1><p>Aditya Traders app · sample data · who does what at every stage</p></header>
+<main>
+<div class="try"><span style="flex:1;min-width:200px"><b>Try it yourself.</b> The demo has the same sample loads. Switch between Owner, Accountant and Staff at the top and watch each other's changes turn red.</span><a href="./">Open the demo</a></div>
+<section><h2>The people in the sample</h2><table>
+<tr><th>Person</th><th>Role</th><th>Sees</th></tr>
+<tr><td>Bharat</td><td>Owner</td><td>Everything, can change everything</td></tr>
+<tr><td>Lakshmi</td><td>Accountant</td><td>Same as owner</td></tr>
+<tr><td>Ravi, Suresh, Prasad, Naidu, Kiran, Srinu, Raju (+3 more)</td><td>Staff</td><td>Loads, mills, quantities, freight, costs, photos, updates — never rates, bills or payments</td></tr>
+</table><p style="margin:8px 0 0;font-size:14px;color:#6b6058">All names, mills, buyers, rates and amounts are invented sample values. The sample was made by running every step as these people through the real database rules, from 1 to 26 Nov 2026.</p></section>
+<section><h2>Home screen</h2>
+<p class="who"><b>Who:</b> Everyone (money tiles only for Owner and Accountant)</p>
+<ol><li>Counts of loads at every truck stage. Tap a tile to see those loads.</li><li>Red bar: loads changed by someone else since you last checked.</li><li>Latest updates: every change, with the exact time, the person and the reason.</li></ol>
+<ul class="rules"><li>Staff never see the money tiles.</li></ul>
+<div class="shots"><figure><img src="guide/01_owner_home.jpg" alt="Owner&#x27;s home: 5–6 loads at each stage, 10 to check, money tiles" loading="lazy"><figcaption>Owner&#x27;s home: 5–6 loads at each stage, 10 to check, money tiles</figcaption></figure><figure><img src="guide/20_staff_home.jpg" alt="Staff home (Ravi): same loads, no money" loading="lazy"><figcaption>Staff home (Ravi): same loads, no money</figcaption></figure></div></section><section><h2>1 · Planning <span class="n">5 sample loads</span></h2>
+<p class="who"><b>Who:</b> Owner or Staff</p>
+<ol><li>Tap + New load. Choose the buyer, destination and state, and the truck size (30 T / 35 T).</li><li>Write the reason (e.g. “Goel asked for one load of Mango”).</li><li>Check which mills have wood: More → Mills → Ask mills about loads (ready WhatsApp message to each mill).</li><li>Post the replies as updates on the load, so nobody has to phone around.</li></ol>
+<ul class="rules"><li>No truck number is needed yet.</li></ul>
+<div class="shots"><figure><img src="guide/10_list_planning.jpg" alt="Loads in Planning" loading="lazy"><figcaption>Loads in Planning</figcaption></figure><figure><img src="guide/11_load_planning.jpg" alt="A load in Planning, with the staff&#x27;s update about mill stock" loading="lazy"><figcaption>A load in Planning, with the staff&#x27;s update about mill stock</figcaption></figure></div></section><section><h2>2 · Truck fixed <span class="n">5 sample loads</span></h2>
+<p class="who"><b>Who:</b> Staff (or Owner)</p>
+<ol><li>Edit the load: truck number, driver name and phone, transporter, freight.</li><li>Move to Truck fixed with a reason (e.g. “Truck booked with Sri Sai Transport”).</li></ol>
+<ul class="rules"><li>The app refuses to leave Planning without a truck number.</li><li>Freight and costs are visible to staff (owner&#x27;s decision).</li></ul>
+<div class="shots"><figure><img src="guide/10_list_truck_fixed.jpg" alt="Loads with a truck fixed" loading="lazy"><figcaption>Loads with a truck fixed</figcaption></figure><figure><img src="guide/11_load_truck_fixed.jpg" alt="Truck, driver, transporter and freight; history shows who entered them" loading="lazy"><figcaption>Truck, driver, transporter and freight; history shows who entered them</figcaption></figure></div></section><section><h2>3 · Going to load <span class="n">5 sample loads</span></h2>
+<p class="who"><b>Who:</b> Staff</p>
+<ol><li>When the driver starts, tap Move to: Going to load and give the reason.</li><li>Call or WhatsApp the driver straight from the load page.</li></ol>
+
+<div class="shots"><figure><img src="guide/10_list_going_to_load.jpg" alt="Trucks on the way to the mills" loading="lazy"><figcaption>Trucks on the way to the mills</figcaption></figure><figure><img src="guide/11_load_going_to_load.jpg" alt="Load page with the stage bar" loading="lazy"><figcaption>Load page with the stage bar</figcaption></figure></div></section><section><h2>4 · Under loading <span class="n">6 sample loads</span></h2>
+<p class="who"><b>Who:</b> Staff add mills · Owner/Accountant set rates</p>
+<ol><li>Staff: + Add mill for each mill the truck loads at: mill, wood, unit (CFT, Tons, Pieces, CBM…), quantity, length.</li><li>The size grade is set from the length: Small under 4 ft, Medium 4–6 ft, Large over 6 ft (provisional, change in Settings).</li><li>Owner or accountant: Set rate on each mill line. Amount = quantity × rate ± adjustment. The mill&#x27;s last rate is suggested.</li><li>The fill bar shows CFT against the owner&#x27;s guide (about 1,350 CFT for 35 T).</li></ol>
+<ul class="rules"><li>Staff never see rates or amounts — the database does not send them to staff phones at all.</li><li>Every rate change is logged as “Admin only” with the reason.</li></ul>
+<div class="shots"><figure><img src="guide/10_list_under_loading.jpg" alt="Six loads being loaded; the red one changed since the owner last looked" loading="lazy"><figcaption>Six loads being loaded; the red one changed since the owner last looked</figcaption></figure><figure><img src="guide/11_load_under_loading.jpg" alt="Owner&#x27;s view: mill lines with purchase rate and amount" loading="lazy"><figcaption>Owner&#x27;s view: mill lines with purchase rate and amount</figcaption></figure><figure><img src="guide/21_staff_under_loading.jpg" alt="Ravi&#x27;s (staff) view of a load being loaded: same lines, no prices" loading="lazy"><figcaption>Ravi&#x27;s (staff) view of a load being loaded: same lines, no prices</figcaption></figure></div></section><section><h2>5 · Loaded <span class="n">5 sample loads</span></h2>
+<p class="who"><b>Who:</b> Staff</p>
+<ol><li>At each mill: Mark done with the final quantity.</li><li>Add costs (hamali, weighbridge…) and the kata slip photo.</li><li>Move to Loaded with the reason, e.g. “All mills loaded, kata 34.2 T”.</li></ol>
+<ul class="rules"><li>Loaded is refused while any mill line is not done.</li><li>After Loaded, mills cannot be added or re-opened (move back to Under loading first).</li></ul>
+<div class="shots"><figure><img src="guide/10_list_loaded.jpg" alt="Loaded trucks" loading="lazy"><figcaption>Loaded trucks</figcaption></figure><figure><img src="guide/22_staff_after_loading.jpg" alt="Ravi finished both mills, marked Loaded and posted an update" loading="lazy"><figcaption>Ravi finished both mills, marked Loaded and posted an update</figcaption></figure></div></section><section><h2>6 · In transit <span class="n">6 sample loads</span></h2>
+<p class="who"><b>Who:</b> Accountant enters e-way bill · Staff move the stage</p>
+<ol><li>Accountant: edit the load and enter the e-way bill number.</li><li>Staff: Move to In transit. Post driver updates (“crossed Nagpur”) instead of calling the office.</li></ol>
+
+<div class="shots"><figure><img src="guide/10_list_in_transit.jpg" alt="Trucks on the road" loading="lazy"><figcaption>Trucks on the road</figcaption></figure><figure><img src="guide/11_load_in_transit.jpg" alt="Load in transit: e-way bill, driver updates in the history" loading="lazy"><figcaption>Load in transit: e-way bill, driver updates in the history</figcaption></figure></div></section><section><h2>7 · Delivered and billing <span class="n">20 sample loads</span></h2>
+<p class="who"><b>Who:</b> Owner/Staff mark delivered · Accountant bills and records payments</p>
+<ol><li>When the party confirms unloading: Move to Delivered → the bill status becomes Ready to bill.</li><li>Accountant: + Create bill — invoice no and date, sale quantity, rate, adjustment, GST amount, credit days.</li><li>Due date = invoice date + credit days. Record payments received (bank, UPI, cash, cheque) and payments to mills and transporters.</li></ol>
+<ul class="rules"><li>Bill status moves by itself: Ready to bill → Billed → Payment pending (part paid or overdue) → Paid.</li><li>Sample GST is left at ₹0 — the rate is for the accountant to confirm.</li></ul>
+<div class="shots"><figure><img src="guide/12_list_ready_to_bill.jpg" alt="Ready to bill (5)" loading="lazy"><figcaption>Ready to bill (5)</figcaption></figure><figure><img src="guide/12_list_billed.jpg" alt="Billed, not yet due (5)" loading="lazy"><figcaption>Billed, not yet due (5)</figcaption></figure><figure><img src="guide/12_list_payment_pending.jpg" alt="Payment pending (5)" loading="lazy"><figcaption>Payment pending (5)</figcaption></figure><figure><img src="guide/12_list_paid.jpg" alt="Paid (5)" loading="lazy"><figcaption>Paid (5)</figcaption></figure><figure><img src="guide/13_load_payment_pending.jpg" alt="A part-paid bill: invoice, due date, received, balance in red" loading="lazy"><figcaption>A part-paid bill: invoice, due date, received, balance in red</figcaption></figure></div></section><section><h2>Who changed what — red flags</h2>
+<p class="who"><b>Who:</b> Everyone</p>
+<ol><li>Each person has their own “checked” time per load. Anything changed by others after that shows in red, with how many changes.</li><li>Open the load: the new entries are marked red in the history. Tap Mark checked when done.</li><li>The Updates screen lists every change across all loads.</li></ol>
+<ul class="rules"><li>Nobody can edit or delete the history.</li></ul>
+<div class="shots"><figure><img src="guide/30_accountant_sees_staff_change.jpg" alt="Lakshmi (accountant) sees exactly what Ravi changed, when and why" loading="lazy"><figcaption>Lakshmi (accountant) sees exactly what Ravi changed, when and why</figcaption></figure><figure><img src="guide/31_accountant_billing.jpg" alt="Lakshmi bills the load and records a part payment" loading="lazy"><figcaption>Lakshmi bills the load and records a part payment</figcaption></figure><figure><img src="guide/40_owner_updates_after.jpg" alt="Bharat (owner) sees both in Updates" loading="lazy"><figcaption>Bharat (owner) sees both in Updates</figcaption></figure></div></section><section><h2>Parties and balances</h2>
+<p class="who"><b>Who:</b> Owner and Accountant only</p>
+<ol><li>Buyers: what to collect. Mills and transporters: what to pay.</li><li>Open a party for its loads, payments and a WhatsApp reminder with the balance.</li></ol>
+
+<div class="shots"><figure><img src="guide/14_parties_buyers.jpg" alt="Buyers to collect from" loading="lazy"><figcaption>Buyers to collect from</figcaption></figure><figure><img src="guide/15_parties_mills.jpg" alt="Mills to pay" loading="lazy"><figcaption>Mills to pay</figcaption></figure></div></section>
+</main><footer>Aditya Traders · app version 2.0 · sample walkthrough</footer></body></html>
