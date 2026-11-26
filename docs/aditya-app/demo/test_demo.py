@@ -102,9 +102,11 @@ try:
         pg.locator("[data-done]").first.click(); sheet({"change_reason": "Tally finished, demo"})
         pg.wait_for_function(f"document.querySelector('#setStage') && document.querySelectorAll('[data-done]').length < {n}", timeout=8000)
     pg.click("#setStage"); sheet({"stage": "Loaded", "change_reason": "All mills loaded, kata 34.2 T (Ravi)"})
+    sheet({"net_weight_t": "34.2"})
     try: pg.wait_for_selector(".sect .pill.s-loaded", timeout=8000)
     except Exception: print("STAGEFAIL", pg.locator(".toast").all_inner_texts(), pg.locator("#title").inner_text()); raise
     ok("staff marks the under-loading load as Loaded", lambda: expect(pg.locator(".sect .pill.s-loaded")).to_be_visible())
+    ok("kata net weight entered by staff shows on the truck card", lambda: expect(pg.locator("dd:has-text('34.2 T')")).to_be_visible())
     pg.fill("#noteText", "Driver will leave by 7 pm after e-way bill"); pg.click("#noteForm button"); pg.wait_for_selector("text=Driver will leave by 7 pm")
     shot("22_staff_after_loading", True)
     leak = pg.evaluate("""async () => {

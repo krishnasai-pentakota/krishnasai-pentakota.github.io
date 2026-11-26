@@ -4,48 +4,51 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#4a2a12">
+<meta name="theme-color" content="#f3eee4">
+<!-- Fonts: Fraunces (headings, numbers) + Outfit (text). If they do not load (weak signal), system fonts are used. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Outfit:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
 <title>Aditya Traders · Demo</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234a2a12'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='15' text-anchor='middle' fill='%23f3b733'%3EAT%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231b4332'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='15' text-anchor='middle' fill='%23f3b733'%3EAT%3C/text%3E%3C/svg%3E">
 <style>
 /* Aditya Traders, version 2: one place for every load.
    Plain HTML/CSS/JS with system fonts, so it is fast on low-end Android over weak signal.
    Brand: teak brown, mango yellow. Red = changed since you last checked. */
-:root{--bg:#f4f1ec;--card:#fff;--ink:#1f1a15;--mut:#6b6058;--line:#e6dfd5;--soft:#faf7f3;--brand:#4a2a12;--brand2:#6d4220;--mango:#f3b733;--red:#c62828;--redbg:#fdecea;--blue:#1d4ed8;--bluebg:#e8efff;--green:#13804a;--greenbg:#e5f4eb;--amber:#8a5a00;--amberbg:#fff3d6;--r:14px}
+:root{--bg:#f3eee4;--card:#fffdf8;--ink:#1c1712;--mut:#6e645a;--line:#e3d7c6;--soft:#f8f3ea;--brand:#1b4332;--brand2:#8a4a12;--act:#b85c14;--mango:#f3b733;--serif:"Fraunces",Georgia,"Times New Roman",serif;--red:#c62828;--redbg:#fdecea;--blue:#1d4ed8;--bluebg:#e8efff;--green:#13804a;--greenbg:#e5f4eb;--amber:#8a5a00;--amberbg:#fff3d6;--r:14px}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 "Outfit",system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;-webkit-text-size-adjust:100%}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:var(--brand2)}
 .hidden{display:none!important}
-h2{font-size:20px;margin:4px 0 12px}
-h3{font-size:16px;margin:0 0 10px}
+h2{font:600 22px/1.2 var(--serif);letter-spacing:-.01em;margin:4px 0 12px}
+h3{font:600 17px/1.25 var(--serif);margin:0 0 10px}
 .mut{color:var(--mut)} .small{font-size:14px} .tiny{font-size:13px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .grow{flex:1}
 .num{font-variant-numeric:tabular-nums;white-space:nowrap}
 /* app bar + bottom nav */
-.top{position:sticky;top:0;z-index:30;background:var(--brand);color:#fbf3e9;display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));min-height:56px}
-.top h1{font-size:18px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.top .sub{display:block;font-size:12px;font-weight:400;opacity:.8}
+.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);color:var(--ink);display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));min-height:56px}
+.top h1{font:600 19px/1.15 var(--serif);letter-spacing:-.01em;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{display:block;font:600 11px/1.3 "Outfit",system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
 .iconbtn{background:none;border:0;color:inherit;min-width:44px;min-height:44px;border-radius:10px;font-size:22px;cursor:pointer}
-.iconbtn:hover{background:rgba(255,255,255,.1)}
+.iconbtn:hover{background:rgba(0,0,0,.05)}
 .net{background:#7a2e0e;color:#fff;text-align:center;font-size:14px;padding:6px 10px}
 main{max-width:860px;margin:0 auto;padding:12px 12px 96px}
-nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
 nav.bottom a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;text-decoration:none;color:var(--mut);font-size:12px;font-weight:600;position:relative}
 nav.bottom a svg{width:24px;height:24px}
-nav.bottom a[aria-current=page]{color:var(--brand)}
+nav.bottom a[aria-current=page]{color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,white);border-radius:12px}
 nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;line-height:18px;text-align:center}
 /* surfaces */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .card.flush{padding:0;overflow:hidden}
 .sect{display:flex;align-items:center;gap:8px;margin:0 0 10px}
 .sect h3{margin:0;flex:1}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:9px 16px;border-radius:11px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:9px 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-weight:700;cursor:pointer;text-decoration:none;color:var(--ink)}
 .btn:hover{border-color:var(--brand2)}
-.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn.acc{background:var(--mango);border-color:var(--mango);color:#2a1b0b}
+.btn.pri{background:var(--act);border-color:var(--act);color:#fff8f1}
+.btn.acc{background:var(--brand);border-color:var(--brand);color:#f4f7f4}
 .btn.wa{background:var(--green);border-color:var(--green);color:#fff}
 .btn.red{color:var(--red);border-color:#efb4ae}
 .btn.sm{min-height:38px;padding:6px 12px;font-size:14px;border-radius:9px}
@@ -54,15 +57,15 @@ nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18p
 :focus-visible{outline:3px solid var(--mango);outline-offset:2px}
 /* tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
-.tile{display:block;text-align:left;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px;cursor:pointer;text-decoration:none;color:var(--ink)}
-.tile .n{font-size:26px;font-weight:800;line-height:1.1}
+.tile{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.tile .n{font:600 28px/1.1 var(--serif)}
 .tile .l{font-size:14px;color:var(--mut);margin-top:2px}
 .tile.alert{border-color:#f0b9b3;background:#fff8f7}
 .tile.alert .n{color:var(--red)}
-.tile.money .n{font-size:20px}
+.tile.money{background:var(--brand);border-color:var(--brand);color:#f4f7f4}.tile.money .l{color:#cfe0d6}.tile.money .n{font-size:21px}
 /* chips + pills */
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none}
-.chip{flex:none;min-height:38px;padding:6px 13px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.chip{flex:none;min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
 .chip[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
 .chip .c{margin-left:4px;opacity:.7}
 .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap;background:#efe9e2;color:#5b4a3a}
@@ -83,12 +86,16 @@ nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18p
 .flag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:800}
 .flag.edited{background:var(--red);color:#fff}
 .flag.new{background:var(--bluebg);color:var(--blue)}
+/* person avatars: initials in a rounded square (owner forest, accountant sand, staff amber) */
+.av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;font:700 12px/1 "Outfit",system-ui,sans-serif;background:#f8e6d2;color:#b85c14;flex:none;vertical-align:middle;margin-right:6px}
+.av.owner{background:#1b4332;color:#f4f7f4}.av.accountant{background:#efe6d6;color:#1c1712}
+.av.big{width:40px;height:40px;border-radius:12px;font-size:15px;margin:0}
 /* load cards */
-.loadc{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-left:5px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--ink);text-decoration:none}
+.loadc{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--ink);text-decoration:none}
 .loadc.edited{border-left-color:var(--red);background:#fffafa}
 .loadc.new{border-left-color:var(--blue)}
 .loadc .t1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.loadc .no{font-weight:800;font-size:17px}
+.loadc .no{font:600 18px/1.2 var(--serif)}
 .loadc .veh{font-weight:700;color:var(--brand2)}
 .loadc .t2{margin-top:4px;color:var(--mut);font-size:14.5px}
 .loadc .t3{margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;font-size:14.5px}
@@ -96,7 +103,7 @@ nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18p
 .bar{height:8px;border-radius:4px;background:#eee6dc;overflow:hidden;margin-top:6px}
 .bar>i{display:block;height:100%;background:var(--mango);border-radius:4px}
 .bar.full>i{background:var(--green)}
-.search{width:100%;min-height:46px;padding:10px 12px;border:1.5px solid var(--line);border-radius:11px;background:#fff;margin-bottom:10px;font-size:16px}
+.search{width:100%;min-height:46px;padding:10px 12px;border:1.5px solid var(--line);border-radius:11px;background:var(--card);margin-bottom:10px;font-size:16px}
 .empty{text-align:center;padding:36px 14px;color:var(--mut)}
 .banner{border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .banner.red{background:var(--redbg);color:#7f1d1d;border:1px solid #f3c1bb}
@@ -128,21 +135,21 @@ nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18p
 /* forms */
 label.f{display:block;margin-bottom:12px}
 label.f>span{display:block;font-weight:600;margin-bottom:4px;font-size:14.5px}
-.in{width:100%;min-height:46px;padding:9px 12px;border:1.5px solid var(--line);border-radius:11px;background:#fff;font-size:16px}
+.in{width:100%;min-height:46px;padding:9px 12px;border:1.5px solid var(--line);border-radius:11px;background:var(--card);font-size:16px}
 textarea.in{min-height:76px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button{flex:1;min-width:64px;min-height:44px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-weight:700;cursor:pointer;font-size:14.5px}
+.seg button{flex:1;min-width:64px;min-height:44px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);font-weight:700;cursor:pointer;font-size:14.5px}
 .seg button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
 .hint{font-size:13px;color:var(--mut);margin-top:4px}
 .req::after{content:" *";color:var(--red)}
-.savebar{position:fixed;left:0;right:0;bottom:0;z-index:35;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:35;background:var(--card);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
 .savebar .in2{max-width:860px;margin:0 auto;display:flex;gap:8px}
 .savebar .btn{flex:1}
 /* sheet (modal) */
 .sheetbg{position:fixed;inset:0;z-index:60;background:rgba(20,12,4,.45);display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
 @media(min-width:700px){.sheetbg{align-items:center}.sheet{border-radius:18px}}
 .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:80;background:#1f1a15;color:#fff;padding:12px 16px;border-radius:12px;max-width:92vw;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .toast.err{background:var(--red)}
@@ -154,8 +161,8 @@ textarea.in{min-height:76px}
 .file .cap{padding:6px 8px;font-size:13px}
 /* login */
 .login{max-width:420px;margin:7vh auto 0;padding:0 16px}
-.brandbox{background:var(--brand);color:#fbf3e9;border-radius:18px;padding:22px 20px;margin-bottom:14px}
-.brandbox b{display:block;font-size:26px;margin-bottom:2px}
+.brandbox{background:var(--brand);color:#f4f7f4;border-radius:18px;padding:22px 20px;margin-bottom:14px}
+.brandbox b{display:block;font:600 28px/1.15 var(--serif);margin-bottom:4px}
 table.t{width:100%;border-collapse:collapse;font-size:14.5px}
 table.t td,table.t th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
 table.t td.r,table.t th.r{text-align:right}
@@ -234,7 +241,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
 const CFG = window.ADITYA_CONFIG || {};
 const SUPABASE_URL = CFG.url || "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = CFG.key || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "2.0 (26 Nov 2026)";
+const APP_VERSION = "2.1 (26 Nov 2026)";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 const STAFF_DOMAIN = "staff.adityatraders.in";   // phone-number logins become <phone>@this-domain
 const BUCKET = "lorry-files";
@@ -253,7 +260,7 @@ const CFT_GUIDE = {30:1150, 35:1350};
 const COST_TYPES = ["Hamali / loading","Weighbridge","Permit","Commission","Toll","Driver bata","Other"];
 const FILE_KINDS = ["Weighbridge (kata) slip","Receipt","Invoice","E-way bill","Lorry receipt (LR)","Loading photo","Other"];
 const MODES = {cash:"Cash", upi:"UPI", bank:"Bank", cheque:"Cheque", other:"Other"};
-const FIELD = {load_date:"Date",truck_stage:"Stage",vehicle_no:"Truck no",capacity_t:"Capacity (T)",driver_name:"Driver",driver_phone:"Driver phone",transporter_id:"Transporter",freight_amount:"Freight (₹)",party_id:"Buyer",destination:"Destination",destination_state:"State",eway_bill_no:"E-way bill no",notes:"Notes",
+const FIELD = {load_date:"Date",truck_stage:"Stage",vehicle_no:"Truck no",capacity_t:"Capacity (T)",driver_name:"Driver",driver_phone:"Driver phone",transporter_id:"Transporter",freight_amount:"Freight (₹)",party_id:"Buyer",destination:"Destination",destination_state:"State",eway_bill_no:"E-way bill no",net_weight_t:"Kata net weight (T)",notes:"Notes",
   sawmill_id:"Mill",wood_type:"Wood",unit:"Unit",quantity:"Quantity",length_ft:"Length (ft)",size_grade:"Size",line_status:"Line status",loaded_on:"Loaded on",
   rate:"Rate (₹)",adjustment:"Adjustment (₹)",line_id:"Line",cost_type:"Cost",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note",
   invoice_no:"Invoice no",invoice_date:"Invoice date",sale_unit:"Sale unit",sale_qty:"Sale qty",sale_rate:"Sale rate (₹)",sale_adjustment:"Sale adjustment (₹)",gst_amount:"GST (₹)",credit_days:"Credit days",
@@ -279,6 +286,8 @@ const dExact = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", mont
 const dShort = d => d ? new Date(d).toLocaleString("en-IN", {day:"numeric", month:"short", hour:"numeric", minute:"2-digit", timeZone:"Asia/Kolkata"}) : "—";
 const today = () => new Date().toLocaleDateString("en-CA", {timeZone:"Asia/Kolkata"});
 const person = id => { const p = S.people[id]; return p ? (p.full_name || p.phone || p.email || "Someone") : (id ? "Someone" : "System"); };
+/* Initials avatar for a person (owner forest, accountant sand, staff amber). */
+const avatar = (id, big) => { const p = S.people[id]; const n = p ? (p.full_name || p.phone || p.email || "?") : "?"; const ini = n.replace(/\(.*?\)/g, "").trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?"; return `<span class="av ${p ? esc(p.role) : ""}${big ? " big" : ""}" aria-hidden="true">${esc(ini)}</span>`; };
 const millName = id => { const m = S.sawmills.find(x => x.id === id); return m ? m.name + (m.place ? ", " + m.place : "") : (id ? "Mill #" + id : "—"); };
 const partyName = id => { const p = S.parties.find(x => x.id === id); return p ? p.name + (p.city ? ", " + p.city : "") : (id ? "#" + id : "—"); };
 const stagePill = s => s ? `<span class="pill s-${esc(s)}">${esc(STAGE[s] || s)}</span>` : "";
@@ -526,7 +535,7 @@ function loadCard(l){
   return `<button class="loadc ${l.my_flag === "ok" ? "" : l.my_flag}" data-load="${l.id}">
     <div class="t1"><span class="no">${esc(l.load_no)}</span>${l.vehicle_no ? `<span class="veh">${esc(l.vehicle_no)}</span>` : ""}${flag}<span class="grow"></span>${stagePill(l.truck_stage)}${isAdmin() && l.bill_stage && l.bill_stage !== "not_ready" ? billPill(l.bill_stage) : ""}</div>
     <div class="t2">${esc(l.mills_count ? l.mills_count + (l.mills_count > 1 ? " mills" : " mill") : "No mills yet")} → ${esc(l.party_name || "Buyer not set")}${l.destination ? ", " + esc(l.destination) : ""}</div>
-    <div class="t3">${l.qty_summary ? `<span class="num">${esc(l.qty_summary)}</span>` : ""}${l.lines_total ? `<span>${l.lines_done}/${l.lines_total} lines done</span>` : ""}${isAdmin() && l.invoice_total != null ? `<span class="num"><b>${inr(l.invoice_total)}</b></span>` : ""}</div>
+    <div class="t3">${l.qty_summary ? `<span class="num">${esc(l.qty_summary)}</span>` : ""}${l.net_weight_t ? `<span class="num">Kata ${esc(Number(l.net_weight_t))} T</span>` : ""}${l.lines_total ? `<span>${l.lines_done}/${l.lines_total} lines done</span>` : ""}${isAdmin() && l.invoice_total != null ? `<span class="num"><b>${inr(l.invoice_total)}</b></span>` : ""}</div>
     ${l.lines_total ? `<div class="bar ${pct >= 100 ? "full" : ""}"><i style="width:${pct}%"></i></div>` : ""}
     <div class="t4 ${l.my_flag === "edited" ? "" : "mut"}" ${l.my_flag === "edited" ? 'style="color:var(--red)"' : ""}>${esc(dExact(l.last_at || l.created_at))} · ${esc(person(l.last_by || l.created_by))}${l.last_reason ? " · " + esc(l.last_reason) : ""}</div>
   </button>`;
@@ -576,11 +585,11 @@ async function renderLoad(id){
   // Truck and buyer
   const r = (label, val) => `<dt>${label}</dt><dd>${val}</dd>`;
   h += `<div class="card"><div class="sect"><h3>Truck and buyer</h3><a class="btn sm" href="#/edit/${L.id}">Edit</a></div><dl class="kv">
-    ${r("Date", esc(dDay(L.load_date)))}${r("Truck no", esc(L.vehicle_no || "—"))}${r("Capacity", L.capacity_t ? esc(Number(L.capacity_t)) + " T" : "—")}
+    ${r("Date", esc(dDay(L.load_date)))}${r("Truck no", esc(L.vehicle_no || "—"))}${r("Capacity", L.capacity_t ? esc(Number(L.capacity_t)) + " T" : "—")}${r("Kata net weight", L.net_weight_t ? `<span class="num">${esc(Number(L.net_weight_t))} T</span>` + (L.capacity_t ? ` <span class="mut small">of ${esc(Number(L.capacity_t))} T</span>` : "") : "—")}
     ${r("Driver", esc([L.driver_name, L.driver_phone].filter(Boolean).join(" · ") || "—"))}${r("Transporter", esc(L.transporter_name || "—"))}
     ${r("Buyer", esc(L.party_name ? L.party_name + (L.party_city ? ", " + L.party_city : "") : "—"))}${r("Destination", esc([L.destination, L.destination_state].filter(Boolean).join(", ") || "—"))}
     ${r("E-way bill", esc(L.eway_bill_no || "—"))}${L.notes ? r("Notes", esc(L.notes)) : ""}</dl>
-    <div class="row" style="margin-top:12px">${L.driver_phone ? `<a class="btn sm" href="tel:${esc(String(L.driver_phone).replace(/[^\d+]/g, ""))}">Call driver</a><a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/91${esc(String(L.driver_phone).replace(/\D/g, "").slice(-10))}">WhatsApp driver</a>` : ""}</div></div>`;
+    <div class="row" style="margin-top:12px">${L.driver_phone ? `<a class="btn sm" href="tel:${esc(String(L.driver_phone).replace(/[^\d+]/g, ""))}">Call driver</a><a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/91${esc(String(L.driver_phone).replace(/\D/g, "").slice(-10))}">WhatsApp driver</a><a class="btn sm wa" target="_blank" rel="noopener" href="https://wa.me/91${esc(String(L.driver_phone).replace(/\D/g, "").slice(-10))}?text=${encodeURIComponent(locText(L))}">Ask location</a>` : ""}</div></div>`;
 
   // Mill lines
   const guide = CFT_GUIDE[Number(L.capacity_t)];
@@ -634,17 +643,21 @@ async function renderLoad(id){
   // ---------- actions
   const reload = () => { loadLoads(true); renderLoad(id); };
   const chk = $("chk"); if (chk) chk.onclick = async () => { try { await q(sb.rpc("v2_mark_checked", {p_load_ids:[id]})); toast("Marked as checked."); reload(); } catch(e) { toast(errText(e), true); } };
+  // Moving to Loaded also asks for the kata (weighbridge) net weight, optional.
+  const kataField = () => ({id:"net_weight_t", label:"Kata net weight (T), from the weighbridge slip", type:"number", value:L.net_weight_t ?? "", min:0.001, hint: L.capacity_t ? "Truck capacity: " + Number(L.capacity_t) + " T" : ""});
+  const stageRec = (target, v) => { const r = {truck_stage: target, change_reason: v.change_reason}; if (target === "loaded" && v.net_weight_t !== undefined && v.net_weight_t !== "") r.net_weight_t = num(v.net_weight_t); return r; };
   const moveTo = async target => {
-    const v = await sheet({title: "Move to " + STAGE[target], intro: `From <b>${esc(STAGE[L.truck_stage])}</b> to <b>${esc(STAGE[target])}</b>.`, fields:[reasonField(true)], ok:"Move"});
+    const v = await sheet({title: "Move to " + STAGE[target], intro: `From <b>${esc(STAGE[L.truck_stage])}</b> to <b>${esc(STAGE[target])}</b>.`, fields: target === "loaded" ? [kataField(), reasonField(true)] : [reasonField(true)], ok:"Move"});
     if (!v) return;
-    try { await q(sb.from("loads").update({truck_stage: target, change_reason: v.change_reason}).eq("id", id)); toast("Stage updated."); reload(); }
+    try { await q(sb.from("loads").update(stageRec(target, v)).eq("id", id)); toast("Stage updated."); reload(); }
     catch(e) { toast(errText(e), true); }
   };
   const ns = $("nextStage"); if (ns) ns.onclick = () => moveTo(STAGES[ci + 1][0]);
   $("setStage").onclick = async () => {
     const v = await sheet({title:"Change stage", fields:[{id:"stage", label:"New stage", type:"select", value:L.truck_stage, options:[...STAGES, ["cancelled","Cancelled"]]}, reasonField(true)], ok:"Change"});
     if (!v || v.stage === L.truck_stage) return;
-    try { await q(sb.from("loads").update({truck_stage: v.stage, change_reason: v.change_reason}).eq("id", id)); toast("Stage updated."); reload(); } catch(e) { toast(errText(e), true); }
+    if (v.stage === "loaded" && !L.net_weight_t) { const w = await sheet({title:"Kata net weight", intro:"Optional: leave empty if the slip is not here yet.", fields:[kataField()], ok:"Continue"}); if (!w) return; v.net_weight_t = w.net_weight_t; }
+    try { await q(sb.from("loads").update(stageRec(v.stage, v)).eq("id", id)); toast("Stage updated."); reload(); } catch(e) { toast(errText(e), true); }
   };
   $("addLine").onclick = () => lineForm(L, null, reload);
   document.querySelectorAll("[data-line]").forEach(b => b.onclick = () => lineForm(L, lines.find(x => x.id === Number(b.dataset.line)), reload));
@@ -708,13 +721,13 @@ function describe(a, lines){
 }
 function tlItem(a, since, lines){
   const isNew = since && a.at > since && a.actor !== S.user.id;
-  return `<div class="tl ${isNew ? "new" : ""} ${a.action === "note" ? "note" : ""} ${a.visibility === "admin" ? "adm" : ""}"><div class="when"><b>${esc(dExact(a.at))}</b> · ${esc(person(a.actor))} · ${stagePill(a.truck_stage)}</div>
+  return `<div class="tl ${isNew ? "new" : ""} ${a.action === "note" ? "note" : ""} ${a.visibility === "admin" ? "adm" : ""}"><div class="when">${avatar(a.actor)}<b>${esc(dExact(a.at))}</b> · ${esc(person(a.actor))} · ${stagePill(a.truck_stage)}</div>
     <div class="what">${describe(a, lines)}</div>${a.reason && a.action !== "note" ? `<div class="why">Reason: ${esc(a.reason)}</div>` : ""}</div>`;
 }
 function feedItem(a, compact){
   const L = S.loads.find(x => x.id === a.load_id);
   return `<a class="tl ${a.action === "note" ? "note" : ""} ${a.visibility === "admin" ? "adm" : ""}" href="#/load/${a.load_id}" style="display:block;text-decoration:none;color:inherit">
-    <div class="when"><b>${esc(L ? L.load_no + (L.vehicle_no ? " · " + L.vehicle_no : "") : "Load #" + a.load_id)}</b> · ${esc(dExact(a.at))} · ${esc(person(a.actor))}</div>
+    <div class="when">${avatar(a.actor)}<b>${esc(L ? L.load_no + (L.vehicle_no ? " · " + L.vehicle_no : "") : "Load #" + a.load_id)}</b> · ${esc(dExact(a.at))} · ${esc(person(a.actor))}</div>
     <div class="what">${describe(a, [])}</div>${a.reason && a.action !== "note" ? `<div class="why">Reason: ${esc(a.reason)}</div>` : ""}</a>`;
 }
 
@@ -857,12 +870,17 @@ async function uploadFile(loadId, original, kind){
   try { await q(sb.from("load_files").insert({load_id:loadId, kind, storage_path:path, file_name:original.name, mime_type:file.type || null, size_bytes:file.size})); }
   catch(e) { await sb.storage.from(BUCKET).remove([path]); throw e; }
 }
+/* WhatsApp message asking the driver for his live location (idea from the Grok build). */
+function locText(L){
+  return `Namaskaram ${L.driver_name || ""}, Aditya Traders here. Please share your live location on WhatsApp for truck ${L.vehicle_no || ""} (${L.load_no})${L.destination ? " going to " + L.destination : ""}. Thank you.`.replace(/\s+/g, " ");
+}
 function waText(L, lines){
   const out = [`*Aditya Traders · ${L.load_no}*`, `Stage: ${STAGE[L.truck_stage]}`];
   if (L.vehicle_no) out.push(`Truck: ${L.vehicle_no}${L.capacity_t ? " (" + Number(L.capacity_t) + " T)" : ""}`);
   if (L.driver_name || L.driver_phone) out.push(`Driver: ${[L.driver_name, L.driver_phone].filter(Boolean).join(", ")}`);
   if (L.party_name) out.push(`Buyer: ${L.party_name}${L.destination ? ", " + L.destination : ""}`);
   (lines || []).forEach(ln => out.push(`• ${ln.sawmill_name}: ${ln.wood_type} ${qty(ln.quantity, ln.unit)} (${LINE_ST[ln.line_status]})`));
+  if (L.net_weight_t) out.push(`Kata net weight: ${Number(L.net_weight_t)} T`);
   if (L.eway_bill_no) out.push(`E-way bill: ${L.eway_bill_no}`);
   out.push(`Updated: ${dExact(L.last_at || L.created_at)}`);
   return out.join("\n");
@@ -883,6 +901,7 @@ async function renderLoadForm(id){
      <div class="two"><label class="f"><span>Date</span><input class="in" type="date" name="load_date" value="${esc(L.load_date || today())}"></label>
        <label class="f"><span>Truck no</span><input class="in" name="vehicle_no" autocapitalize="characters" autocomplete="off" placeholder="AP39TA1234" value="${esc(L.vehicle_no || "")}"></label></div>
      <label class="f"><span>Capacity</span><div class="seg" data-seg="capacity_t">${[30, 35].map(c => `<button type="button" data-v="${c}" aria-pressed="${Number(L.capacity_t) === c}">${c} ton</button>`).join("")}<input class="in" name="capacity_other" type="number" inputmode="decimal" placeholder="Other" style="flex:1;min-width:90px" value="${L.capacity_t && ![30, 35].includes(Number(L.capacity_t)) ? esc(Number(L.capacity_t)) : ""}"></div></label>
+     <label class="f"><span>Kata net weight (T)</span><input class="in" name="net_weight_t" type="number" inputmode="decimal" min="0" step="any" placeholder="From the weighbridge slip, e.g. 34.62" value="${esc(L.net_weight_t ?? "")}"></label>
      <div class="two"><label class="f"><span>Driver name</span><input class="in" name="driver_name" value="${esc(L.driver_name || "")}"></label>
        <label class="f"><span>Driver phone</span><input class="in" name="driver_phone" type="tel" inputmode="tel" value="${esc(L.driver_phone || "")}"></label></div>
      <div class="two"><label class="f"><span>Transporter</span>${sel("transporter_id", trans, L.transporter_id, p => p.name + (p.city ? ", " + p.city : ""))}</label>
@@ -905,7 +924,7 @@ async function renderLoadForm(id){
   const collect = () => { const f = Object.fromEntries(new FormData(form)); return {
     load_date: f.load_date || today(), vehicle_no: (f.vehicle_no || "").toUpperCase().replace(/\s+/g, "") || null, capacity_t: cap,
     driver_name: f.driver_name.trim() || null, driver_phone: f.driver_phone.trim() || null,
-    transporter_id: f.transporter_id && f.transporter_id !== "__new" ? Number(f.transporter_id) : null, freight_amount: num(f.freight_amount),
+    transporter_id: f.transporter_id && f.transporter_id !== "__new" ? Number(f.transporter_id) : null, freight_amount: num(f.freight_amount), net_weight_t: num(f.net_weight_t),
     party_id: f.party_id && f.party_id !== "__new" ? Number(f.party_id) : null, destination: f.destination.trim() || null, destination_state: f.destination_state.trim() || null,
     eway_bill_no: (f.eway_bill_no || "").replace(/\s+/g, "") || null, notes: f.notes.trim() || null, change_reason: f.change_reason.trim() || null }; };
   const draft = () => { if (!id) lsSet("at2_draft", collect()); };
@@ -923,6 +942,7 @@ async function renderLoadForm(id){
     const rec = collect();
     if (id && !rec.change_reason) { toast("Write the reason for this change.", true); form.change_reason.focus(); return; }
     if (rec.freight_amount !== null && (isNaN(rec.freight_amount) || rec.freight_amount < 0)) return toast("Check the freight amount.", true);
+    if (rec.net_weight_t !== null && (isNaN(rec.net_weight_t) || rec.net_weight_t <= 0 || rec.net_weight_t >= 100)) return toast("Check the kata net weight (tons).", true);
     const b = $("fSave"); b.disabled = true; b.textContent = "Saving…";
     try {
       let newId = id;
@@ -1041,7 +1061,7 @@ async function renderParty(kind, pid){
 function renderMore(){
   chrome("More", {nav:"more"});
   const item = (href, t, d) => `<a class="loadc" href="${href}"><div class="t1"><span class="no">${t}</span></div><div class="t2">${d}</div></a>`;
-  $("app").innerHTML = `<div class="card"><b>${esc(S.me.full_name || "")}</b><div class="small mut">${esc(phoneOf(S.user.email) || S.user.email)} · ${esc(S.me.role)}</div></div>
+  $("app").innerHTML = `<div class="card row">${avatar(S.me.id, true)}<div class="grow"><b>${esc(S.me.full_name || "")}</b><div class="small mut">${esc(phoneOf(S.user.email) || S.user.email)} · ${esc(S.me.role)}</div></div></div>
     ${isAdmin() ? item("#/team", "Team", "Add staff logins, approve people, set roles, reset passwords") : ""}
     ${item("#/mills", "Mills", "Mill list, phone numbers, ask mills about loads")}
     ${isAdmin() ? item("#/parties", "Parties and balances", "Buyers to collect, mills and transporters to pay") : ""}
@@ -1057,7 +1077,7 @@ async function renderTeam(){
   const roleName = {owner:"Owner", accountant:"Accountant", staff:"Staff"};
   $("app").innerHTML = `<button class="btn pri block" id="addPerson" style="margin-bottom:12px">+ Add a person</button>
     <p class="small mut">Owner and accountant have full access. Staff never see prices, bills or payments. Staff sign in with their phone number.</p>
-    ${ppl.map(p => `<div class="card"><div class="row"><b class="grow">${esc(p.full_name || "(no name)")}</b><span class="pill">${esc(roleName[p.role])}</span>${p.active ? "" : `<span class="pill b-payment_pending">Not approved</span>`}</div>
+    ${ppl.map(p => `<div class="card"><div class="row">${avatar(p.id, true)}<b class="grow">${esc(p.full_name || "(no name)")}</b><span class="pill">${esc(roleName[p.role])}</span>${p.active ? "" : `<span class="pill b-payment_pending">Not approved</span>`}</div>
       <div class="small mut">${esc(p.phone || phoneOf(p.email) || p.email || "")}</div>
       <div class="row" style="margin-top:10px"><button class="btn sm" data-edit="${p.id}">Edit</button>${p.active ? `<button class="btn sm red" data-act="${p.id}">Block</button>` : `<button class="btn sm pri" data-act="${p.id}">Approve</button>`}${p.id !== S.user.id ? `<button class="btn sm" data-pw="${p.id}">Set password</button>` : ""}</div></div>`).join("")}`;
   $("addPerson").onclick = async () => {
@@ -1131,7 +1151,7 @@ function renderExport(){
         if (isAdmin()) pays = pays.concat(await q(sb.from("payments").select("*").in("load_id", part).order("paid_on")));
       }
       const byId = Object.fromEntries(loads.map(l => [l.id, l])), n = v => v == null ? null : Number(v), A = isAdmin();
-      const s1 = loads.map(l => ({"Load":l.load_no, "Date":l.load_date, "Stage":STAGE[l.truck_stage], "Truck":l.vehicle_no, "Capacity (T)":n(l.capacity_t), "Driver":l.driver_name, "Driver phone":l.driver_phone, "Transporter":l.transporter_name, "Freight (₹)":n(l.freight_amount), "Other costs (₹)":n(l.costs_total), "Buyer":l.party_name, "Destination":l.destination, "State":l.destination_state, "E-way bill":l.eway_bill_no, "Mills":n(l.mills_count), "Quantity":l.qty_summary, ...(A ? {"Purchase total (₹)":n(l.purchase_total), "Invoice no":l.invoice_no, "Invoice date":l.invoice_date, "Invoice total (₹)":n(l.invoice_total), "Due date":l.due_date, "Received (₹)":n(l.received), "Bill stage":BILL[l.bill_stage]} : {}), "Last change":dExact(l.last_at), "Last change by":person(l.last_by), "Last reason":l.last_reason}));
+      const s1 = loads.map(l => ({"Load":l.load_no, "Date":l.load_date, "Stage":STAGE[l.truck_stage], "Truck":l.vehicle_no, "Capacity (T)":n(l.capacity_t), "Kata net (T)":n(l.net_weight_t), "Driver":l.driver_name, "Driver phone":l.driver_phone, "Transporter":l.transporter_name, "Freight (₹)":n(l.freight_amount), "Other costs (₹)":n(l.costs_total), "Buyer":l.party_name, "Destination":l.destination, "State":l.destination_state, "E-way bill":l.eway_bill_no, "Mills":n(l.mills_count), "Quantity":l.qty_summary, ...(A ? {"Purchase total (₹)":n(l.purchase_total), "Invoice no":l.invoice_no, "Invoice date":l.invoice_date, "Invoice total (₹)":n(l.invoice_total), "Due date":l.due_date, "Received (₹)":n(l.received), "Bill stage":BILL[l.bill_stage]} : {}), "Last change":dExact(l.last_at), "Last change by":person(l.last_by), "Last reason":l.last_reason}));
       const s2 = lines.map(x => ({"Load":byId[x.load_id]?.load_no, "Mill":x.sawmill_name, "Place":x.sawmill_place, "Wood":x.wood_type, "Unit":x.unit, "Quantity":n(x.quantity), "Length (ft)":n(x.length_ft), "Size":GRADES[x.size_grade] || "", "Status":LINE_ST[x.line_status], "Loaded on":x.loaded_on, ...(A ? {"Rate (₹)":n(x.rate), "Adjustment (₹)":n(x.adjustment), "Amount (₹)":n(x.amount)} : {})}));
       const s3 = costs.map(c => ({"Load":byId[c.load_id]?.load_no, "Cost":c.cost_type, "Amount (₹)":n(c.amount), "Paid to":c.paid_to, "Paid on":c.paid_on}));
       const s4 = acts.map(a => ({"When (exact)":dExact(a.at), "Load":byId[a.load_id]?.load_no, "Who":person(a.actor), "Stage then":STAGE[a.truck_stage] || "", "What":ENTITY[a.entity] + " " + a.action, "Details":a.action === "note" ? a.reason : JSON.stringify(a.changes || {}), "Reason":a.action === "note" ? "" : (a.reason || "")}));

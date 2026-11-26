@@ -197,6 +197,14 @@ ok("staff cannot delete a load (0 rows)", run("staff", "with d as (delete from p
 ok("accountant can delete a load", run("acc", "with d as (delete from public.loads where id = %s returning 1) select count(*) from d", (L3,))[0][0] == 1)
 ok("deleted load keeps its history", one("owner", "select count(*) from public.activity where load_id = %s and action = 'delete' and entity = 'loads'", (L3,)) == 1)
 
+# ---------------------------------------------------------------- kata net weight (migration 010)
+L_nw = one("staff", "insert into public.loads (vehicle_no, capacity_t, change_reason) values ('AP39NW0001', 35, 'nw test') returning id")
+run("staff", "update public.loads set net_weight_t = 34.62, change_reason = 'Kata slip 34.62 T' where id = %s", (L_nw,), fetch=False)
+ok("staff can enter the kata net weight; v_loads shows it", float(one("staff", "select net_weight_t from public.v_loads where id = %s", (L_nw,))) == 34.62)
+ok("kata net weight change is in the history with its reason", one("owner", "select reason from public.activity where load_id = %s and changes ? 'net_weight_t'", (L_nw,)) == "Kata slip 34.62 T")
+e = err("staff", "update public.loads set net_weight_t = 0 where id = %s", (L_nw,))
+ok("kata net weight of 0 is refused", e is not None and "check constraint" in e, e)
+
 # ---------------------------------------------------------------- outsiders
 for t in ["loads", "load_lines", "line_prices", "load_costs", "load_billing", "payments", "load_files", "activity", "v_loads", "v_lines", "v_balances", "app_settings"]:
     ok(f"stranger (not approved) sees nothing in {t}", one("stranger", f"select count(*) from public.{t}") == 0)

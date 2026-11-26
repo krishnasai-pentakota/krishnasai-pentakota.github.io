@@ -168,7 +168,8 @@ def build(target, start, bill=None, cancel=False):
     run(s1, "insert into public.load_files (load_id, kind, storage_path, file_name, mime_type, size_bytes) values (%s,'Weighbridge (kata) slip',%s,'kata.jpg','image/svg+xml',2000)",
         (lid, f"demo/kata-{lid}.svg"))
     step(.5)
-    run(s1, "update public.loads set truck_stage='loaded', change_reason=%s where id=%s", (f"All mills loaded, kata {round(cap - random.uniform(0.2, 1.4), 1)} T", lid))
+    kata = round(cap - random.uniform(0.2, 1.4), 2)
+    run(s1, "update public.loads set truck_stage='loaded', net_weight_t=%s, change_reason=%s where id=%s", (kata, f"All mills loaded, kata {kata} T", lid))
     if random.random() < .3:
         step(2); run("owner", "select public.v2_post_note(%s,%s,true)", (lid, "Pay Durga mill only after kata copy reaches office"))
     if STAGES.index(target) < 5: return lid

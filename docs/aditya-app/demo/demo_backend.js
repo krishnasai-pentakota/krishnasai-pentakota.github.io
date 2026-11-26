@@ -190,7 +190,7 @@
   function checkRow(t, r, op, old) {
     const need = (cond, what) => { if (!cond) throw new ApiErr(400, "23514", `new row for relation "${t}" violates check constraint (${what})`); };
     if (t === "loads") {
-      need(!r.capacity_t || r.capacity_t > 0, "capacity"); need(r.freight_amount === null || r.freight_amount === undefined || r.freight_amount >= 0, "freight");
+      need(!r.capacity_t || r.capacity_t > 0, "capacity"); need(r.net_weight_t === null || r.net_weight_t === undefined || (r.net_weight_t > 0 && r.net_weight_t < 100), "net_weight_t"); need(r.freight_amount === null || r.freight_amount === undefined || r.freight_amount >= 0, "freight");
       if (STAGES_AFTER_PLAN.includes(r.truck_stage) && !String(r.vehicle_no || "").trim()) throw ruleErr("Enter the truck number before moving past Planning.");
       if (LOADED_PLUS.includes(r.truck_stage) && (op === "insert" || r.truck_stage !== old.truck_stage)) {
         const ls = D.t.load_lines.filter(x => x.load_id === r.id);
@@ -227,7 +227,7 @@
     for (const k of Object.keys(r)) {
       if (NUM2.includes(k)) r[k] = r2(r[k]);
       else if (NUM3.includes(k)) r[k] = r3(r[k]);
-      else if (["capacity_t", "length_ft"].includes(k)) r[k] = r[k] === null || r[k] === "" || r[k] === undefined ? null : Number(r[k]);
+      else if (["capacity_t", "length_ft", "net_weight_t"].includes(k)) r[k] = r[k] === null || r[k] === "" || r[k] === undefined ? null : Number(r[k]);
       else if (k.endsWith("_id") && k !== "user_id" && k !== "line_id" && r[k] !== null && r[k] !== undefined && /^\d+$/.test(String(r[k]))) r[k] = Number(r[k]);
     }
     return r;
