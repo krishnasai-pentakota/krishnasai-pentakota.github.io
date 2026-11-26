@@ -1,53 +1,78 @@
-# Aditya Traders: lorry trips app (version 1.4)
+# Aditya Traders: loads app (version 2.0, 26 Nov 2026)
 
-A mobile web app for Aditya Traders. It records lorry trips and their costs, and **flags edits in red** so the accountant sees what changed without being told.
+One place for every load. It replaces phone calls and WhatsApp messages between owner, staff and accountant: **each change records what changed, who made it, the exact time (to the second), why, and the load's stage at that moment.** Anything changed since you last checked shows in red.
 
-- **App:** `apps/aditya/index.html`, plain HTML/CSS/JS. The site build copies it as-is to https://krishnasai-pentakota.github.io/aditya/
-- **Database:** Supabase project `aditya-traders` (Mumbai). The schema and security rules are in `docs/aditya-app/supabase/` (001 to 006).
-- **Demo (no login, sample data):** https://krishnasai-pentakota.github.io/aditya/demo/ (built from the real page by `docs/aditya-app/demo/build_demo.py`; rebuild it after changing the app).
-- **Login:** email and password. Only people the owner approves can see or change anything (enforced by Row-Level Security in the database).
+- **App:** `apps/aditya/index.html`. Plain HTML/CSS/JS, phone-first. Published at https://krishnasai-pentakota.github.io/aditya/
+- **Database:** Supabase project `aditya-traders` (Mumbai). The schema and security rules are in `docs/aditya-app/supabase/`; version 2 is `007_v2_loads.sql` and `008_lock_size_grade_fn.sql`. The database enforces every rule below, not just the screens.
+- **Login service:** the Supabase function `team-admin` (`docs/aditya-app/supabase/functions/team-admin/index.ts`) lets the owner or accountant create logins from inside the app.
+- **Tests:** `docs/aditya-app/tests/`
+  - 98 database checks: the real migrations on a local Postgres.
+  - 67 browser checks: the real page, supabase-js and database through a local stand-in, on a phone-sized screen.
 
-## What version 1 does
-- **Lorries:** date, vehicle number, 30/35-ton size, driver name and phone, transporter, sawmill, wood, CFT, net weight, lorry hire, party, destination, invoice no, e-way bill no (1.4), status (order taken / on the way / completed) and notes.
-- **Costs:** add, change or remove cost lines (hamali, weighbridge, permit and so on) at any time. The app shows the total for each lorry.
-- **Edit flags:**
-  - Each person has their own "checked" mark on each lorry.
-  - A lorry that someone else changed after you checked it shows **Edited** in red.
-  - The lorry's page shows the old values in red.
-  - "Mark as checked" clears the flag.
-- **History:** every add, change and delete is recorded with **the exact time (to the second), who made it, and the lorry's status at that moment** (1.4). Nobody can edit or delete the history. Changed fields show "was …, changed <time> by <person>", and flagged lorries in the list show when they changed.
-- **Excel export:** for a date range, with three sheets: Lorries, Costs and Changes (exact time and lorry status for every change).
-- **WhatsApp:** share a summary of any lorry.
-- **Photos and files (1.2):** attach the weighbridge (kanta) slip, receipts, invoices and other photos to a lorry. Photos are shrunk before upload and kept private. Adding one shows the red flag to others.
-- **Purchase and sale price (1.3, 1.4):** rate, basis (per CFT / per ton / per lorry), amount and note, for both purchase and sale. **The owner changes them; the owner and the accountant see them; staff never do** (the database enforces this). Price changes have their own history, seen only by the owner and accountant, and raise the red flag for them, not for staff. Their Excel export adds a Prices sheet, and price changes appear in the Changes sheet. Amounts are typed in, not calculated.
+## What it does
+- **Loads:** each truck is one load (L-0001…). It records date, truck number, 30/35 T or other, driver and phone, transporter, freight, buyer, destination and state (any state), e-way bill and notes.
+- **Truck stage:** Planning → Truck fixed → Going to load → Under loading → Loaded → In transit → Delivered (or Cancelled). Every move needs a reason.
+  - The truck number is needed before the load leaves Planning.
+  - **Loaded** needs every mill line marked done.
+  - After Loaded, mill lines can't be added, removed or re-opened.
+- **Mill lines:** one load can fill from several mills. Each line has the mill, wood, unit, quantity, length, size grade and status (planned / loading / done).
+  - Units: CFT, CBM, Pieces, Tons, Quintal, Kg, Running ft, Sq ft.
+  - Size grade is set from length: Small < 4 ft, Medium 4–6 ft, Large > 6 ft. These limits are **provisional** and can be changed in Settings.
+  - A fill bar compares CFT with the owner's rough guide (about 1,150 CFT for 30 T, 1,350 CFT for 35 T). The guide is never used in money.
+- **Purchase rate per mill line** (owner and accountant only): amount = quantity × rate ± adjustment. The app suggests the mill's last rate.
+- **Freight and costs:** hamali, weighbridge, permit and others. Everyone can see these (owner's decision).
+- **Billing** (owner and accountant only):
+  - Each bill has invoice no and date, sale quantity, rate, adjustment and GST.
+  - Invoice total = qty × rate ± adjustment + GST.
+  - Due date = invoice date + credit days (the bill's own, else the buyer's, else 30).
+  - Bill status: Not ready → Ready to bill (once delivered) → Billed → Payment pending (part paid or overdue) → Paid.
+- **Payments:** money received from buyers, and money paid to mills and transporters (cash, UPI, bank, cheque), each with a reference.
+- **Parties:**
+  - Buyers to collect from; mills and transporters to pay.
+  - Each one has a page with its loads, payments, balance, and a WhatsApp reminder link.
+- **Mills:** the mill list grouped by area. "Ask mills about loads" opens a ready WhatsApp message for each mill.
+- **Updates and history:**
+  - Anyone can post an update on a load. Owner and accountant can also post admin-only ones.
+  - The Updates screen shows every change across all loads.
+  - Nobody can edit or delete history.
+- **Red flags:** each person has their own "checked" time for each load.
+  - A load that others changed since then shows **Changed** in red, with how many changes; those entries are red in the history.
+  - Your own changes never flag you.
+- **Photos:** kata slip, receipt, invoice, e-way bill, LR and loading photos. They are shrunk before upload and kept private behind signed links.
+- **Excel export** for a date range:
+  - Everyone gets Loads, Mill lines, Costs and History.
+  - Owner and accountant also get prices, bill columns, Payments and Balances.
 - **Weak signal:**
-  - The last list stays viewable when there's no signal.
-  - A new-lorry form is kept as a draft if saving fails.
+  - If the signal drops while the app is open, the last loaded list stays visible.
+  - A new-load form is kept as a draft.
 
-## Not in version 1 (waiting on the client)
-- **CFT calculation:** waits for the client's Excel template (spec Q-01). CFT is typed in by hand for now.
-- **Payment reminders and sawmill rates:** waiting for the questionnaire answers.
-- **WhatsApp location-tracking bot:** proposed, not yet agreed.
+## Who can do what
+Owner and accountant have the same full access (owner's answer, 26 Nov).
 
-## Adding a person
-1. In the Supabase dashboard, open **Authentication → Users → Add user → Create new user**. Enter their email and a password, and tick **Auto Confirm User**.
-2. **The very first account becomes the owner automatically.** Everyone after that waits for approval.
-3. The owner opens **Menu → Team** in the app, taps **Approve**, and sets their role (owner, accountant or staff).
+| | Owner / Accountant | Staff |
+|---|---|---|
+| See and edit loads, mill lines, freight, costs, photos, updates | ✓ | ✓ |
+| Move the stage (with a reason) | ✓ | ✓ |
+| See purchase rates, sale rates, bills, payments, balances | ✓ | never |
+| Admin-only history and updates | ✓ | never |
+| Delete loads, remove photos | ✓ | |
+| Add people, approve or block them, set roles, reset passwords | ✓ | |
+| Change size-grade limits | ✓ | |
 
-## Who can do what (version 1.4)
-The accountant may not change costs (owner's answer, 24 Nov). The database enforces this.
+## Adding people
+- The owner's account already exists. If ever needed, the first account is created in Supabase → Authentication → Users → Add user, with **Auto Confirm User** ticked. The first account becomes owner automatically.
+- Everyone else is added in the app:
+  1. Open **More → Team → Add a person** and enter their name and **phone number** (or email for the accountant).
+  2. Set a password and a role. They can sign in straight away.
+- Staff sign in with their phone number.
+- **Block** removes access at once; **Set password** resets a forgotten one.
 
-| | Owner | Accountant | Staff |
-|---|---|---|---|
-| See all lorries and history | ✓ | ✓ | ✓ |
-| Add or edit lorries | ✓ | ✓ | ✓ |
-| Add or change costs (cost lines, lorry hire) | ✓ | | ✓ |
-| Add photos and files | ✓ | ✓ | ✓ |
-| Remove photos and files | ✓ | | |
-| See purchase/sale price and its history | ✓ | ✓ | |
-| Change purchase/sale price | ✓ | | |
-| Delete a lorry | ✓ | | |
-| Approve people and set roles | ✓ | | |
+## Not done yet
+- **CFT calculation:** waiting for the client's Excel template. CFT is typed in by hand.
+- **Automatic WhatsApp messages:** these need the WhatsApp Business Platform (about ₹0.15 per utility message). The app has tap-to-send links for now.
+- **Opening the app with no signal at all:** reloading the page offline needs a service worker, which is not added yet.
 
-## Updating the app
-Edit `apps/aditya/index.html` and push to `main`. The site rebuilds and publishes in about 2 minutes.
+## Updating
+Edit `apps/aditya/index.html` and push to `main`. The site rebuilds in about 2 minutes. For database changes, add a numbered SQL file and run both test suites first:
+- `docs/aditya-app/tests/db/test_db.py`
+- `docs/aditya-app/tests/e2e/test_app.py`
