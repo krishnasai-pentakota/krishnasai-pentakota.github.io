@@ -5,11 +5,11 @@ Output folder: demo2/out/  (index.html, demo_backend.js, sample_data.json)."""
 import json, os, shutil, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-APP = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "v2", "index.html")
+APP = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "v2", "index.html")   # app 3.2
 OUT = os.path.join(HERE, "out"); os.makedirs(OUT, exist_ok=True)
 
 PEOPLE = [  # (label, login) — sample accounts, all with the demo password
-    ("Bharat · Owner", "owner@adityatraders.demo"),
+    ("Owner (Aditya & Bharat)", "owner@adityatraders.demo"),
     ("Lakshmi · Accountant", "accounts@adityatraders.demo"),
     ("Ravi · Staff", "9848000001"),
     ("Suresh · Staff", "9848000002"),
@@ -17,14 +17,12 @@ PEOPLE = [  # (label, login) — sample accounts, all with the demo password
 ]
 opts = "".join(f'<option value="{l}">{n}</option>' for n, l in PEOPLE)
 
-BAR = f"""<div id="demoBar" style="background:#f3b733;color:#2a1b0b;font:600 14px/1.3 system-ui,sans-serif;padding:6px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-  <span style="background:#2a1b0b;color:#f3b733;border-radius:6px;padding:2px 7px;font-weight:800">DEMO</span>
-  <span style="flex:1;min-width:120px">Sample data · changes stay on this phone</span>
-  <label style="display:flex;gap:6px;align-items:center">You are
-    <select id="demoWho" aria-label="Switch person" style="min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 6px">
-      <option value="">— choose —</option>{opts}</select></label>
-  <a href="guide.html" style="min-height:36px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid #8a5a00;background:#fff;color:#2a1b0b;padding:2px 10px;text-decoration:none">Guide</a>
-  <button id="demoReset" style="min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 10px;cursor:pointer">Reset</button>
+BAR = f"""<div id="demoBar" title="Sample data. Changes stay on this phone only." style="background:#f3b733;color:#2a1b0b;font:600 14px/1.3 system-ui,sans-serif;padding:6px 8px;display:flex;gap:6px;align-items:center">
+  <span style="background:#2a1b0b;color:#f3b733;border-radius:6px;padding:3px 7px;font-weight:800">DEMO</span>
+  <select id="demoWho" aria-label="Switch person (sample logins)" style="flex:1;min-width:0;min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 4px">
+    <option value="">Choose a person…</option>{opts}</select>
+  <a href="guide.html" style="min-height:36px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid #8a5a00;background:#fff;color:#2a1b0b;padding:2px 9px;text-decoration:none">Guide</a>
+  <button id="demoReset" style="min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 9px;cursor:pointer">Reset</button>
 </div>
 <script>
 (function () {{
@@ -49,7 +47,7 @@ BAR = f"""<div id="demoBar" style="background:#f3b733;color:#2a1b0b;font:600 14p
     clearInterval(iv);
     const box = document.createElement("div");
     box.className = "card"; box.style.marginTop = "12px";
-    box.innerHTML = '<b>Demo logins</b><p class="small mut" style="margin:4px 0 8px">Tap a person to sign in. Password for all: <b></b></p>' +
+    box.innerHTML = '<b>Demo logins</b><p class="small mut" style="margin:4px 0 8px">Sample data: changes stay on this phone only (Reset puts the sample back). Tap a person to sign in. Password for all: <b></b></p>' +
       {json.dumps(PEOPLE, ensure_ascii=False)}.map(p => '<button type="button" class="btn sm" style="margin:0 6px 6px 0" data-l="' + p[1] + '">' + p[0] + '</button>').join("");
     box.querySelector("b + p b").textContent = window.ADITYA_DEMO.password;
     u.closest("form").after(box);

@@ -33,6 +33,7 @@ h3{font:600 17px/1.25 var(--serif);margin:0 0 10px}
 .top .sub{display:block;font:600 11px/1.3 "Outfit",system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
 .iconbtn{background:none;border:0;color:inherit;min-width:44px;min-height:44px;border-radius:10px;font-size:22px;cursor:pointer}
 .iconbtn:hover{background:rgba(0,0,0,.05)}
+.topnew{flex:none;display:inline-flex;align-items:center;min-height:40px;padding:6px 14px;border-radius:999px;background:var(--act);color:#fff8f1;font-weight:700;font-size:14.5px;text-decoration:none;white-space:nowrap}
 .net{background:#7a2e0e;color:#fff;text-align:center;font-size:14px;padding:6px 10px}
 main{max-width:860px;margin:0 auto;padding:12px 12px 96px}
 nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
@@ -90,6 +91,35 @@ nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18p
 .av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;font:700 12px/1 "Outfit",system-ui,sans-serif;background:#f8e6d2;color:#b85c14;flex:none;vertical-align:middle;margin-right:6px}
 .av.owner{background:#1b4332;color:#f4f7f4}.av.accountant{background:#efe6d6;color:#1c1712}
 .av.big{width:40px;height:40px;border-radius:12px;font-size:15px;margin:0}
+/* quick actions (GimBooks-style round icons) */
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 4px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 6px 12px;margin-bottom:12px}
+.qa a{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);font-size:12.5px;font-weight:600;text-align:center;line-height:1.2}
+.qa i{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.qa svg{width:24px;height:24px}
+/* documents and per-sawmill sections */
+.docs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.doc{border:1.5px solid var(--line);border-radius:12px;padding:8px;text-align:center;font-size:13px;background:var(--soft)}
+.doc .st{display:block;font-weight:700;margin:4px 0 6px}
+.doc.req{border-color:#e7a19a;background:#fff4f2}
+.doc.req .st{color:var(--red)}
+.doc.ok .st{color:var(--green)}
+.doc.na .st{color:#555}
+.doc img{width:100%;height:70px;object-fit:cover;border-radius:8px;display:block;background:#eee}
+.doc label.btn{width:100%}
+.mustbox{border:2px solid var(--red);background:#fff1ef;color:#8e1b12;border-radius:12px;padding:10px 12px;font-weight:700;margin:10px 0}
+.alloc{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
+.alloc .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.alloc .sub{font-size:13.5px;color:var(--mut);margin:2px 0 6px}
+.item{border-top:1px dashed var(--line);padding:8px 0}
+.item:first-of-type{border-top:0}
+.slip{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.slip .hd{display:flex;gap:8px;align-items:center}
+.na-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:700;background:#e9e6e1;color:#444}
+.ok-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:700;background:var(--greenbg);color:var(--green)}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.thumbs a{width:64px;height:64px;border-radius:8px;overflow:hidden;background:#eee;display:grid;place-items:center;font-size:11px;color:var(--mut);text-decoration:none}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.stepno{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font:700 13px/1 "Outfit",system-ui,sans-serif;margin-right:6px}
 /* load cards */
 .loadc{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--ink);text-decoration:none}
 .loadc.edited{border-left-color:var(--red);background:#fffafa}
@@ -131,7 +161,7 @@ nav.bottom a .dot{position:absolute;top:6px;right:calc(50% - 20px);min-width:18p
 .tl .what{margin-top:2px}
 .tl .why{margin-top:3px;font-size:14px;color:#5b4a3a;font-style:italic}
 .tl.note .what{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-style:normal}
-.tl.adm .what::before{content:"Admin only · ";font-weight:700;color:var(--amber)}
+.tl.adm .what::before{content:"Money only · ";font-weight:700;color:var(--amber)}
 /* forms */
 label.f{display:block;margin-bottom:12px}
 label.f>span{display:block;font-weight:600;margin-bottom:4px;font-size:14.5px}
@@ -172,14 +202,12 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
 </style>
 </head>
 <body>
-<div id="demoBar" style="background:#f3b733;color:#2a1b0b;font:600 14px/1.3 system-ui,sans-serif;padding:6px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-  <span style="background:#2a1b0b;color:#f3b733;border-radius:6px;padding:2px 7px;font-weight:800">DEMO</span>
-  <span style="flex:1;min-width:120px">Sample data · changes stay on this phone</span>
-  <label style="display:flex;gap:6px;align-items:center">You are
-    <select id="demoWho" aria-label="Switch person" style="min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 6px">
-      <option value="">— choose —</option><option value="owner@adityatraders.demo">Bharat · Owner</option><option value="accounts@adityatraders.demo">Lakshmi · Accountant</option><option value="9848000001">Ravi · Staff</option><option value="9848000002">Suresh · Staff</option><option value="9848000003">Prasad · Staff</option></select></label>
-  <a href="guide.html" style="min-height:36px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid #8a5a00;background:#fff;color:#2a1b0b;padding:2px 10px;text-decoration:none">Guide</a>
-  <button id="demoReset" style="min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 10px;cursor:pointer">Reset</button>
+<div id="demoBar" title="Sample data. Changes stay on this phone only." style="background:#f3b733;color:#2a1b0b;font:600 14px/1.3 system-ui,sans-serif;padding:6px 8px;display:flex;gap:6px;align-items:center">
+  <span style="background:#2a1b0b;color:#f3b733;border-radius:6px;padding:3px 7px;font-weight:800">DEMO</span>
+  <select id="demoWho" aria-label="Switch person (sample logins)" style="flex:1;min-width:0;min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 4px">
+    <option value="">Choose a person…</option><option value="owner@adityatraders.demo">Owner (Aditya & Bharat)</option><option value="accounts@adityatraders.demo">Lakshmi · Accountant</option><option value="9848000001">Ravi · Staff</option><option value="9848000002">Suresh · Staff</option><option value="9848000003">Prasad · Staff</option></select>
+  <a href="guide.html" style="min-height:36px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid #8a5a00;background:#fff;color:#2a1b0b;padding:2px 9px;text-decoration:none">Guide</a>
+  <button id="demoReset" style="min-height:36px;border-radius:8px;border:1px solid #8a5a00;background:#fff;font:inherit;padding:2px 9px;cursor:pointer">Reset</button>
 </div>
 <script>
 (function () {
@@ -204,8 +232,8 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
     clearInterval(iv);
     const box = document.createElement("div");
     box.className = "card"; box.style.marginTop = "12px";
-    box.innerHTML = '<b>Demo logins</b><p class="small mut" style="margin:4px 0 8px">Tap a person to sign in. Password for all: <b></b></p>' +
-      [["Bharat · Owner", "owner@adityatraders.demo"], ["Lakshmi · Accountant", "accounts@adityatraders.demo"], ["Ravi · Staff", "9848000001"], ["Suresh · Staff", "9848000002"], ["Prasad · Staff", "9848000003"]].map(p => '<button type="button" class="btn sm" style="margin:0 6px 6px 0" data-l="' + p[1] + '">' + p[0] + '</button>').join("");
+    box.innerHTML = '<b>Demo logins</b><p class="small mut" style="margin:4px 0 8px">Sample data: changes stay on this phone only (Reset puts the sample back). Tap a person to sign in. Password for all: <b></b></p>' +
+      [["Owner (Aditya & Bharat)", "owner@adityatraders.demo"], ["Lakshmi · Accountant", "accounts@adityatraders.demo"], ["Ravi · Staff", "9848000001"], ["Suresh · Staff", "9848000002"], ["Prasad · Staff", "9848000003"]].map(p => '<button type="button" class="btn sm" style="margin:0 6px 6px 0" data-l="' + p[1] + '">' + p[0] + '</button>').join("");
     box.querySelector("b + p b").textContent = window.ADITYA_DEMO.password;
     u.closest("form").after(box);
     box.querySelectorAll("[data-l]").forEach(b => b.onclick = () => { sessionStorage.setItem("demo_as", b.dataset.l); who.value = b.dataset.l; go(b.dataset.l); });
@@ -217,6 +245,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
 <div class="top" id="top">
   <button class="iconbtn hidden" id="backBtn" aria-label="Back">&#8592;</button>
   <h1 id="title">Aditya Traders</h1>
+  <a class="topnew hidden" id="topNew" href="#/new">+ New load</a>
   <button class="iconbtn hidden" id="refreshBtn" aria-label="Refresh" title="Refresh">&#8635;</button>
 </div>
 <div class="net hidden" id="net"></div>
@@ -241,7 +270,9 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px}
 const CFG = window.ADITYA_CONFIG || {};
 const SUPABASE_URL = CFG.url || "https://yqcsmuycditxkhvdfwyz.supabase.co";
 const SUPABASE_KEY = CFG.key || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxY3NtdXljZGl0eGtodmRmd3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzI3MzcsImV4cCI6MjExMTEwODczN30.qNVM2PJWVsK35nxS8da07YMh4xxrHpu4r2YNFpxSOJU";
-const APP_VERSION = "2.1 (26 Nov 2026)";
+const APP_VERSION = "3.2.1 (26 Nov 2026)";
+const JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+const AUTOTABLE_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js";
 const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 const STAFF_DOMAIN = "staff.adityatraders.in";   // phone-number logins become <phone>@this-domain
 const BUCKET = "lorry-files";
@@ -252,27 +283,42 @@ const STAGE = Object.fromEntries([...STAGES, ["cancelled","Cancelled"]]);
 const BILL = {not_ready:"Not ready", ready_to_bill:"Ready to bill", billed:"Billed", payment_pending:"Payment pending", paid:"Paid"};
 const LINE_ST = {planned:"Planned", loading:"Loading", done:"Done"};
 /* Units used by sawmills (owner, 26 Nov). */
-const UNITS = ["CFT","CBM","Pieces","Tons","Quintal","Kg","Running ft","Sq ft"];
-const WOODS = ["Mango","Teak","Acacia","Neem","Jamun","Marri","Country wood","Other"];
-const GRADES = {small:"Small", medium:"Medium", large:"Large", mixed:"Mixed"};
+const UNITS = ["CFT","CBM","RFT","SFT","Tons","Pieces","Quintal","Kg"];
+const GRADES = {small:"Small", medium:"Medium", large:"Large"};
+/* Planning and Truck fixed belong to the owner (and anyone given the "plan" permission). */
+const OWNER_STAGES = ["planning","truck_fixed"];
+/* Driver documents: the photo is mandatory, the other two are optional. */
+/* Driver documents. The photo is optional unless the owner makes it compulsory in Settings. */
+const photoRequired = () => Number(S.settings.driver_photo_required || 0) === 1;
+const slipRequired = () => Number(S.settings.weigh_slip_required ?? 1) === 1;
+const DOCS_LIST = () => [{kind:"Driver with truck", label:"Driver with truck", must:photoRequired()}, {kind:"Driving licence", label:"Driving licence"}, {kind:"C-Book / RC", label:"C-Book / RC"}];
 /* Owner's rough figures for a full lorry of Mango (guide only, never used in money). */
 const CFT_GUIDE = {30:1150, 35:1350};
-const COST_TYPES = ["Hamali / loading","Weighbridge","Permit","Commission","Toll","Driver bata","Other"];
-const FILE_KINDS = ["Weighbridge (kata) slip","Receipt","Invoice","E-way bill","Lorry receipt (LR)","Loading photo","Other"];
+const FILE_KINDS = ["Loading photo","E-way bill","Lorry receipt (LR)","Invoice copy","Other"];   // general photos; driver documents and weigh slips have their own sections
 const MODES = {cash:"Cash", upi:"UPI", bank:"Bank", cheque:"Cheque", other:"Other"};
-const FIELD = {load_date:"Date",truck_stage:"Stage",vehicle_no:"Truck no",capacity_t:"Capacity (T)",driver_name:"Driver",driver_phone:"Driver phone",transporter_id:"Transporter",freight_amount:"Freight (₹)",party_id:"Buyer",destination:"Destination",destination_state:"State",eway_bill_no:"E-way bill no",net_weight_t:"Kata net weight (T)",notes:"Notes",
+const FIELD = {load_date:"Date",truck_stage:"Stage",vehicle_no:"Truck no",capacity_t:"Capacity (T)",driver_name:"Driver",driver_phone:"Driver phone",transporter_id:"Transporter",capacity_cft:"Capacity (CFT)",reached_at:"Truck reached",loading_done_at:"Loading done",slip_net_weight_t:"Slip net weight (T)",allocation_id:"Sawmill",owner_name:"Sawmill owner",party_name:"Party name",dimensions:"Dimensions",pieces:"Pieces",receipt_path:"Receipt",effective_from:"Effective from",party_id:"Buyer",destination:"Destination",destination_state:"State",eway_bill_no:"E-way bill no",net_weight_t:"Kata net weight (T)",notes:"Notes",
   sawmill_id:"Mill",wood_type:"Wood",unit:"Unit",quantity:"Quantity",length_ft:"Length (ft)",size_grade:"Size",line_status:"Line status",loaded_on:"Loaded on",
-  rate:"Rate (₹)",adjustment:"Adjustment (₹)",line_id:"Line",cost_type:"Cost",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note",
+  rate:"Rate (₹)",adjustment:"Adjustment (₹)",line_id:"Item",cost_type:"Category",amount:"Amount (₹)",paid_to:"Paid to",paid_on:"Paid on",note:"Note",
   invoice_no:"Invoice no",invoice_date:"Invoice date",sale_unit:"Sale unit",sale_qty:"Sale qty",sale_rate:"Sale rate (₹)",sale_adjustment:"Sale adjustment (₹)",gst_amount:"GST (₹)",credit_days:"Credit days",
-  party_kind:"Paid by/to",mode:"Mode",reference:"Reference",kind:"Photo type",file_name:"File",storage_path:"File",mime_type:"Type",size_bytes:"Size",load_id:"Load"};
-const ENTITY = {loads:"Load", load_lines:"Mill line", line_prices:"Purchase rate", load_costs:"Cost", load_billing:"Bill", payments:"Payment", load_files:"Photo", note:"Update"};
+  party_kind:"Paid by/to",mode:"Mode",reference:"Reference",kind:"Document",file_name:"File",storage_path:"File",mime_type:"Type",size_bytes:"Size",load_id:"Load"};
+const ENTITY = {loads:"Load", load_allocations:"Sawmill", load_lines:"Wood item", line_prices:"Purchase rate", load_costs:"Expense", load_billing:"Bill", payments:"Payment", load_files:"Document", sawmill_rates:"Rate card", note:"Update"};
 
 // CFG.fetch is only set by the demo page (sample data in the browser); the live app uses the network.
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true}, ...(CFG.fetch ? {global:{fetch: CFG.fetch}} : {})});
 
 /* ---------- state ---------- */
-const S = {user:null, me:null, loads:[], sawmills:[], parties:[], people:{}, settings:{}, filter:"all", q:"", loadedAt:null, offline:false};
-const isAdmin = () => !!S.me && S.me.active && (S.me.role === "owner" || S.me.role === "accountant");
+const S = {user:null, me:null, loads:[], sawmills:[], parties:[], people:{}, settings:{}, woods:[], expCats:[], filter:"all", q:"", loadedAt:null, offline:false};
+/* Permissions (the database enforces the same rules; these only shape the screens).
+   plan: Planning + Truck fixed · finance: bills, payments, balances, and VIEW rates and expenses ·
+   rates: enter sawmill rates · expenses: enter freight and other charges · people: logins and settings.
+   The owner login (shared by Aditya and Bharat) has everything; others only what the owner ticks. */
+const isOwner = () => !!S.me && S.me.active && S.me.role === "owner";
+const can = p => !!S.me && S.me.active && (S.me.role === "owner" || !!S.me["perm_" + p]);
+const isAdmin = () => can("finance");
+const canSeeExp = () => can("expenses") || can("finance");
+const canSeeRates = () => can("finance") || can("rates");
+const ROLE_NAME = {owner:"Owner", accountant:"Accountant", freight:"Freight & expenses", staff:"Staff"};
+const visibleStages = () => can("plan") ? STAGES : STAGES.filter(([k]) => !OWNER_STAGES.includes(k));
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -323,15 +369,16 @@ function sheet({title, intro = "", fields = [], ok = "Save", danger = null}){
       const req = f.required ? " req" : "";
       if (f.type === "select") return `<label class="f"><span class="${req}">${esc(f.label)}</span><select class="in" id="sf_${f.id}">${f.options.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(f.value ?? "") ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ""}</label>`;
       if (f.type === "textarea") return `<label class="f"><span class="${req}">${esc(f.label)}</span><textarea class="in" id="sf_${f.id}" placeholder="${esc(f.placeholder || "")}">${esc(f.value ?? "")}</textarea>${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ""}</label>`;
+      if (f.type === "file") return `<label class="f"><span>${esc(f.label)}</span><input class="in" id="sf_${f.id}" type="file" accept="image/*,application/pdf"></label>`;
       if (f.type === "check") return `<label class="row" style="margin-bottom:12px"><input type="checkbox" id="sf_${f.id}" ${f.value ? "checked" : ""} style="width:22px;height:22px"> <span>${esc(f.label)}</span></label>`;
-      return `<label class="f"><span class="${req}">${esc(f.label)}</span><input class="in" id="sf_${f.id}" type="${f.type || "text"}" ${f.type === "number" ? `inputmode="decimal" step="${f.step || "any"}"` : ""} ${f.list ? `list="sl_${f.id}"` : ""} value="${esc(f.value ?? "")}" placeholder="${esc(f.placeholder || "")}" autocomplete="off">${f.list ? `<datalist id="sl_${f.id}">${f.list.map(x => `<option value="${esc(x)}">`).join("")}</datalist>` : ""}${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ""}</label>`;
+      return `<label class="f"><span class="${req}">${esc(f.label)}</span><input class="in" id="sf_${f.id}" type="${f.type || "text"}" ${f.type === "number" ? `inputmode="${f.step === "1" ? "numeric" : "decimal"}" step="${f.step || "any"}"` : ""} ${f.list ? `list="sl_${f.id}"` : ""} value="${esc(f.value ?? "")}" placeholder="${esc(f.placeholder || "")}" autocomplete="off">${f.list ? `<datalist id="sl_${f.id}">${f.list.map(x => `<option value="${esc(x)}">`).join("")}</datalist>` : ""}${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ""}</label>`;
     };
     bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><h2>${esc(title)}</h2>${intro ? `<p class="mut small" style="margin-top:-6px">${intro}</p>` : ""}
       <form id="sheetForm" novalidate>${fields.map(field).join("")}<p class="small" id="sheetErr" style="color:var(--red);min-height:1em;margin:0 0 8px"></p>
       <div class="row"><button type="button" class="btn" id="sheetCancel">Cancel</button>${danger ? `<button type="button" class="btn red" id="sheetDanger">${esc(danger)}</button>` : ""}<button class="btn pri grow" id="sheetOk">${esc(ok)}</button></div></form></div>`;
     document.body.appendChild(bg);
     const close = v => { bg.remove(); resolve(v); };
-    const first = bg.querySelector("input,select,textarea"); if (first) setTimeout(() => first.focus(), 30);
+    const first = bg.querySelector("input,select,textarea"); if (first) first.focus({preventScroll:true});   // immediately: a delayed focus could steal typing from another box
     bg.addEventListener("click", e => { if (e.target === bg) close(null); });
     $("sheetCancel").onclick = () => close(null);
     if (danger) $("sheetDanger").onclick = () => close({__danger: true});
@@ -340,8 +387,8 @@ function sheet({title, intro = "", fields = [], ok = "Save", danger = null}){
       const out = {};
       for (const f of fields) {
         const el = $("sf_" + f.id);
-        out[f.id] = f.type === "check" ? el.checked : el.value.trim();
-        if (f.required && !out[f.id]) { $("sheetErr").textContent = "Fill in: " + f.label; el.focus(); return; }
+        out[f.id] = f.type === "check" ? el.checked : f.type === "file" ? (el.files[0] || null) : el.value.trim();
+        if (f.required && !out[f.id]) { $("sheetErr").textContent = (f.type === "file" ? "Add: " : "Fill in: ") + f.label; el.focus(); return; }
         if (f.type === "number" && out[f.id] !== "" && (isNaN(Number(out[f.id])) || (f.min !== undefined && Number(out[f.id]) < f.min))) { $("sheetErr").textContent = "Check the number in: " + f.label; el.focus(); return; }
       }
       close(out);
@@ -355,6 +402,9 @@ function chrome(title, {back = false, nav = null, sub = ""} = {}){
   $("title").innerHTML = esc(title) + (sub ? `<span class="sub">${esc(sub)}</span>` : "");
   $("backBtn").classList.toggle("hidden", !back);
   $("refreshBtn").classList.toggle("hidden", !(S.me && S.me.active));
+  const tn = $("topNew"), inForm = /^#\/(new|register|edit\/)/.test(location.hash);
+  if (S.me && S.me.active && !inForm) { tn.href = can("plan") ? "#/new" : "#/register"; tn.textContent = can("plan") ? "+ New load" : "+ Truck"; tn.classList.remove("hidden"); }
+  else tn.classList.add("hidden");
   const showNav = !!(S.me && S.me.active);
   $("nav").classList.toggle("hidden", !showNav);
   document.querySelectorAll("[data-nav]").forEach(a => a.dataset.nav === nav ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
@@ -398,38 +448,42 @@ async function afterLogin(){
   try { S.me = await q(sb.from("profiles").select("*").eq("id", S.user.id).maybeSingle()); }
   catch(e) {
     const c = lsGet(cacheKey());
-    if (c && c.me) { Object.assign(S, {me:c.me, loads:c.loads || [], sawmills:c.sawmills || [], parties:c.parties || [], people:c.people || {}, settings:c.settings || {}, loadedAt:c.at, offline:true}); setNet(); route(); return; }
+    if (c && c.me) { Object.assign(S, {me:c.me, loads:c.loads || [], sawmills:c.sawmills || [], parties:c.parties || [], people:c.people || {}, settings:c.settings || {}, woods:c.woods || [], loadedAt:c.at, offline:true}); setNet(); route(); return; }
     $("app").innerHTML = `<div class="empty">${esc(errText(e))}<br><br><button class="btn" onclick="location.reload()">Try again</button></div>`; return;
   }
   if (!S.me || !S.me.active) {
     chrome("Aditya Traders");
-    $("app").innerHTML = `<div class="card" style="margin-top:20px"><h2>Waiting for approval</h2><p>You are signed in as <b>${esc(phoneOf(S.user.email) || S.user.email)}</b>. The owner or accountant must approve your login first.</p>
+    $("app").innerHTML = `<div class="card" style="margin-top:20px"><h2>Waiting for approval</h2><p>You are signed in as <b>${esc(phoneOf(S.user.email) || S.user.email)}</b>. The owner must approve your login first.</p>
       <div class="row"><button class="btn" onclick="location.reload()">Check again</button><button class="btn" id="soBtn">Sign out</button></div></div>`;
     $("soBtn").onclick = () => sb.auth.signOut(); return;
   }
-  $("navPartiesLabel").textContent = isAdmin() ? "Parties" : "Mills";
-  $("navParties").href = isAdmin() ? "#/parties" : "#/mills";
+  $("navPartiesLabel").textContent = can("finance") ? "Parties" : "Mills";
+  $("navParties").href = can("finance") ? "#/parties" : "#/mills";
   await loadMasters();
   route();
 }
 
 async function loadMasters(){
   try {
-    const [mills, parties, ppl, sets] = await Promise.all([
+    const [mills, parties, ppl, sets, woods, cats] = await Promise.all([
       q(sb.from("sawmills").select("*").order("name")),
       q(sb.from("parties").select("*").order("name")),
-      q(sb.from("profiles").select("id,full_name,email,phone,role,active,created_at").order("created_at")),
-      q(sb.from("app_settings").select("*"))
+      q(sb.from("profiles").select("id,full_name,email,phone,role,active,created_at,perm_plan,perm_finance,perm_expenses,perm_people,perm_rates").order("created_at")),
+      q(sb.from("app_settings").select("*")),
+      q(sb.from("wood_types").select("*").order("sort").order("name")),
+      canSeeExp() ? q(sb.from("expense_categories").select("*").order("sort").order("name")) : Promise.resolve([])
     ]);
     S.sawmills = mills; S.parties = parties; S.people = Object.fromEntries(ppl.map(p => [p.id, p]));
     S.settings = Object.fromEntries(sets.map(s => [s.key, Number(s.value)]));
+    S.woods = woods.filter(w => w.active).map(w => w.name); S.expCats = cats.filter(c => c.active).map(c => c.name);
+    if (S.people[S.me.id]) S.me = {...S.me, ...S.people[S.me.id]};
   } catch(e) { /* keep cached */ }
 }
 async function loadLoads(silent){
   try {
     S.loads = await q(sb.from("v_loads").select("*").order("load_date", {ascending:false}).order("id", {ascending:false}).limit(500));
     S.loadedAt = new Date().toISOString(); S.offline = false;
-    lsSet(cacheKey(), {at:S.loadedAt, me:S.me, loads:S.loads, sawmills:S.sawmills, parties:S.parties, people:S.people, settings:S.settings});
+    lsSet(cacheKey(), {at:S.loadedAt, me:S.me, loads:S.loads, sawmills:S.sawmills, parties:S.parties, people:S.people, settings:S.settings, woods:S.woods});
   } catch(e) {
     const c = lsGet(cacheKey()); if (c) { S.loads = c.loads || []; S.loadedAt = c.at; }
     S.offline = true; if (!silent) toast(errText(e), true);
@@ -444,22 +498,27 @@ async function refresh(silent){ await loadMasters(); await loadLoads(silent); ro
    Router
    ===================================================================== */
 let lastHash = null;
+/* A slow screen must not draw over the screen the person has already moved to. */
+const here = () => location.hash || "#/";
 async function route(soft){
   const h = location.hash || "#/"; let m;
-  if (soft && /^#\/(new|edit\/)/.test(h)) return;          // never wipe a form being typed
+  if (soft && /^#\/(new|register|edit\/)/.test(h)) return;          // never wipe a form being typed
   lastHash = h;
-  if (h === "#/") { if (!S.loadedAt || !soft) await loadLoads(true); return renderHome(); }
-  if (h === "#/loads") { if (!S.loadedAt || !soft) await loadLoads(true); return renderLoads(); }
+  if (h === "#/") { if (!S.loadedAt || !soft) await loadLoads(true); return here() === h ? renderHome() : undefined; }
+  if (h === "#/loads") { if (!S.loadedAt || !soft) await loadLoads(true); return here() === h ? renderLoads() : undefined; }
   if ((m = h.match(/^#\/load\/(\d+)$/))) return renderLoad(Number(m[1]));
-  if (h === "#/new") return renderLoadForm(null);
+  if (h === "#/new") return can("plan") ? renderLoadForm(null) : (location.hash = "#/register");
+  if (h === "#/register") return renderLoadForm(null, true);
+  if (h === "#/expenses") return canSeeExp() ? renderExpenses() : (location.hash = "#/");
+  if (h === "#/rates") return canSeeRates() ? renderRates() : (location.hash = "#/");
   if ((m = h.match(/^#\/edit\/(\d+)$/))) return renderLoadForm(Number(m[1]));
   if (h === "#/updates") return renderUpdates();
   if (h === "#/mills") return renderMills();
   if (h === "#/parties") return isAdmin() ? renderParties() : (location.hash = "#/mills");
   if ((m = h.match(/^#\/party\/(buyer|mill|transporter)\/(\d+)$/))) return isAdmin() ? renderParty(m[1], Number(m[2])) : (location.hash = "#/");
   if (h === "#/more") return renderMore();
-  if (h === "#/team") return isAdmin() ? renderTeam() : (location.hash = "#/");
-  if (h === "#/settings") return isAdmin() ? renderSettings() : (location.hash = "#/");
+  if (h === "#/team") return can("people") ? renderTeam() : (location.hash = "#/");
+  if (h === "#/settings") return can("people") ? renderSettings() : (location.hash = "#/");
   if (h === "#/export") return renderExport();
   location.hash = "#/";
 }
@@ -468,34 +527,69 @@ window.addEventListener("hashchange", () => { if (S.me && S.me.active) route(); 
 /* =====================================================================
    Home
    ===================================================================== */
+/* Quick-action icons (simple line drawings inside coloured circles). */
+const ICON = {
+  plus:'<path d="M12 5v14M5 12h14"/>', truck:'<path d="M2 7h11v9H2zM13 10h4l3 3v3h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
+  list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>', chat:'<path d="M4 5h16v11H8l-4 4z"/>',
+  mill:'<path d="M4 20V9l8-5 8 5v11M9 20v-6h6v6"/>', rupee:'<path d="M7 5h10M7 9h10M9 5c4 0 6 1.5 6 4s-2 4-6 4H7l7 6"/>',
+  rate:'<path d="M4 19l5-6 4 3 7-9"/><path d="M15 7h5v5"/>', people:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.5a3 3 0 0 1 0 6M18 14.5c2 .6 3 2.5 3 5.5"/>',
+  sheet:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M14 3v5h5"/>', fuel:'<path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M4 11h11M15 8h2l2 2v8a1.5 1.5 0 0 1-3 0v-4h-1"/>'
+};
+const qaItem = (href, icon, label, color) => `<a href="${href}"><i style="background:${color}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[icon]}</svg></i>${esc(label)}</a>`;
+const docsPending = l => !OWNER_STAGES.includes(l.truck_stage) && !["cancelled","delivered"].includes(l.truck_stage) && ((photoRequired() && !l.driver_photo) || (Number(l.allocs_without_slip) > 0 && ["under_loading","loaded","in_transit"].includes(l.truck_stage)));
+
 async function renderHome(){
-  chrome("Aditya Traders", {nav:"home", sub: (S.me.full_name || "") + " · " + S.me.role});
+  chrome("Aditya Traders", {nav:"home", sub: [S.me.full_name, (S.me.full_name || "").toLowerCase().startsWith((ROLE_NAME[S.me.role] || S.me.role).toLowerCase()) ? "" : (ROLE_NAME[S.me.role] || S.me.role)].filter(Boolean).join(" · ")});
   const L = S.loads.filter(l => l.truck_stage !== "cancelled");
   const cnt = s => L.filter(l => l.truck_stage === s).length;
   const toCheck = L.filter(l => l.my_flag !== "ok");
   const edited = L.filter(l => l.my_flag === "edited").length;
+  const noPhoto = photoRequired() ? L.filter(l => !OWNER_STAGES.includes(l.truck_stage) && l.truck_stage !== "delivered" && !l.driver_photo).length : 0;
+  const noSlip = L.filter(l => ["under_loading","loaded","in_transit"].includes(l.truck_stage)).reduce((a, l) => a + Number(l.allocs_without_slip || 0), 0);
   let h = "";
-  const pending = isAdmin() ? Object.values(S.people).filter(p => !p.active).length : 0;
+  // Quick actions: only what this person may use.
+  const qa = [];
+  if (can("plan")) qa.push(qaItem("#/new", "plus", "New load", "#b85c14"));
+  qa.push(qaItem("#/register", "truck", "Register truck", "#1b4332"));
+  qa.push(qaItem("#/loads", "list", "Loads", "#3a6ea5"));
+  qa.push(qaItem("#/updates", "chat", "Updates", "#7a4fb0"));
+  if (canSeeExp()) qa.push(qaItem("#/expenses", "fuel", "Expenses", "#c2410c"));
+  if (can("finance")) qa.push(qaItem("#/parties", "rupee", "Parties", "#0f766e"));
+  if (canSeeRates()) qa.push(qaItem("#/rates", "rate", "Sawmill rates", "#a16207"));
+  qa.push(qaItem("#/mills", "mill", "Mills", "#6d4220"));
+  qa.push(qaItem("#/export", "sheet", "Excel", "#15803d"));
+  if (can("people")) qa.push(qaItem("#/team", "people", "Team", "#475467"));
+  h += `<div class="qa" aria-label="Quick actions">${qa.join("")}</div>`;
+  const pending = can("people") ? Object.values(S.people).filter(p => !p.active).length : 0;
   if (pending) h += `<div class="banner amber"><span class="grow">${pending} ${pending === 1 ? "person is" : "people are"} waiting for approval.</span><a class="btn sm" href="#/team">Open team</a></div>`;
   if (toCheck.length) h += `<div class="banner red"><span class="grow"><b>${toCheck.length} load${toCheck.length > 1 ? "s" : ""} to check</b>${edited ? ` · ${edited} changed since you last looked` : ""}</span><button class="btn sm" data-goto="check">Show</button></div>`;
-  h += `<div class="tiles">${STAGES.map(([k, l]) => `<button class="tile" data-goto="${k}"><div class="n num">${cnt(k)}</div><div class="l">${l}</div></button>`).join("")}</div>`;
-  if (isAdmin()) {
+  if (noPhoto || noSlip) h += `<div class="banner amber"><span class="grow"><b>Pending documents:</b> ${noPhoto ? `${noPhoto} truck${noPhoto > 1 ? "s" : ""} without the driver photo` : ""}${noPhoto && noSlip ? " · " : ""}${noSlip ? `${noSlip} sawmill${noSlip > 1 ? "s" : ""} without a weigh slip` : ""}</span><button class="btn sm" data-goto="docs">Show</button></div>`;
+  h += `<div class="sect"><h3>Loads by stage</h3><span class="small mut">${L.length} total</span></div>
+    <div class="tiles">${visibleStages().map(([k, l]) => `<button class="tile" data-goto="${k}"><div class="n num">${cnt(k)}</div><div class="l">${l}</div></button>`).join("")}</div>`;
+  if (canSeeExp()) {
+    const month = today().slice(0, 7), inMonth = L.filter(l => String(l.load_date).slice(0, 7) === month);
+    const fr = inMonth.reduce((a, l) => a + Number(l.freight_total || 0), 0), all = inMonth.reduce((a, l) => a + Number(l.costs_total || 0), 0);
+    h += `<div class="sect"><h3>Freight and expenses</h3><a class="small" href="#/expenses">Expenses →</a></div>
+      <div class="tiles"><a class="tile money" href="#/expenses"><div class="n num">${inr(fr)}</div><div class="l">Truck freight this month</div></a>
+      <a class="tile money" href="#/expenses"><div class="n num">${inr(all - fr)}</div><div class="l">Other expenses this month</div></a></div>`;
+  }
+  if (can("finance")) {
     let bal = [];
     try { bal = await q(sb.from("v_balances").select("*")); } catch(e) {}
+    if (here() !== "#/") return;
     const sumKind = k => bal.filter(b => b.party_kind === k).reduce((a, b) => a + Number(b.total_due) - Number(b.total_paid), 0);
-    const overdue = L.filter(l => l.bill_stage === "payment_pending").length;
-    const ready = L.filter(l => l.bill_stage === "ready_to_bill").length;
+    const overdue = L.filter(l => l.bill_stage === "payment_pending").length, ready = L.filter(l => l.bill_stage === "ready_to_bill").length;
     h += `<div class="sect"><h3>Money</h3><a class="small" href="#/parties">Parties →</a></div>
       <div class="tiles">
         <a class="tile money" href="#/parties"><div class="n num">${inr(sumKind("buyer"))}</div><div class="l">To collect from buyers</div></a>
-        <a class="tile money" href="#/parties"><div class="n num">${inr(sumKind("mill"))}</div><div class="l">To pay mills</div></a>
+        <a class="tile money" href="#/parties"><div class="n num">${inr(sumKind("mill"))}</div><div class="l">To pay sawmills</div></a>
         <a class="tile money" href="#/parties"><div class="n num">${inr(sumKind("transporter"))}</div><div class="l">To pay transporters</div></a>
         <button class="tile ${ready ? "alert" : ""}" data-goto="ready_to_bill"><div class="n num">${ready}</div><div class="l">Ready to bill</div></button>
         <button class="tile ${overdue ? "alert" : ""}" data-goto="payment_pending"><div class="n num">${overdue}</div><div class="l">Payment pending</div></button>
       </div>`;
   }
   h += `<div class="sect"><h3>Latest updates</h3><a class="small" href="#/updates">All →</a></div><div id="homeFeed" class="card"><p class="mut small">Loading…</p></div>`;
-  h += `<a class="btn acc block" href="#/new">+ New load</a><footer>Version ${APP_VERSION}${S.loadedAt ? " · updated " + esc(dShort(S.loadedAt)) : ""}</footer>`;
+  h += `<a class="btn acc block" href="${can("plan") ? "#/new" : "#/register"}">${can("plan") ? "+ New load" : "+ Register truck"}</a><footer>Version ${APP_VERSION}${S.loadedAt ? " · updated " + esc(dShort(S.loadedAt)) : ""}</footer>`;
   $("app").innerHTML = h;
   document.querySelectorAll("[data-goto]").forEach(b => b.onclick = () => { S.filter = b.dataset.goto; location.hash = "#/loads"; });
   try {
@@ -510,17 +604,18 @@ async function renderHome(){
 function renderLoads(){
   chrome("Loads", {nav:"loads"});
   const L = S.loads;
-  const filters = [["all","All"],["check","To check"],...STAGES,["cancelled","Cancelled"]];
-  if (isAdmin()) filters.push(["ready_to_bill","Ready to bill"],["billed","Billed"],["payment_pending","Payment pending"],["paid","Paid"]);
-  const match = (l, f) => f === "all" ? l.truck_stage !== "cancelled" : f === "check" ? l.my_flag !== "ok" : (BILL[f] ? l.bill_stage === f : l.truck_stage === f);
+  const filters = [["all","All"],["check","To check"],["docs","Pending documents"],...visibleStages()];
+  if (can("plan")) filters.push(["cancelled","Cancelled"]);
+  if (can("finance")) filters.push(["ready_to_bill","Ready to bill"],["billed","Billed"],["payment_pending","Payment pending"],["paid","Paid"]);
+  const match = (l, f) => f === "all" ? l.truck_stage !== "cancelled" : f === "check" ? l.my_flag !== "ok" : f === "docs" ? docsPending(l) : (BILL[f] ? l.bill_stage === f : l.truck_stage === f);
   const qq = S.q.trim().toLowerCase();
   let rows = L.filter(l => match(l, S.filter));
   if (qq) rows = rows.filter(l => [l.load_no, l.vehicle_no, l.driver_name, l.driver_phone, l.party_name, l.party_city, l.destination, l.transporter_name, l.eway_bill_no, l.invoice_no, l.qty_summary].join(" ").toLowerCase().includes(qq));
   let h = `<div class="chips" role="group" aria-label="Filter">${filters.map(([k, n]) => `<button class="chip" data-f="${k}" aria-pressed="${S.filter === k}">${esc(n)}<span class="c">${L.filter(l => match(l, k)).length}</span></button>`).join("")}</div>
     <input class="search" id="search" type="search" placeholder="Search load, truck, driver, buyer, invoice" value="${esc(S.q)}" aria-label="Search">`;
   if (S.filter === "check" && rows.length) h += `<div class="row" style="margin-bottom:10px"><span class="grow small mut">Open each load to see what changed, or</span><button class="btn sm" id="markAll">Mark all ${rows.length} checked</button></div>`;
-  h += rows.length ? rows.map(loadCard).join("") : `<div class="empty">${L.length ? "No loads match." : "No loads yet. Tap <b>+ New load</b> to start."}</div>`;
-  h += `<a class="btn acc block" href="#/new" style="margin-top:6px">+ New load</a>`;
+  h += rows.length ? rows.map(loadCard).join("") : `<div class="empty">${L.length ? "No loads match." : "No loads yet."}</div>`;
+  h += `<a class="btn acc block" href="${can("plan") ? "#/new" : "#/register"}" style="margin-top:6px">${can("plan") ? "+ New load" : "+ Register truck"}</a>`;
   $("app").innerHTML = h;
   document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.filter = b.dataset.f; renderLoads(); });
   document.querySelectorAll("[data-load]").forEach(b => b.onclick = () => { location.hash = "#/load/" + b.dataset.load; });
@@ -528,14 +623,17 @@ function renderLoads(){
   const ma = $("markAll");
   if (ma) ma.onclick = async () => { ma.disabled = true; try { await q(sb.rpc("v2_mark_checked", {p_load_ids: rows.map(l => l.id)})); toast("Marked as checked."); await loadLoads(); renderLoads(); } catch(e) { toast(errText(e), true); ma.disabled = false; } };
 }
+function capGuide(l){ return l.capacity_cft ? Number(l.capacity_cft) : CFT_GUIDE[Number(l.capacity_t)]; }
 function loadCard(l){
   const flag = l.my_flag === "edited" ? `<span class="flag edited">Changed</span>` : l.my_flag === "new" ? `<span class="flag new">New</span>` : "";
-  const guide = CFT_GUIDE[Number(l.capacity_t)];
+  const guide = capGuide(l);
   const pct = guide && l.cft_total ? Math.min(100, Math.round(Number(l.cft_total) / guide * 100)) : (l.lines_total ? Math.round(l.lines_done / l.lines_total * 100) : 0);
+  const docWarn = photoRequired() && !OWNER_STAGES.includes(l.truck_stage) && !["cancelled","delivered"].includes(l.truck_stage) && !l.driver_photo ? `<span class="pill b-payment_pending">No driver photo</span>` : "";
+  const slipWarn = ["under_loading","loaded","in_transit"].includes(l.truck_stage) && Number(l.allocs_without_slip) > 0 ? `<span class="pill l-loading">${l.allocs_without_slip} weigh slip${l.allocs_without_slip > 1 ? "s" : ""} missing</span>` : "";
   return `<button class="loadc ${l.my_flag === "ok" ? "" : l.my_flag}" data-load="${l.id}">
-    <div class="t1"><span class="no">${esc(l.load_no)}</span>${l.vehicle_no ? `<span class="veh">${esc(l.vehicle_no)}</span>` : ""}${flag}<span class="grow"></span>${stagePill(l.truck_stage)}${isAdmin() && l.bill_stage && l.bill_stage !== "not_ready" ? billPill(l.bill_stage) : ""}</div>
-    <div class="t2">${esc(l.mills_count ? l.mills_count + (l.mills_count > 1 ? " mills" : " mill") : "No mills yet")} → ${esc(l.party_name || "Buyer not set")}${l.destination ? ", " + esc(l.destination) : ""}</div>
-    <div class="t3">${l.qty_summary ? `<span class="num">${esc(l.qty_summary)}</span>` : ""}${l.net_weight_t ? `<span class="num">Kata ${esc(Number(l.net_weight_t))} T</span>` : ""}${l.lines_total ? `<span>${l.lines_done}/${l.lines_total} lines done</span>` : ""}${isAdmin() && l.invoice_total != null ? `<span class="num"><b>${inr(l.invoice_total)}</b></span>` : ""}</div>
+    <div class="t1"><span class="no">${esc(l.load_no)}</span>${l.vehicle_no ? `<span class="veh">${esc(l.vehicle_no)}</span>` : ""}${flag}<span class="grow"></span>${stagePill(l.truck_stage)}${can("finance") && l.bill_stage && l.bill_stage !== "not_ready" ? billPill(l.bill_stage) : ""}</div>
+    <div class="t2">${esc(l.mills_count ? l.mills_count + (l.mills_count > 1 ? " sawmills" : " sawmill") : "No sawmills yet")} → ${esc(l.party_name || "Party not set")}${l.destination ? ", " + esc(l.destination) : ""}</div>
+    <div class="t3">${l.qty_summary ? `<span class="num">${esc(l.qty_summary)}</span>` : ""}${l.net_weight_t ? `<span class="num">Kata ${esc(Number(l.net_weight_t))} T</span>` : ""}${l.lines_total ? `<span>${l.lines_done}/${l.lines_total} items done</span>` : ""}${can("finance") && l.invoice_total != null ? `<span class="num"><b>${inr(l.invoice_total)}</b></span>` : ""}${docWarn}${slipWarn}</div>
     ${l.lines_total ? `<div class="bar ${pct >= 100 ? "full" : ""}"><i style="width:${pct}%"></i></div>` : ""}
     <div class="t4 ${l.my_flag === "edited" ? "" : "mut"}" ${l.my_flag === "edited" ? 'style="color:var(--red)"' : ""}>${esc(dExact(l.last_at || l.created_at))} · ${esc(person(l.last_by || l.created_by))}${l.last_reason ? " · " + esc(l.last_reason) : ""}</div>
   </button>`;
@@ -545,75 +643,124 @@ function loadCard(l){
    One load
    ===================================================================== */
 async function renderLoad(id){
+  const h0 = here();
   chrome("Load", {back:true, nav:"loads"});
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
-  let L, lines, costs, acts, files, bill = null, pays = [];
+  let L, allocs, lines, acts, files, costs = [], bill = null, pays = [], sets;
   try {
-    [L, lines, costs, acts, files] = await Promise.all([
+    [L, allocs, lines, acts, files, sets] = await Promise.all([
       q(sb.from("v_loads").select("*").eq("id", id).maybeSingle()),
+      q(sb.from("v_allocations").select("*").eq("load_id", id).order("id")),
       q(sb.from("v_lines").select("*").eq("load_id", id).order("id")),
-      q(sb.from("load_costs").select("*").eq("load_id", id).order("id")),
       q(sb.from("activity").select("*").eq("load_id", id).order("at", {ascending:false}).order("id", {ascending:false}).limit(300)),
-      q(sb.from("load_files").select("*").eq("load_id", id).order("id"))
+      q(sb.from("load_files").select("*").eq("load_id", id).order("id")),
+      q(sb.from("app_settings").select("*"))   // loading rules may have changed on another phone
     ]);
-    if (isAdmin()) [bill, pays] = await Promise.all([
+    S.settings = Object.fromEntries(sets.map(x => [x.key, Number(x.value)]));
+    if (canSeeExp()) costs = await q(sb.from("load_costs").select("*").eq("load_id", id).order("id"));
+    if (can("finance")) [bill, pays] = await Promise.all([
       q(sb.from("load_billing").select("*").eq("load_id", id).maybeSingle()),
       q(sb.from("payments").select("*").eq("load_id", id).order("paid_on").order("id"))
     ]);
   } catch(e) {
+    if (here() !== h0) return;
     L = S.loads.find(x => x.id === id);
     if (!L) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
-    lines = []; costs = []; acts = []; files = [];
+    allocs = []; lines = []; acts = []; files = [];
     toast("Offline: showing saved summary only.", true);
   }
-  if (!L) { $("app").innerHTML = `<div class="empty">This load was deleted.</div>`; return; }
+  if (here() !== h0) return;
+  if (!L) { $("app").innerHTML = `<div class="empty">This load is not available to you, or it was deleted.</div>`; return; }
   chrome(L.load_no + (L.vehicle_no ? " · " + L.vehicle_no : ""), {back:true, nav:"loads"});
   const since = L.my_reviewed_at;
   const fresh = since ? acts.filter(a => a.at > since && a.actor !== S.user.id) : [];
   const freshIds = new Set(fresh.map(a => a.entity + ":" + a.entity_id));
-  const ci = STAGES.findIndex(([k]) => k === L.truck_stage);
+  const stages = visibleStages(), ci = stages.findIndex(([k]) => k === L.truck_stage);
+  const hasPhoto = files.some(f => f.kind === "Driver with truck");
+  const photoGate = photoRequired() && !OWNER_STAGES.includes(L.truck_stage) && !hasPhoto;   // only when the owner made the photo compulsory
+  const r = (label, val) => `<dt>${label}</dt><dd>${val}</dd>`;
   let h = "";
 
   if (L.my_flag === "edited") h += `<div class="banner red"><span class="grow"><b>${fresh.length} change${fresh.length === 1 ? "" : "s"} since you checked</b> (${esc(dExact(since))}).<br>Last: <b>${esc(dExact(L.last_at))}</b> by ${esc(person(L.last_by))}${L.last_reason ? ` · “${esc(L.last_reason)}”` : ""}. Shown in red below.</span><button class="btn sm" id="chk">Mark checked</button></div>`;
   if (L.my_flag === "new") h += `<div class="banner blue"><span class="grow">You have not checked this load yet.</span><button class="btn sm" id="chk">Mark checked</button></div>`;
 
-  // Stage
+  // ---- stage
+  const next = ci >= 0 && ci < stages.length - 1 ? stages[ci + 1] : null;
   h += `<div class="card"><div class="sect"><h3>Truck stage</h3>${stagePill(L.truck_stage)}</div>
-    ${L.truck_stage === "cancelled" ? `<p class="mut small">This load was cancelled.</p>` : `<div class="stepper">${STAGES.map(([k, n], i) => `<div class="step ${i < ci ? "done" : i === ci ? "cur" : ""}"><i></i>${esc(n)}</div>`).join("")}</div>`}
-    <div class="row">${ci >= 0 && ci < STAGES.length - 1 ? `<button class="btn pri grow" id="nextStage">Move to: ${esc(STAGES[ci + 1][1])}</button>` : ""}<button class="btn" id="setStage">Change stage</button></div></div>`;
+    ${L.truck_stage === "cancelled" ? `<p class="mut small">This load was cancelled.</p>` : `<div class="stepper">${stages.map(([k, n], i) => `<div class="step ${i < ci ? "done" : i === ci ? "cur" : ""}"><i></i>${esc(n)}</div>`).join("")}</div>`}
+    <div class="row">${next && L.truck_stage !== "cancelled" ? `<button class="btn pri grow" id="nextStage">Move to: ${esc(next[1])}</button>` : ""}<button class="btn" id="setStage">Change stage</button></div></div>`;
 
-  // Truck and buyer
-  const r = (label, val) => `<dt>${label}</dt><dd>${val}</dd>`;
-  h += `<div class="card"><div class="sect"><h3>Truck and buyer</h3><a class="btn sm" href="#/edit/${L.id}">Edit</a></div><dl class="kv">
-    ${r("Date", esc(dDay(L.load_date)))}${r("Truck no", esc(L.vehicle_no || "—"))}${r("Capacity", L.capacity_t ? esc(Number(L.capacity_t)) + " T" : "—")}${r("Kata net weight", L.net_weight_t ? `<span class="num">${esc(Number(L.net_weight_t))} T</span>` + (L.capacity_t ? ` <span class="mut small">of ${esc(Number(L.capacity_t))} T</span>` : "") : "—")}
+  // ---- step 1: truck and driver
+  const fileTile = f => `<a id="fl-${f.id}" target="_blank" rel="noopener">${/^image\//.test(f.mime_type || "") ? `<img alt="${esc(f.kind)}" id="fi-${f.id}">` : "PDF"}</a>`;
+  const docTile = d => {
+    const fs = files.filter(f => f.kind === d.kind);
+    const cls = fs.length ? "ok" : d.must ? "req" : "na";
+    const st = fs.length ? "Uploaded" : d.must ? "Required" : "Not Provided";
+    return `<div class="doc ${cls}" id="doc-${d.kind === "Driver with truck" ? "driver" : d.kind === "Driving licence" ? "licence" : "cbook"}"><b>${esc(d.label)}</b>${d.must ? '<span class="req"></span>' : ""}
+      <span class="st">${st}</span>${fs.length ? `<div class="thumbs" style="justify-content:center">${fs.slice(-1).map(fileTile).join("")}</div>` : ""}
+      <label class="btn sm ${d.must && !fs.length ? "pri" : ""}" for="up-${encodeURIComponent(d.kind)}">${fs.length ? "Replace" : "Upload"}</label>
+      <input type="file" id="up-${encodeURIComponent(d.kind)}" data-kind="${esc(d.kind)}" accept="image/*${d.kind === "Driver with truck" ? "" : ",application/pdf"}" ${d.kind === "Driver with truck" ? 'capture="environment"' : ""} hidden></div>`;
+  };
+  const cap = [L.capacity_t ? Number(L.capacity_t) + " T" : "", L.capacity_cft ? qty(L.capacity_cft, "CFT") : ""].filter(Boolean).join(" · ");
+  h += `<div class="card"><div class="sect"><h3><span class="stepno">1</span>Truck and driver</h3><a class="btn sm" href="#/edit/${L.id}">Edit</a></div><dl class="kv">
+    ${r("Date", esc(dDay(L.load_date)))}${r("Truck no", esc(L.vehicle_no || "—"))}${r("Capacity", esc(cap || "—"))}${r("Kata net weight", L.net_weight_t ? `<span class="num">${esc(Number(L.net_weight_t))} T</span>` + (L.capacity_t ? ` <span class="mut small">of ${esc(Number(L.capacity_t))} T</span>` : "") : "—")}
     ${r("Driver", esc([L.driver_name, L.driver_phone].filter(Boolean).join(" · ") || "—"))}${r("Transporter", esc(L.transporter_name || "—"))}
-    ${r("Buyer", esc(L.party_name ? L.party_name + (L.party_city ? ", " + L.party_city : "") : "—"))}${r("Destination", esc([L.destination, L.destination_state].filter(Boolean).join(", ") || "—"))}
+    ${r("Party / consignee", esc(L.party_name ? L.party_name + (L.party_city ? ", " + L.party_city : "") : "—"))}${r("Destination", esc([L.destination, L.destination_state].filter(Boolean).join(", ") || "—"))}
     ${r("E-way bill", esc(L.eway_bill_no || "—"))}${L.notes ? r("Notes", esc(L.notes)) : ""}</dl>
-    <div class="row" style="margin-top:12px">${L.driver_phone ? `<a class="btn sm" href="tel:${esc(String(L.driver_phone).replace(/[^\d+]/g, ""))}">Call driver</a><a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/91${esc(String(L.driver_phone).replace(/\D/g, "").slice(-10))}">WhatsApp driver</a><a class="btn sm wa" target="_blank" rel="noopener" href="https://wa.me/91${esc(String(L.driver_phone).replace(/\D/g, "").slice(-10))}?text=${encodeURIComponent(locText(L))}">Ask location</a>` : ""}</div></div>`;
+    ${!hasPhoto && photoRequired() ? `<div class="mustbox" id="photoMust">Driver photo with truck is mandatory.<div class="small" style="font-weight:400">A clear photo of the driver standing beside this truck. ${OWNER_STAGES.includes(L.truck_stage) ? "Needed before sawmills are added once the truck is going to load." : "Sawmills and loading stay locked until it is uploaded."}</div></div>` : ""}
+    <div class="docs">${DOCS_LIST().map(docTile).join("")}</div>
+    <div class="row" style="margin-top:12px">${L.driver_phone ? `<a class="btn sm" href="tel:${esc(String(L.driver_phone).replace(/[^\d+]/g, ""))}">Call driver</a><a class="btn sm wa" target="_blank" rel="noopener" href="https://wa.me/91${esc(String(L.driver_phone).replace(/\D/g, "").slice(-10))}?text=${encodeURIComponent(locText(L))}">Ask location</a>` : ""}</div></div>`;
 
-  // Mill lines
-  const guide = CFT_GUIDE[Number(L.capacity_t)];
-  h += `<div class="card"><div class="sect"><h3>Mill lines (${lines.length})</h3><button class="btn sm pri" id="addLine">+ Add mill</button></div>`;
-  if (guide && L.cft_total) { const pct = Math.min(100, Math.round(Number(L.cft_total) / guide * 100)); h += `<div class="small mut">${esc(qty(L.cft_total, "CFT"))} of about ${esc(qty(guide, "CFT"))} for a ${Number(L.capacity_t)} T lorry (owner's guide, not exact)</div><div class="bar ${pct >= 100 ? "full" : ""}" style="margin-bottom:12px"><i style="width:${pct}%"></i></div>`; }
-  h += lines.length ? lines.map(ln => {
-    const chg = freshIds.has("load_lines:" + ln.id) || freshIds.has("line_prices:" + ln.id);
-    return `<div class="line" ${chg ? 'style="background:#fff7f6"' : ""}><div class="h"><b class="grow">${esc(ln.sawmill_name)}${ln.sawmill_place ? `<span class="mut small">, ${esc(ln.sawmill_place)}</span>` : ""}</b>${chg ? `<span class="flag edited">Changed</span>` : ""}<span class="pill l-${ln.line_status}">${LINE_ST[ln.line_status]}</span></div>
-      <div class="small" style="margin-top:4px">${esc(ln.wood_type)} · <b class="num">${esc(qty(ln.quantity, ln.unit))}</b>${ln.size_grade ? " · " + esc(GRADES[ln.size_grade]) : ""}${ln.length_ft ? " · " + esc(Number(ln.length_ft)) + " ft" : ""}${ln.loaded_on ? " · loaded " + esc(dDay(ln.loaded_on)) : ""}</div>
-      ${ln.notes ? `<div class="small mut">${esc(ln.notes)}</div>` : ""}
-      ${isAdmin() ? `<div class="price">Purchase: ${ln.rate != null ? `<b class="num">${inr(ln.rate)}</b> per ${esc(ln.unit)}${Number(ln.adjustment) ? ` · adj. ${inr(ln.adjustment)}` : ""} = <b class="num">${inr(ln.amount)}</b>` : `<span class="mut">no rate yet</span>`} <button class="btn sm" data-rate="${ln.id}" style="margin-left:6px">${ln.rate != null ? "Change rate" : "Set rate"}</button></div>` : ""}
-      <div class="row" style="margin-top:8px">${ln.line_status !== "done" ? `<button class="btn sm" data-done="${ln.id}">Mark done</button>` : ""}<button class="btn sm" data-line="${ln.id}">Edit</button></div></div>`;
-  }).join("") : `<p class="mut small">No mills yet. Add each mill the truck loads from.</p>`;
-  if (isAdmin() && L.purchase_total != null) h += `<div class="tot big"><span>Purchase total</span><span class="num">${inr(L.purchase_total)}</span></div>`;
+  // ---- step 2: sawmills and wood items
+  const guide = capGuide(L);
+  h += `<div class="card"><div class="sect"><h3><span class="stepno">2</span>Sawmills (${allocs.length})</h3><button class="btn sm pri" id="addAlloc" ${photoGate ? "disabled" : ""}>+ Add sawmill</button></div>`;
+  if (photoGate) h += `<p class="small" style="color:var(--red);font-weight:700;margin-top:0">Upload the driver photo with the truck first.</p>`;
+  if (guide && L.cft_total) { const pct = Math.min(100, Math.round(Number(L.cft_total) / guide * 100)); h += `<div class="small mut">${esc(qty(L.cft_total, "CFT"))} of ${L.capacity_cft ? "" : "about "}${esc(qty(guide, "CFT"))}${L.capacity_cft ? " capacity" : ` for a ${Number(L.capacity_t)} T lorry (owner's guide)`}</div><div class="bar ${pct >= 100 ? "full" : ""}" style="margin-bottom:12px"><i style="width:${pct}%"></i></div>`; }
+  h += allocs.length ? allocs.map(a => {
+    const its = lines.filter(x => x.allocation_id === a.id);
+    const chgA = freshIds.has("load_allocations:" + a.id);
+    return `<div class="alloc" ${chgA ? 'style="background:#fff7f6"' : ""}><div class="hd"><b class="grow">${esc(a.sawmill_name)}${a.sawmill_place ? `<span class="mut small">, ${esc(a.sawmill_place)}</span>` : ""}</b>${chgA ? `<span class="flag edited">Changed</span>` : ""}<span class="pill ${a.items_total && a.items_done === a.items_total ? "l-done" : "l-loading"}">${a.items_done}/${a.items_total} done</span></div>
+      <div class="sub">Owner: ${esc(a.owner_name || "—")} · Party name: ${esc(a.party_name || "—")}</div>
+      <div class="small" style="margin-bottom:6px">${a.reached_at ? `<span class="ok-pill">Truck reached · ${esc(dShort(a.reached_at))}</span>` : `<span class="na-pill">Truck not here yet</span>`} ${a.loading_done_at ? `<span class="ok-pill">Loading done · ${esc(dShort(a.loading_done_at))}${a.slip_net_weight_t ? " · slip " + esc(Number(a.slip_net_weight_t)) + " T" : ""}</span>` : ""}</div>
+      ${!a.reached_at && !OWNER_STAGES.includes(L.truck_stage) && L.truck_stage !== "cancelled" ? `<button class="btn pri block" data-reached="${a.id}" style="margin-bottom:8px">Truck reached ${esc(a.sawmill_name)}</button>` : ""}
+      ${its.length ? its.map(ln => {
+        const chg = freshIds.has("load_lines:" + ln.id) || freshIds.has("line_prices:" + ln.id);
+        return `<div class="item" ${chg ? 'style="background:#fff7f6"' : ""}><div class="row"><b class="grow">${esc(ln.wood_type)}${ln.dimensions ? ` <span class="mut small">${esc(ln.dimensions)}</span>` : ""}</b>${chg ? `<span class="flag edited">Changed</span>` : ""}<span class="pill l-${ln.line_status}">${LINE_ST[ln.line_status]}</span></div>
+          <div class="small"><b class="num">${esc(qty(ln.quantity, ln.unit))}</b>${ln.pieces ? ` · ${esc(Number(ln.pieces).toLocaleString("en-IN"))} pcs` : ""} · ${esc(GRADES[ln.size_grade] || "Size not set")}${ln.length_ft ? " · " + esc(Number(ln.length_ft)) + " ft" : ""}${ln.loaded_on ? " · loaded " + esc(dDay(ln.loaded_on)) : ""}</div>
+          ${ln.notes ? `<div class="small mut">${esc(ln.notes)}</div>` : ""}
+          ${canSeeRates() ? `<div class="price">Purchase: ${ln.rate != null ? `<b class="num">${inr(ln.rate)}</b> per ${esc(ln.unit)}${Number(ln.adjustment) ? ` ${Number(ln.adjustment) < 0 ? "−" : "+"} ${inr(Math.abs(Number(ln.adjustment)))} adj.` : ""} = <b class="num">${inr(ln.amount)}</b>` : `<span class="mut">no rate yet</span>`} ${can("rates") ? `<button class="btn sm" data-rate="${ln.id}" style="margin-left:6px">${ln.rate != null ? "Change rate" : "Set rate"}</button>` : ""}</div>` : ""}
+          <div class="row" style="margin-top:6px">${ln.line_status !== "done" ? `<button class="btn sm" data-done="${ln.id}">Mark done</button>` : ""}<button class="btn sm" data-item="${ln.id}">Edit</button></div></div>`;
+      }).join("") : `<p class="small mut">No wood items yet.</p>`}
+      <div class="row" style="margin-top:8px"><button class="btn sm ${a.reached_at ? "" : "pri"}" data-additem="${a.id}">+ Add wood item</button>${a.reached_at && !a.loading_done_at && its.length ? `<button class="btn sm pri" data-ldone="${a.id}">Loading done here + weigh slip</button>` : ""}<button class="btn sm" data-alloc="${a.id}">Edit sawmill</button></div></div>`;
+  }).join("") : `<p class="mut small">No sawmills yet. Add each sawmill the truck loads from, then its wood items.</p>`;
+  if (can("finance") && L.purchase_total != null) h += `<div class="tot big"><span>Purchase total</span><span class="num">${inr(L.purchase_total)}</span></div>`;
   h += `</div>`;
 
-  // Costs
-  h += `<div class="card"><div class="sect"><h3>Freight and costs</h3><button class="btn sm" id="addCost">+ Add cost</button></div>
-    <div class="tot" style="border-top:0"><span>Freight (lorry hire)</span><span class="num">${inr(L.freight_amount)}</span></div>
-    ${costs.map(c => `<div class="tot"><span>${esc(c.cost_type)}${c.paid_to ? `<span class="mut small"> · ${esc(c.paid_to)}</span>` : ""}${freshIds.has("load_costs:" + c.id) ? ' <span class="flag edited">Changed</span>' : ""}</span><span class="row"><span class="num">${inr(c.amount)}</span><button class="btn sm" data-cost="${c.id}">Edit</button></span></div>`).join("")}
-    <div class="tot big"><span>Transport total</span><span class="num">${inr(L.transport_total)}</span></div></div>`;
+  // ---- step 3: staff PDF
+  h += `<div class="card"><div class="sect"><h3><span class="stepno">3</span>Loading document</h3></div>
+    <p class="small mut" style="margin-top:0">Truck loading / dispatch details as a PDF: sawmills, wood, size, quantity and unit. No rates, amounts, tax or payment details.</p>
+    <button class="btn pri block" id="pdfBtn" ${lines.length ? "" : "disabled"}>Export Staff PDF</button>${lines.length ? "" : `<p class="small mut">Add the sawmills and wood items first.</p>`}</div>`;
 
-  // Billing and payments (admins)
-  if (isAdmin()) {
+  // ---- step 4: weigh slips per sawmill
+  h += `<div class="card"><div class="sect"><h3><span class="stepno">4</span>Weigh slips</h3><span class="small mut">one per sawmill</span></div>
+    ${slipRequired() ? `<p class="small mut" style="margin-top:0">Every sawmill needs its weigh slip before the truck can be marked Loaded.</p>` : ""}
+    ${allocs.length ? allocs.map((a, i) => {
+      const fs = files.filter(f => f.kind === "Weigh slip" && f.allocation_id === a.id);
+      return `<div class="slip" data-slipfor="${a.id}"><div class="hd"><b class="grow">${i + 1}. ${esc(a.sawmill_name)}${a.slip_net_weight_t ? ` <span class="mut small">· net ${esc(Number(a.slip_net_weight_t))} T</span>` : ""}</b>${fs.length ? `<span class="ok-pill">${fs.length} uploaded</span>` : `<span class="na-pill">Not Uploaded</span>`}</div>
+        ${fs.length ? `<div class="thumbs">${fs.map(f => `${fileTile(f)}`).join("")}</div>` : ""}
+        <label class="btn sm" style="margin-top:8px" for="slip-${a.id}">Upload weigh slip for ${esc(a.sawmill_name)}</label>
+        <input type="file" id="slip-${a.id}" data-alloc="${a.id}" accept="image/*,application/pdf" multiple hidden></div>`;
+    }).join("") : `<p class="mut small">Weigh-slip sections appear here, one for each sawmill on this truck.</p>`}</div>`;
+
+  // ---- expenses (expense / finance people only)
+  if (canSeeExp()) {
+    h += `<div class="card"><div class="sect"><h3>Freight and expenses</h3>${can("expenses") ? `<button class="btn sm" id="addExp">+ Add expense</button>` : ""}</div>
+      ${costs.length ? costs.map(c => `<div class="tot"><span>${esc(c.cost_type)}${c.allocation_id ? `<span class="mut small"> · ${esc((allocs.find(a => a.id === c.allocation_id) || {}).sawmill_name || "sawmill")}</span>` : ""}${c.paid_to ? `<span class="mut small"> · ${esc(c.paid_to)}</span>` : ""}${c.receipt_path ? ` <a class="small" href="#" data-receipt="${esc(c.receipt_path)}">receipt</a>` : ""}${freshIds.has("load_costs:" + c.id) ? ' <span class="flag edited">Changed</span>' : ""}</span><span class="row"><span class="num">${inr(c.amount)}</span>${can("expenses") ? `<button class="btn sm" data-cost="${c.id}">Edit</button>` : ""}</span></div>`).join("") : `<p class="mut small">No freight or expenses recorded.</p>`}
+      <div class="tot big"><span>Total</span><span class="num">${inr(L.costs_total || 0)}</span></div></div>`;
+  }
+
+  // ---- billing and payments (finance)
+  if (can("finance")) {
     h += `<div class="card"><div class="sect"><h3>Billing</h3>${billPill(L.bill_stage)}<button class="btn sm" id="editBill">${bill ? "Edit bill" : "+ Create bill"}</button></div>`;
     if (bill) h += `<dl class="kv">${r("Invoice", esc((bill.invoice_no || "—") + (bill.invoice_date ? " · " + dDay(bill.invoice_date) : "")))}
       ${r("Sale", bill.sale_rate != null ? `<span class="num">${esc(qty(bill.sale_qty, bill.sale_unit))} × ${inr(bill.sale_rate)}</span>` : "—")}
@@ -625,51 +772,107 @@ async function renderLoad(id){
       ${pays.length ? `<table class="t">${pays.map(p => `<tr><td>${esc(dDay(p.paid_on))}<div class="tiny mut">${esc(p.party_kind === "buyer" ? "From " + partyName(p.party_id) : p.party_kind === "mill" ? "To " + millName(p.sawmill_id) : "To " + partyName(p.party_id))} · ${esc(MODES[p.mode])}${p.reference ? " · " + esc(p.reference) : ""}</div></td><td class="r num">${p.party_kind === "buyer" ? "+" : "−"}${inr(p.amount)}</td><td class="r"><button class="btn sm" data-pay="${p.id}">Edit</button></td></tr>`).join("")}</table>` : `<p class="mut small">No payments recorded.</p>`}</div>`;
   }
 
-  // Photos
-  h += `<div class="card"><div class="sect"><h3>Photos and documents</h3></div>
-    ${files.length ? `<div class="files">${files.map(f => `<div class="file"><a id="fl-${f.id}" target="_blank" rel="noopener">${/^image\//.test(f.mime_type || "") ? `<img alt="${esc(f.kind)}" id="fi-${f.id}">` : "PDF"}</a><div class="cap"><b>${esc(f.kind)}</b>${freshIds.has("load_files:" + f.id) ? ' <span class="flag edited">New</span>' : ""}<div class="mut">${esc(dShort(f.created_at))} · ${esc(person(f.created_by))}</div>${isAdmin() ? `<button class="btn sm red" style="margin-top:6px;width:100%" data-delfile="${f.id}">Remove</button>` : ""}</div></div>`).join("")}</div>` : `<p class="mut small">No photos yet. Add the kata slip, e-way bill or receipts.</p>`}
-    <div class="row"><select class="in grow" id="fKind" aria-label="Photo type">${FILE_KINDS.map(k => `<option>${esc(k)}</option>`).join("")}</select><label class="btn pri" for="fPick" id="fPickBtn">+ Add photo</label></div>
+  // ---- other photos
+  const others = files.filter(f => !["Driver with truck","Driving licence","C-Book / RC","Weigh slip"].includes(f.kind));
+  h += `<div class="card"><div class="sect"><h3>Other photos and documents</h3></div>
+    ${others.length ? `<div class="files">${others.map(f => `<div class="file">${fileTile(f)}<div class="cap"><b>${esc(f.kind)}</b>${freshIds.has("load_files:" + f.id) ? ' <span class="flag edited">New</span>' : ""}<div class="mut">${esc(dShort(f.created_at))} · ${esc(person(f.created_by))}</div>${isOwner() || f.created_by === S.user.id ? `<button class="btn sm red" style="margin-top:6px;width:100%" data-delfile="${f.id}">Remove</button>` : ""}</div></div>`).join("")}</div>` : `<p class="mut small">E-way bill, lorry receipt, loading photos.</p>`}
+    <div class="row"><select class="in grow" id="fKind" aria-label="Photo type">${FILE_KINDS.map(k => `<option>${esc(k)}</option>`).join("")}</select><label class="btn" for="fPick" id="fPickBtn">+ Add photo</label></div>
     <input type="file" id="fPick" accept="image/*,application/pdf" hidden></div>`;
 
-  // Updates and history
+  // ---- updates and history
   h += `<div class="card"><div class="sect"><h3>Updates and history</h3></div>
-    <form id="noteForm" class="row" style="margin-bottom:14px;align-items:flex-start"><textarea class="in grow" id="noteText" placeholder="Post an update for everyone (e.g. truck reached the mill, loading started)" style="min-height:50px"></textarea>
-    <div style="display:grid;gap:6px"><button class="btn pri">Post</button>${isAdmin() ? `<label class="tiny row" style="gap:4px"><input type="checkbox" id="noteAdmin"> Admin only</label>` : ""}</div></form>
-    ${acts.length ? acts.map(a => tlItem(a, since, lines)).join("") : `<p class="mut small">No history yet.</p>`}</div>`;
-
-  h += `<div class="row" style="margin-bottom:12px"><a class="btn wa grow" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(waText(L, lines))}">Share on WhatsApp</a>${isAdmin() ? `<button class="btn red" id="delLoad">Delete load</button>` : ""}</div>`;
+    <form id="noteForm" class="row" style="margin-bottom:14px;align-items:flex-start"><textarea class="in grow" id="noteText" placeholder="Post an update (e.g. truck reached the sawmill, loading started)" style="min-height:50px"></textarea>
+    <div style="display:grid;gap:6px"><button class="btn pri">Post</button>${can("finance") ? `<label class="tiny row" style="gap:4px"><input type="checkbox" id="noteAdmin"> Money only</label>` : ""}</div></form>
+    ${acts.length ? acts.map(a => tlItem(a, since, lines, allocs)).join("") : `<p class="mut small">No history yet.</p>`}</div>`;
+  h += `<div class="row" style="margin-bottom:12px"><a class="btn wa grow" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(waText(L, lines))}">Share on WhatsApp</a>${isOwner() ? `<button class="btn red" id="delLoad">Delete load</button>` : ""}</div>`;
   $("app").innerHTML = h;
 
   // ---------- actions
   const reload = () => { loadLoads(true); renderLoad(id); };
   const chk = $("chk"); if (chk) chk.onclick = async () => { try { await q(sb.rpc("v2_mark_checked", {p_load_ids:[id]})); toast("Marked as checked."); reload(); } catch(e) { toast(errText(e), true); } };
-  // Moving to Loaded also asks for the kata (weighbridge) net weight, optional.
-  const kataField = () => ({id:"net_weight_t", label:"Kata net weight (T), from the weighbridge slip", type:"number", value:L.net_weight_t ?? "", min:0.001, hint: L.capacity_t ? "Truck capacity: " + Number(L.capacity_t) + " T" : ""});
-  const stageRec = (target, v) => { const r = {truck_stage: target, change_reason: v.change_reason}; if (target === "loaded" && v.net_weight_t !== undefined && v.net_weight_t !== "") r.net_weight_t = num(v.net_weight_t); return r; };
+  const kataField = () => ({id:"net_weight_t", label:"Kata net weight (T), from the final weighbridge slip", type:"number", value:L.net_weight_t ?? "", min:0.001, hint: L.capacity_t ? "Truck capacity: " + Number(L.capacity_t) + " T" : ""});
+  const stageRec = (target, v) => { const rr = {truck_stage: target, change_reason: v.change_reason}; if (target === "loaded" && v.net_weight_t !== undefined && v.net_weight_t !== "") rr.net_weight_t = num(v.net_weight_t); return rr; };
+  const needsPhoto = t => photoRequired() && ["under_loading","loaded","in_transit","delivered"].includes(t) && !hasPhoto;
+  const blockPhoto = () => { toast("Driver photo with truck is mandatory.", true); const m = $("photoMust"); if (m) m.scrollIntoView({behavior:"smooth", block:"center"}); };
   const moveTo = async target => {
+    if (needsPhoto(target)) return blockPhoto();
+    if (target === "under_loading" && !allocs.some(a => a.reached_at)) {   // Under loading starts only at a sawmill
+      if (!allocs.length) return toast("Add the sawmill the truck has reached first.", true);
+      const w = await sheet({title:"Which sawmill has the truck reached?", fields:[{id:"a", label:"Sawmill", type:"select", options:allocs.map(a => [a.id, a.sawmill_name])}], ok:"Next"});
+      if (!w) return; return markReached(allocs.find(a => a.id === Number(w.a)));
+    }
+    if (target === "loaded" && slipRequired()) { const miss = allocs.filter(a => !files.some(f => f.kind === "Weigh slip" && f.allocation_id === a.id)); if (miss.length) return toast("Upload the weigh slip for: " + miss.map(a => a.sawmill_name).join(", "), true); }
     const v = await sheet({title: "Move to " + STAGE[target], intro: `From <b>${esc(STAGE[L.truck_stage])}</b> to <b>${esc(STAGE[target])}</b>.`, fields: target === "loaded" ? [kataField(), reasonField(true)] : [reasonField(true)], ok:"Move"});
     if (!v) return;
     try { await q(sb.from("loads").update(stageRec(target, v)).eq("id", id)); toast("Stage updated."); reload(); }
     catch(e) { toast(errText(e), true); }
   };
-  const ns = $("nextStage"); if (ns) ns.onclick = () => moveTo(STAGES[ci + 1][0]);
+  const ns = $("nextStage"); if (ns) ns.onclick = () => moveTo(next[0]);
   $("setStage").onclick = async () => {
-    const v = await sheet({title:"Change stage", fields:[{id:"stage", label:"New stage", type:"select", value:L.truck_stage, options:[...STAGES, ["cancelled","Cancelled"]]}, reasonField(true)], ok:"Change"});
+    const opts = [...stages, ...(can("plan") ? [["cancelled","Cancelled"]] : [])];
+    const v = await sheet({title:"Change stage", fields:[{id:"stage", label:"New stage", type:"select", value:L.truck_stage, options:opts}, reasonField(true)], ok:"Change"});
     if (!v || v.stage === L.truck_stage) return;
+    if (needsPhoto(v.stage)) return blockPhoto();
+    if (v.stage === "under_loading" && !allocs.some(a => a.reached_at)) return moveTo("under_loading");
     if (v.stage === "loaded" && !L.net_weight_t) { const w = await sheet({title:"Kata net weight", intro:"Optional: leave empty if the slip is not here yet.", fields:[kataField()], ok:"Continue"}); if (!w) return; v.net_weight_t = w.net_weight_t; }
     try { await q(sb.from("loads").update(stageRec(v.stage, v)).eq("id", id)); toast("Stage updated."); reload(); } catch(e) { toast(errText(e), true); }
   };
-  $("addLine").onclick = () => lineForm(L, null, reload);
-  document.querySelectorAll("[data-line]").forEach(b => b.onclick = () => lineForm(L, lines.find(x => x.id === Number(b.dataset.line)), reload));
+  // documents
+  document.querySelectorAll("input[data-kind]").forEach(inp => inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    try { toast("Uploading…"); await uploadFile(id, f, inp.dataset.kind); toast(inp.dataset.kind + " saved."); reload(); } catch(e) { toast(errText(e), true); inp.value = ""; }
+  });
+  // truck reached a sawmill: record it; the first arrival starts Under loading
+  const markReached = async a => {
+    const v = await sheet({title:"Truck reached " + a.sawmill_name, intro:"Loading starts here. The truck moves to <b>Under loading</b>.", fields:[reasonField(false, "Truck reached " + a.sawmill_name)], ok:"Yes, truck is here"});
+    if (!v) return;
+    try {
+      await q(sb.from("load_allocations").update({reached_at: new Date().toISOString(), change_reason: v.change_reason || "Truck reached " + a.sawmill_name}).eq("id", a.id));
+      if (["going_to_load"].includes(L.truck_stage)) await q(sb.from("loads").update({truck_stage:"under_loading", change_reason: v.change_reason || "Truck reached " + a.sawmill_name}).eq("id", id));
+      toast("Truck reached " + a.sawmill_name + "."); reload();
+    } catch(e) { toast(errText(e), true); }
+  };
+  document.querySelectorAll("[data-reached]").forEach(b => b.onclick = () => markReached(allocs.find(a => a.id === Number(b.dataset.reached))));
+  // loading finished at a sawmill: weigh slip (+ optional net weight), all its items done
+  document.querySelectorAll("[data-ldone]").forEach(b => b.onclick = async () => {
+    const a = allocs.find(x => x.id === Number(b.dataset.ldone)), its = lines.filter(x => x.allocation_id === a.id);
+    const hasSlip = files.some(f => f.kind === "Weigh slip" && f.allocation_id === a.id);
+    const v = await sheet({title:"Loading done · " + a.sawmill_name, intro:`${its.length} item(s) will be marked done with their current quantities. Edit any quantity first if it changed.`, fields:[
+      {id:"slip", label: hasSlip ? "Another weigh slip (optional)" : "Weigh slip photo" + (slipRequired() ? "" : " (optional)"), type:"file", required: slipRequired() && !hasSlip},
+      {id:"slip_net_weight_t", label:"Net weight on this slip (T, optional)", type:"number", value:a.slip_net_weight_t ?? "", min:0.001},
+      reasonField(false, "Loading done at " + a.sawmill_name)], ok:"Save"});
+    if (!v) return;
+    try {
+      if (v.slip) await uploadFile(id, v.slip, "Weigh slip", a.id);
+      for (const ln of its.filter(x => x.line_status !== "done")) await q(sb.from("load_lines").update({line_status:"done", loaded_on: today(), change_reason: v.change_reason || "Loading done at " + a.sawmill_name}).eq("id", ln.id));
+      await q(sb.from("load_allocations").update({loading_done_at: new Date().toISOString(), slip_net_weight_t: num(v.slip_net_weight_t), change_reason: v.change_reason || "Loading done at " + a.sawmill_name}).eq("id", a.id));
+      toast("Loading done at " + a.sawmill_name + "."); reload();
+    } catch(e) { toast(errText(e), true); }
+  });
+  // sawmills and items
+  $("addAlloc").onclick = () => photoGate ? blockPhoto() : allocForm(L, null, reload);
+  document.querySelectorAll("[data-alloc]").forEach(b => { if (b.tagName === "BUTTON") b.onclick = () => allocForm(L, allocs.find(a => a.id === Number(b.dataset.alloc)), reload); });
+  document.querySelectorAll("[data-additem]").forEach(b => b.onclick = () => itemForm(allocs.find(a => a.id === Number(b.dataset.additem)), null, reload));
+  document.querySelectorAll("[data-item]").forEach(b => b.onclick = () => { const ln = lines.find(x => x.id === Number(b.dataset.item)); itemForm(allocs.find(a => a.id === ln.allocation_id), ln, reload); });
   document.querySelectorAll("[data-done]").forEach(b => b.onclick = async () => {
     const ln = lines.find(x => x.id === Number(b.dataset.done));
-    const v = await sheet({title:"Mark " + ln.sawmill_name + " done", fields:[{id:"quantity", label:"Final quantity (" + ln.unit + ")", type:"number", value:ln.quantity ?? "", required:true, min:0}, {id:"loaded_on", label:"Loaded on", type:"date", value:ln.loaded_on || today()}, reasonField(false, "Loading finished at this mill")], ok:"Mark done"});
+    const v = await sheet({title:"Mark done · " + ln.sawmill_name, intro: esc(ln.wood_type + (ln.dimensions ? " " + ln.dimensions : "")), fields:[{id:"quantity", label:"Final quantity (" + ln.unit + ")", type:"number", value:ln.quantity ?? "", required:true, min:0}, {id:"pieces", label:"Pieces (optional)", type:"number", value:ln.pieces ?? "", min:0, step:"1"}, {id:"loaded_on", label:"Loaded on", type:"date", value:ln.loaded_on || today()}, reasonField(false, "Loading finished at this sawmill")], ok:"Mark done"});
     if (!v) return;
-    try { await q(sb.from("load_lines").update({line_status:"done", quantity:num(v.quantity), loaded_on:v.loaded_on || null, change_reason:v.change_reason || "Loading finished"}).eq("id", ln.id)); toast("Line done."); reload(); } catch(e) { toast(errText(e), true); }
+    try { await q(sb.from("load_lines").update({line_status:"done", quantity:num(v.quantity), pieces: v.pieces === "" ? null : Math.round(num(v.pieces)), loaded_on:v.loaded_on || null, change_reason:v.change_reason || "Loading finished"}).eq("id", ln.id)); toast("Item done."); reload(); } catch(e) { toast(errText(e), true); }
   });
-  document.querySelectorAll("[data-rate]").forEach(b => b.onclick = () => rateForm(lines.find(x => x.id === Number(b.dataset.rate)), reload));
-  $("addCost").onclick = () => costForm(id, null, reload);
-  document.querySelectorAll("[data-cost]").forEach(b => b.onclick = () => costForm(id, costs.find(x => x.id === Number(b.dataset.cost)), reload));
+  document.querySelectorAll("[data-rate]").forEach(b => b.onclick = () => rateForm(L, lines.find(x => x.id === Number(b.dataset.rate)), reload));
+  // PDF
+  $("pdfBtn").onclick = async () => { const b = $("pdfBtn"); b.disabled = true; b.textContent = "Preparing PDF…"; try { await exportStaffPdf(L, allocs, lines, files); toast("PDF ready."); } catch(e) { toast(errText(e), true); } b.disabled = false; b.textContent = "Export Staff PDF"; };
+  // weigh slips: each upload goes to its own sawmill
+  document.querySelectorAll("input[data-alloc]").forEach(inp => inp.onchange = async () => {
+    const list = [...inp.files]; if (!list.length) return;
+    try { for (const f of list) await uploadFile(id, f, "Weigh slip", Number(inp.dataset.alloc)); toast(list.length > 1 ? list.length + " weigh slips saved." : "Weigh slip saved."); reload(); } catch(e) { toast(errText(e), true); inp.value = ""; }
+  });
+  // expenses
+  const ax = $("addExp"); if (ax) ax.onclick = () => expenseForm(L, allocs, null, reload);
+  document.querySelectorAll("[data-cost]").forEach(b => b.onclick = () => expenseForm(L, allocs, costs.find(x => x.id === Number(b.dataset.cost)), reload));
+  document.querySelectorAll("[data-receipt]").forEach(a => a.onclick = async e => { e.preventDefault(); try { const u = await signedUrl(a.dataset.receipt); window.open(u, "_blank", "noopener"); } catch(er) { toast(errText(er), true); } });
+  // money
   const eb = $("editBill"); if (eb) eb.onclick = () => billForm(L, bill, reload, lines);
   const ap = $("addPay"); if (ap) ap.onclick = () => payForm({load: L, lines}, null, reload);
   document.querySelectorAll("[data-pay]").forEach(b => b.onclick = () => payForm({load: L, lines}, pays.find(x => x.id === Number(b.dataset.pay)), reload));
@@ -690,7 +893,7 @@ async function renderLoad(id){
   };
   const dl = $("delLoad");
   if (dl) dl.onclick = async () => {
-    if (!confirm("Delete " + L.load_no + " with all its mill lines, costs and bill? The history keeps a record. This cannot be undone.")) return;
+    if (!confirm("Delete " + L.load_no + " with all its sawmills, items, expenses and bill? The history keeps a record. This cannot be undone.")) return;
     try { await q(sb.from("loads").delete().eq("id", id)); toast("Deleted."); location.hash = "#/loads"; } catch(e) { toast(errText(e), true); }
   };
 }
@@ -707,85 +910,120 @@ function describe(a, lines){
     if (k === "party_id" || k === "transporter_id") return partyName(v);
     if (k === "mode") return MODES[v] || v;
     if (/amount|rate|adjustment|gst/.test(k)) return inr(v);
+    if (/_at$/.test(k)) return dExact(v);
     if (/date|_on$/.test(k)) return dDay(v);
     return String(v);
   };
   const ent = ENTITY[a.entity] || a.entity;
-  const lineLabel = () => { const ln = (lines || []).find(x => String(x.id) === String(a.entity_id)); return ln ? " (" + ln.sawmill_name + ")" : ""; };
+  const lineLabel = () => { const ln = (lines || []).find(x => String(x.id) === String(a.entity_id)); return ln ? " (" + ln.sawmill_name + " · " + ln.wood_type + ")" : ""; };
   if (a.action === "note") return `<b>${esc(person(a.actor))}:</b> ${esc(a.reason)}`;
   if (a.action === "stage") return `Stage: <b>${esc(fmt("truck_stage", ch.truck_stage?.[0]))} → ${esc(fmt("truck_stage", ch.truck_stage?.[1]))}</b>` + Object.entries(ch).filter(([k]) => k !== "truck_stage").map(([k, v]) => `<br>${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("");
   if (a.action === "update") return `${esc(ent)}${a.entity === "load_lines" || a.entity === "line_prices" ? esc(lineLabel()) : ""} changed:` + Object.entries(ch).map(([k, v]) => `<br>${esc(FIELD[k] || k)}: ${esc(fmt(k, v[0]))} → <b>${esc(fmt(k, v[1]))}</b>`).join("");
-  const keyBits = {loads: ["vehicle_no","truck_stage"], load_lines:["sawmill_id","wood_type","quantity","unit"], line_prices:["rate","adjustment"], load_costs:["cost_type","amount"], load_billing:["invoice_no","sale_rate","gst_amount"], payments:["party_kind","amount","mode"], load_files:["kind"]}[a.entity] || [];
-  const bits = keyBits.filter(k => ch[k] !== undefined).map(k => k === "unit" ? "" : (k === "quantity" ? fmt(k, ch[k]) + " " + (ch.unit || "") : fmt(k, ch[k]))).filter(Boolean).join(" · ");
-  return `${a.action === "insert" ? "Added" : "Removed"} ${esc(ent.toLowerCase())}${a.entity === "line_prices" ? esc(lineLabel()) : ""}${bits ? ": <b>" + esc(bits) + "</b>" : ""}`;
+  const keyBits = {loads: ["vehicle_no","truck_stage"], load_allocations:["sawmill_id","owner_name"], sawmill_rates:["sawmill_id","wood_type","rate","unit","effective_from"], load_lines:["sawmill_id","wood_type","size_grade","quantity","unit"], line_prices:["rate","adjustment"], load_costs:["cost_type","amount"], load_billing:["invoice_no","sale_rate","gst_amount"], payments:["party_kind","amount","mode"], load_files:["kind"]}[a.entity] || [];
+  const bits = keyBits.filter(k => ch[k] !== undefined && !(k === "adjustment" && !Number(ch[k]))).map(k => k === "unit" ? "" : (k === "quantity" ? fmt(k, ch[k]) + " " + (ch.unit || "") : fmt(k, ch[k]))).filter(Boolean).join(" · ");
+  return `${a.action === "insert" ? (a.entity === "load_files" ? "Uploaded" : "Added") : "Removed"} ${esc(ent.toLowerCase())}${a.entity === "line_prices" ? esc(lineLabel()) : ""}${bits ? ": <b>" + esc(bits) + "</b>" : ""}`;
 }
-function tlItem(a, since, lines){
+function tlItem(a, since, lines, allocs){
   const isNew = since && a.at > since && a.actor !== S.user.id;
-  return `<div class="tl ${isNew ? "new" : ""} ${a.action === "note" ? "note" : ""} ${a.visibility === "admin" ? "adm" : ""}"><div class="when">${avatar(a.actor)}<b>${esc(dExact(a.at))}</b> · ${esc(person(a.actor))} · ${stagePill(a.truck_stage)}</div>
+  return `<div class="tl ${isNew ? "new" : ""} ${a.action === "note" ? "note" : ""} ${a.visibility !== "all" ? "adm" : ""}"><div class="when">${avatar(a.actor)}<b>${esc(dExact(a.at))}</b> · ${esc(person(a.actor))} · ${stagePill(a.truck_stage)}</div>
     <div class="what">${describe(a, lines)}</div>${a.reason && a.action !== "note" ? `<div class="why">Reason: ${esc(a.reason)}</div>` : ""}</div>`;
 }
 function feedItem(a, compact){
   const L = S.loads.find(x => x.id === a.load_id);
-  return `<a class="tl ${a.action === "note" ? "note" : ""} ${a.visibility === "admin" ? "adm" : ""}" href="#/load/${a.load_id}" style="display:block;text-decoration:none;color:inherit">
+  return `<a class="tl ${a.action === "note" ? "note" : ""} ${a.visibility !== "all" ? "adm" : ""}" href="#/load/${a.load_id}" style="display:block;text-decoration:none;color:inherit">
     <div class="when">${avatar(a.actor)}<b>${esc(L ? L.load_no + (L.vehicle_no ? " · " + L.vehicle_no : "") : "Load #" + a.load_id)}</b> · ${esc(dExact(a.at))} · ${esc(person(a.actor))}</div>
     <div class="what">${describe(a, [])}</div>${a.reason && a.action !== "note" ? `<div class="why">Reason: ${esc(a.reason)}</div>` : ""}</a>`;
 }
 
-/* ---------- mill line form ---------- */
-async function lineForm(L, ln, done){
-  const millOpts = [["", "— choose mill —"], ...S.sawmills.map(m => [m.id, m.name + (m.place ? ", " + m.place : "")]), ["__new", "+ Add a new mill"]];
-  const v = await sheet({title: ln ? "Edit mill line" : "Add mill to " + L.load_no, fields: [
-    {id:"sawmill_id", label:"Mill", type:"select", options:millOpts, value:ln?.sawmill_id ?? "", required:true},
-    {id:"wood_type", label:"Wood", type:"text", list:WOODS, value:ln?.wood_type ?? "Mango", required:true},
-    {id:"unit", label:"Unit", type:"select", options:UNITS.map(u => [u, u]), value:ln?.unit ?? "CFT"},
-    {id:"quantity", label:"Quantity", type:"number", value:ln?.quantity ?? "", min:0, hint:"Expected now; update the final figure when done."},
-    {id:"length_ft", label:"Length (ft), for size grade", type:"number", value:ln?.length_ft ?? "", min:0, hint:`Small < ${S.settings.size_small_below_ft ?? 4} ft · Medium ${S.settings.size_small_below_ft ?? 4}–${S.settings.size_large_above_ft ?? 6} ft · Large > ${S.settings.size_large_above_ft ?? 6} ft (provisional)`},
-    {id:"size_grade", label:"Size grade", type:"select", options:[["", "Auto from length"], ...Object.entries(GRADES)], value:ln?.size_grade ?? ""},
-    {id:"line_status", label:"Status", type:"select", options:Object.entries(LINE_ST), value:ln?.line_status ?? "planned"},
-    {id:"notes", label:"Notes", type:"text", value:ln?.notes ?? ""},
-    reasonField(!!ln, ln ? "" : "Mill added to the load")
-  ], ok: ln ? "Save" : "Add", danger: ln ? "Remove" : null});
+/* ---------- sawmill allocation (one per sawmill on a truck trip) ---------- */
+async function allocForm(L, a, done){
+  const millOpts = [["", "— choose sawmill —"], ...S.sawmills.map(m => [m.id, m.name + (m.place ? ", " + m.place : "")]), ["__new", "+ Add a new sawmill"]];
+  const v = await sheet({title: a ? "Edit sawmill" : "Add sawmill to " + L.load_no, intro: a ? "" : "Then add its wood items (one sawmill can have several).", fields: [
+    {id:"sawmill_id", label:"Sawmill name", type:"select", options:millOpts, value:a?.sawmill_id ?? "", required:true},
+    {id:"owner_name", label:"Sawmill owner name", type:"text", value:a?.owner_name ?? "", hint:"Filled from the sawmill if left empty."},
+    {id:"party_name", label:"Party name", type:"text", value:a?.party_name ?? "", hint:"As the sawmill's bill names it, if different."},
+    {id:"notes", label:"Notes", type:"text", value:a?.notes ?? ""},
+    reasonField(!!a, a ? "" : "Sawmill added to the truck")
+  ], ok: a ? "Save" : "Add sawmill", danger: a ? "Remove sawmill" : null});
   if (!v) return;
   try {
-    if (v.__danger) { if (!confirm("Remove this mill line?")) return; await q(sb.from("load_lines").delete().eq("id", ln.id)); toast("Removed."); return done(); }
+    if (v.__danger) { if (!confirm("Remove " + a.sawmill_name + " and its wood items from this truck?")) return; await q(sb.from("load_allocations").delete().eq("id", a.id)); toast("Removed."); return done(); }
     let millId = v.sawmill_id;
     if (millId === "__new") { const m = await millForm(null); if (!m) return; millId = m.id; }
-    const len = num(v.length_ft);
-    const rec = {sawmill_id:Number(millId), wood_type:v.wood_type, unit:v.unit, quantity:num(v.quantity), length_ft:len, size_grade:v.size_grade || gradeFor(len), line_status:v.line_status, notes:v.notes || null, change_reason:v.change_reason || null};
-    if (rec.line_status === "done" && !ln?.loaded_on) rec.loaded_on = today();
-    if (ln) await q(sb.from("load_lines").update(rec).eq("id", ln.id));
-    else await q(sb.from("load_lines").insert({...rec, load_id:L.id}));
-    toast(ln ? "Saved." : "Mill added."); done();
+    const rec = {sawmill_id:Number(millId), owner_name:v.owner_name || null, party_name:v.party_name || null, notes:v.notes || null, change_reason:v.change_reason || null};
+    if (a) await q(sb.from("load_allocations").update(rec).eq("id", a.id));
+    else await q(sb.from("load_allocations").insert({...rec, load_id:L.id}));
+    toast(a ? "Saved." : "Sawmill added."); done();
   } catch(e) { toast(errText(e), true); }
 }
-/* Purchase rate: admins. Suggests this mill's last rate for the same wood and unit. */
-async function rateForm(ln, done){
-  let last = null;
+/* ---------- wood item inside a sawmill allocation ---------- */
+async function itemForm(a, ln, done){
+  const auto = Number(S.settings.size_auto || 0) === 1;
+  const v = await sheet({title: (ln ? "Edit wood item · " : "Add wood item · ") + a.sawmill_name, fields: [
+    {id:"wood_type", label:"Wood type", type:"text", list:S.woods, value:ln?.wood_type ?? "", required:true, placeholder:"Search: Country Wood, Acacia, Teak…", hint: can("plan") ? "A new name is added to the list for everyone." : "Pick from the list. The owner can add new wood types."},
+    {id:"size_grade", label:"Size", type:"select", options:[["", auto ? "From length" : "— choose —"], ...Object.entries(GRADES)], value:ln?.size_grade ?? ""},
+    {id:"quantity", label:"Quantity", type:"number", value:ln?.quantity ?? "", min:0, required:true},
+    {id:"unit", label:"Unit", type:"select", options:UNITS.map(u => [u, u]), value:ln?.unit ?? "CFT"},
+    {id:"pieces", label:"Number of pieces (optional)", type:"number", value:ln?.pieces ?? "", min:0, step:"1", hint:"For Pieces, or alongside CFT/SFT when counted."},
+    {id:"dimensions", label:"Dimensions (optional)", type:"text", value:ln?.dimensions ?? "", placeholder:'e.g. 3" x 3" x 6\''},
+    {id:"length_ft", label:"Length in ft (optional)", type:"number", value:ln?.length_ft ?? "", min:0},
+    {id:"line_status", label:"Status", type:"select", options:Object.entries(LINE_ST), value:ln?.line_status ?? "loading"},
+    {id:"notes", label:"Notes", type:"text", value:ln?.notes ?? ""},
+    reasonField(!!ln, ln ? "" : "Wood item added")
+  ], ok: ln ? "Save" : "Add item", danger: ln ? "Remove item" : null});
+  if (!v) return;
   try {
-    const prev = await q(sb.from("v_lines").select("rate,wood_type,unit,updated_at").eq("sawmill_id", ln.sawmill_id).eq("wood_type", ln.wood_type).eq("unit", ln.unit).order("id", {ascending:false}).limit(10));
-    last = (prev.find(p => p.rate != null) || {}).rate ?? null;
+    if (v.__danger) { if (!confirm("Remove this wood item?")) return; await q(sb.from("load_lines").delete().eq("id", ln.id)); toast("Removed."); return done(); }
+    const wood = v.wood_type.trim(), known = S.woods.find(w => w.toLowerCase() === wood.toLowerCase());
+    if (!known) {
+      if (!can("plan")) return toast("Choose a wood type from the list. The owner can add new ones.", true);
+      await q(sb.from("wood_types").insert({name: wood})); S.woods.push(wood);
+    }
+    if (!v.size_grade && !auto) return toast("Choose the size: Small, Medium or Large.", true);
+    const len = num(v.length_ft);
+    const rec = {allocation_id:a.id, wood_type: known || wood, unit:v.unit, quantity:num(v.quantity), pieces: v.pieces === "" ? null : Math.round(num(v.pieces)), dimensions:v.dimensions || null,
+      length_ft:len, size_grade:v.size_grade || (auto ? gradeFor(len) : null), line_status:v.line_status, notes:v.notes || null, change_reason:v.change_reason || null};
+    if (rec.line_status === "done" && !ln?.loaded_on) rec.loaded_on = today();
+    if (ln) await q(sb.from("load_lines").update(rec).eq("id", ln.id));
+    else await q(sb.from("load_lines").insert(rec));
+    toast(ln ? "Saved." : "Item added."); done();
+  } catch(e) { toast(errText(e), true); }
+}
+/* Purchase rate for one item (finance). Suggests the sawmill's rate card effective on the load date, else its last rate. */
+async function rateForm(L, ln, done){
+  let card = null, last = null;
+  try {
+    const cards = await q(sb.from("sawmill_rates").select("*").eq("sawmill_id", ln.sawmill_id).eq("wood_type", ln.wood_type).eq("unit", ln.unit).lte("effective_from", L.load_date).order("effective_from", {ascending:false}).order("id", {ascending:false}).limit(20));
+    card = cards.find(c => c.size_grade === ln.size_grade) || cards.find(c => !c.size_grade) || null;
+    if (!card) { const prev = await q(sb.from("v_lines").select("rate").eq("sawmill_id", ln.sawmill_id).eq("wood_type", ln.wood_type).eq("unit", ln.unit).order("id", {ascending:false}).limit(10)); last = (prev.find(p => p.rate != null) || {}).rate ?? null; }
   } catch(e) {}
-  const v = await sheet({title:"Purchase rate · " + ln.sawmill_name, intro:`${esc(ln.wood_type)} · ${esc(qty(ln.quantity, ln.unit))}. Amount = quantity × rate ± adjustment.`, fields:[
-    {id:"rate", label:"Rate (₹ per " + ln.unit + ")", type:"number", value:ln.rate ?? last ?? "", required:true, min:0, hint: last != null && ln.rate == null ? "Suggested from this mill's last rate: " + inr(last) : ""},
-    {id:"adjustment", label:"Adjustment (₹, + or −)", type:"number", value:ln.adjustment ?? 0, hint:"The small difference agreed with the mill."},
-    reasonField(ln.rate != null, ln.rate != null ? "" : "Rate agreed with mill")], ok:"Save rate"});
+  const sug = card ? card.rate : last;
+  const v = await sheet({title:"Purchase rate · " + ln.sawmill_name, intro:`${esc(ln.wood_type)} · ${esc(GRADES[ln.size_grade] || "")} · ${esc(qty(ln.quantity, ln.unit))}. Amount = quantity × rate ± adjustment. Saved on this item only: later rate-card changes do not alter it.`, fields:[
+    {id:"rate", label:"Rate (₹ per " + ln.unit + ")", type:"number", value:ln.rate ?? sug ?? "", required:true, min:0, hint: ln.rate == null && sug != null ? (card ? `From the rate card effective ${dDay(card.effective_from)}: ${inr(card.rate)}` : "This sawmill's last rate: " + inr(last)) : ""},
+    {id:"adjustment", label:"Adjustment (₹, + or −)", type:"number", value:ln.adjustment ?? 0, hint:"The small difference agreed with the sawmill."},
+    reasonField(ln.rate != null, ln.rate != null ? "" : (card ? "From rate card" : "Rate agreed with sawmill"))], ok:"Save rate"});
   if (!v) return;
   try { await q(sb.from("line_prices").upsert({line_id:ln.id, rate:num(v.rate), adjustment:num(v.adjustment) || 0, change_reason:v.change_reason || null}, {onConflict:"line_id"})); toast("Rate saved."); done(); }
   catch(e) { toast(errText(e), true); }
 }
-async function costForm(loadId, c, done){
-  const v = await sheet({title: c ? "Edit cost" : "Add cost", fields:[
-    {id:"cost_type", label:"Cost", type:"text", list:COST_TYPES, value:c?.cost_type ?? "", required:true},
+/* Freight and travel expense (expense permission). Optional sawmill link and receipt photo. */
+async function expenseForm(L, allocs, c, done){
+  const v = await sheet({title: c ? "Edit expense" : "Add expense · " + L.load_no, fields:[
+    {id:"cost_type", label:"Category", type:"select", options:(S.expCats.length ? S.expCats : ["Truck Freight","Other Travel Expenses"]).map(x => [x, x]), value:c?.cost_type ?? "Truck Freight"},
     {id:"amount", label:"Amount (₹)", type:"number", value:c?.amount ?? "", required:true, min:0},
+    {id:"allocation_id", label:"Sawmill (optional)", type:"select", options:[["", "Whole truck trip"], ...allocs.map(a => [a.id, a.sawmill_name])], value:c?.allocation_id ?? "", hint:"Shared costs stay on the whole trip; nothing is split automatically."},
+    {id:"paid_on", label:"Expense date", type:"date", value:c?.paid_on ?? today()},
     {id:"paid_to", label:"Paid to", type:"text", value:c?.paid_to ?? ""},
-    {id:"paid_on", label:"Paid on", type:"date", value:c?.paid_on ?? today()},
-    reasonField(!!c, c ? "" : "Cost added")], ok:"Save", danger: c ? "Remove" : null});
+    {id:"note", label:"Description", type:"text", value:c?.note ?? ""},
+    {id:"receipt", label:c?.receipt_path ? "Replace receipt photo (optional)" : "Receipt photo (optional)", type:"file"},
+    reasonField(!!c, c ? "" : "Expense entered")], ok:"Save", danger: c ? "Remove" : null});
   if (!v) return;
   try {
-    if (v.__danger) { if (!confirm("Remove this cost?")) return; await q(sb.from("load_costs").delete().eq("id", c.id)); toast("Removed."); return done(); }
-    const rec = {cost_type:v.cost_type, amount:num(v.amount), paid_to:v.paid_to || null, paid_on:v.paid_on || null, change_reason:v.change_reason || null};
-    if (c) await q(sb.from("load_costs").update(rec).eq("id", c.id)); else await q(sb.from("load_costs").insert({...rec, load_id:loadId}));
-    toast("Saved."); done();
+    if (v.__danger) { if (!confirm("Remove this expense?")) return; await q(sb.from("load_costs").delete().eq("id", c.id)); toast("Removed."); return done(); }
+    const rec = {cost_type:v.cost_type, amount:num(v.amount), allocation_id: v.allocation_id ? Number(v.allocation_id) : null, paid_on:v.paid_on || null, paid_to:v.paid_to || null, note:v.note || null, change_reason:v.change_reason || null};
+    if (v.receipt) rec.receipt_path = await uploadObject(v.receipt, `expenses/${L.id}`);
+    if (c) await q(sb.from("load_costs").update(rec).eq("id", c.id)); else await q(sb.from("load_costs").insert({...rec, load_id:L.id}));
+    toast("Expense saved."); done();
   } catch(e) { toast(errText(e), true); }
 }
 async function billForm(L, b, done, lines = []){
@@ -860,15 +1098,97 @@ async function shrink(file){
     return blob && blob.size < file.size ? new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", {type:"image/jpeg"}) : file;
   } catch(e) { return file; }
 }
-async function uploadFile(loadId, original, kind){
+async function uploadObject(original, folder){
   const file = await shrink(original);
   if (file.size > 10 * 1024 * 1024) throw new Error("File is bigger than 10 MB.");
   const ext = (file.name.match(/\.([a-z0-9]+)$/i) || [, file.type === "application/pdf" ? "pdf" : "jpg"])[1].toLowerCase();
-  const path = `v2/${loadId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const up = await sb.storage.from(BUCKET).upload(path, file, {contentType:file.type || undefined, upsert:false});
   if (up.error) throw up.error;
-  try { await q(sb.from("load_files").insert({load_id:loadId, kind, storage_path:path, file_name:original.name, mime_type:file.type || null, size_bytes:file.size})); }
+  return path;
+}
+/* Upload a document to a load (optionally to one sawmill allocation, for weigh slips). */
+async function uploadFile(loadId, original, kind, allocationId){
+  const path = await uploadObject(original, `v2/${loadId}`);
+  const file = {name: original.name, type: original.type};
+  try { await q(sb.from("load_files").insert({load_id:loadId, allocation_id: allocationId || null, kind, storage_path:path, file_name:file.name, mime_type:/^image\//.test(file.type) ? "image/jpeg" : (file.type || null), size_bytes:original.size})); }
   catch(e) { await sb.storage.from(BUCKET).remove([path]); throw e; }
+}
+async function signedUrl(path){
+  if (CFG.fileUrl) return CFG.fileUrl(path);
+  const { data, error } = await sb.storage.from(BUCKET).createSignedUrl(path, 3600);
+  if (error) throw error; return data.signedUrl;
+}
+function loadJs(src, ready){ return new Promise((ok, bad) => { if (ready()) return ok(); const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => bad(new Error("Could not load the PDF tool. Check the signal and try again.")); document.head.appendChild(s); }); }
+
+/* =====================================================================
+   Staff PDF: TRUCK LOADING / DISPATCH DETAILS
+   Operational only. Built from an explicit list of non-money fields, so a
+   rate, amount, tax, freight, expense or payment can never reach it.
+   Columns: Sl. No. | Saw Mill Name | Name of Product | Size | Quantity | Unit
+   ===================================================================== */
+async function exportStaffPdf(L, allocs, lines, files){
+  await loadJs(JSPDF_URL, () => window.jspdf && window.jspdf.jsPDF);
+  await loadJs(AUTOTABLE_URL, () => window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const M = 12, W = 210 - 2 * M;
+  const plain = t => String(t ?? "").replace(/[–—]/g, "-").replace(/×/g, "x").replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[^\x20-\x7E\n]/g, "");
+  const dd = d => d ? new Date(String(d).length === 10 ? d + "T00:00:00+05:30" : d).toLocaleDateString("en-GB", {timeZone:"Asia/Kolkata"}).replace(/\//g, "-") : "-";
+  const nf = v => v === null || v === undefined || v === "" ? "-" : Number(v).toLocaleString("en-IN", {maximumFractionDigits:3});
+  const loadedOn = lines.map(x => x.loaded_on).filter(Boolean).sort().pop();
+  const cap = [L.capacity_t ? nf(L.capacity_t) + " T" : "", L.capacity_cft ? nf(L.capacity_cft) + " CFT" : ""].filter(Boolean).join(" / ") || "-";
+  const grid = {theme:"grid", styles:{font:"helvetica", fontSize:9, cellPadding:1.8, lineColor:[60, 60, 60], lineWidth:0.2, textColor:[20, 20, 20]}, margin:{left:M, right:M}};
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(15);
+  doc.text("TRUCK LOADING / DISPATCH DETAILS", 105, 15, {align:"center"});
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5);
+  doc.text("Operational document - not a tax invoice", 105, 20, {align:"center"});
+
+  // Header details (two columns of label / value)
+  const left = [["Load reference", L.load_no], ["Document date", dd(today())], ["Loading date", dd(loadedOn || L.load_date)], ["Destination", [L.destination, L.destination_state].filter(Boolean).join(", ") || "-"]];
+  const right = [["Truck number", L.vehicle_no || "-"], ["Truck capacity", cap], ["Driver name", L.driver_name || "-"], ["Kata net weight", L.net_weight_t ? nf(L.net_weight_t) + " T" : "-"]];
+  doc.autoTable({...grid, startY:24, body:left.map((x, i) => [x[0], plain(x[1]), right[i][0], plain(right[i][1])]),
+    columnStyles:{0:{fontStyle:"bold", cellWidth:32, fillColor:[244, 241, 236]}, 1:{cellWidth:W / 2 - 32}, 2:{fontStyle:"bold", cellWidth:32, fillColor:[244, 241, 236]}, 3:{cellWidth:W / 2 - 32}}});
+  // Dispatch from / consignee
+  const buyer = S.parties.find(p => p.id === L.party_id);
+  const mills = allocs.map(a => a.sawmill_name + (a.sawmill_place ? " (" + a.sawmill_place + ")" : "")).join(", ");
+  doc.autoTable({...grid, startY:doc.lastAutoTable.finalY + 3, head:[["Dispatch From (Consignor)", "Consignee / Party"]],
+    headStyles:{fillColor:[27, 67, 50], textColor:255, fontStyle:"bold"},
+    body:[[plain("ADITYA TRADERS\nLoaded at: " + (mills || "-")), plain(buyer ? [buyer.name, [buyer.city, buyer.state].filter(Boolean).join(", ")].filter(Boolean).join("\n") : (L.party_name || "-"))]],
+    columnStyles:{0:{cellWidth:W / 2}, 1:{cellWidth:W / 2}}});
+
+  // Item table — Sl. No. first, Saw Mill Name second. Same sawmill may repeat on several rows.
+  const rows = [];
+  allocs.forEach(a => lines.filter(x => x.allocation_id === a.id).forEach(x => {
+    const product = [x.wood_type, x.dimensions, x.length_ft ? nf(x.length_ft) + " ft long" : "", x.pieces ? nf(x.pieces) + " pcs" : ""].filter(Boolean).join(" - ");
+    rows.push([String(rows.length + 1), plain(a.sawmill_name + (a.owner_name ? "\nOwner: " + a.owner_name : "")), plain(product), GRADES[x.size_grade] || "-", nf(x.quantity), x.unit]);
+  }));
+  doc.autoTable({...grid, startY:doc.lastAutoTable.finalY + 3, showHead:"everyPage",
+    head:[["Sl. No.", "Saw Mill Name", "Name of Product / Wood Details", "Size", "Quantity", "Unit"]],
+    headStyles:{fillColor:[27, 67, 50], textColor:255, fontStyle:"bold", halign:"center"},
+    body:rows,
+    columnStyles:{0:{cellWidth:17, halign:"center"}, 1:{cellWidth:45}, 2:{cellWidth:65}, 3:{cellWidth:19, halign:"center"}, 4:{cellWidth:22, halign:"right"}, 5:{cellWidth:18, halign:"center"}}});
+
+  // Operational summary: quantity per unit (units are never added together), weigh slips, remarks
+  const byUnit = {}; lines.forEach(x => { if (x.quantity != null) byUnit[x.unit] = (byUnit[x.unit] || 0) + Number(x.quantity); });
+  const slips = allocs.map(a => { const n = files.filter(f => f.kind === "Weigh slip" && f.allocation_id === a.id).length; return a.sawmill_name + ": " + (n ? n + " uploaded" : "not uploaded") + (a.slip_net_weight_t ? " (net " + nf(a.slip_net_weight_t) + " T)" : ""); }).join("; ");
+  doc.autoTable({...grid, startY:doc.lastAutoTable.finalY + 3,
+    body:[["Quantity by unit", plain(Object.keys(byUnit).sort().map(u => nf(byUnit[u]) + " " + u).join(" + ") || "-")],
+          ["Weigh slips", plain(slips || "-")],
+          ["Driver photo", files.some(f => f.kind === "Driver with truck") ? "On record" : "Not Provided"],
+          ["Remarks", plain(L.notes || "-")]],
+    columnStyles:{0:{fontStyle:"bold", cellWidth:36, fillColor:[244, 241, 236]}, 1:{cellWidth:W - 36}}});
+
+  // Footer: prepared by and signatures
+  doc.autoTable({...grid, startY:doc.lastAutoTable.finalY + 6, head:[["Prepared by", "Driver acknowledgement", "Loading confirmation"]],
+    headStyles:{fillColor:[244, 241, 236], textColor:20, fontStyle:"bold"},
+    body:[[plain((S.me.full_name || "") + "\n" + dExact(new Date().toISOString())), "\n\n\nSignature", "\n\n\nSignature"]],
+    bodyStyles:{minCellHeight:24}, columnStyles:{0:{cellWidth:W / 3}, 1:{cellWidth:W / 3}, 2:{cellWidth:W / 3}}});
+
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(110); doc.text(plain(`Aditya Traders - ${L.load_no} - page ${i} of ${n}`), 105, 290, {align:"center"}); }
+  doc.save(`${L.load_no}_loading_details.pdf`);
 }
 /* WhatsApp message asking the driver for his live location (idea from the Grok build). */
 function locText(L){
@@ -879,7 +1199,7 @@ function waText(L, lines){
   if (L.vehicle_no) out.push(`Truck: ${L.vehicle_no}${L.capacity_t ? " (" + Number(L.capacity_t) + " T)" : ""}`);
   if (L.driver_name || L.driver_phone) out.push(`Driver: ${[L.driver_name, L.driver_phone].filter(Boolean).join(", ")}`);
   if (L.party_name) out.push(`Buyer: ${L.party_name}${L.destination ? ", " + L.destination : ""}`);
-  (lines || []).forEach(ln => out.push(`• ${ln.sawmill_name}: ${ln.wood_type} ${qty(ln.quantity, ln.unit)} (${LINE_ST[ln.line_status]})`));
+  (lines || []).forEach(ln => out.push(`• ${ln.sawmill_name}: ${ln.wood_type}${ln.size_grade ? " " + GRADES[ln.size_grade] : ""} ${qty(ln.quantity, ln.unit)}${ln.pieces ? " (" + ln.pieces + " pcs)" : ""} (${LINE_ST[ln.line_status]})`));
   if (L.net_weight_t) out.push(`Kata net weight: ${Number(L.net_weight_t)} T`);
   if (L.eway_bill_no) out.push(`E-way bill: ${L.eway_bill_no}`);
   out.push(`Updated: ${dExact(L.last_at || L.created_at)}`);
@@ -889,67 +1209,105 @@ function waText(L, lines){
 /* =====================================================================
    New / edit load
    ===================================================================== */
-async function renderLoadForm(id){
-  chrome(id ? "Edit load" : "New load", {back:true, nav:"loads"});
+async function renderLoadForm(id, register){
+  register = !!register && !id;
+  const h0 = here();
+  if (register) await loadMasters();
+  if (here() !== h0) return;   // the owner may have changed the photo rule on another phone
+  chrome(id ? "Edit load" : register ? "Register truck" : "New load (planning)", {back:true, nav:"loads"});
   let L = null;
-  if (id) { try { L = await q(sb.from("loads").select("*").eq("id", id).maybeSingle()); } catch(e) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; } if (!L) { $("app").innerHTML = `<div class="empty">This load was deleted.</div>`; return; } }
-  else L = lsGet("at2_draft") || {load_date: today(), truck_stage:"planning"};
+  if (id) { try { L = await q(sb.from("loads").select("*").eq("id", id).maybeSingle()); if (here() !== h0) return; } catch(e) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; } if (!L) { $("app").innerHTML = `<div class="empty">This load is not available to you, or it was deleted.</div>`; return; } }
+  else L = (register ? lsGet("at2_reg") : lsGet("at2_draft")) || {load_date: today()};
   const buyers = S.parties.filter(p => p.kind === "buyer"), trans = S.parties.filter(p => p.kind === "transporter");
   const sel = (name, list, val, label) => `<select class="in" name="${name}"><option value="">— choose —</option>${list.map(x => `<option value="${x.id}" ${x.id === val ? "selected" : ""}>${esc(label(x))}</option>`).join("")}<option value="__new">+ Add new…</option></select>`;
+  const docPick = (key, label, must) => `<div class="doc ${must ? "req" : "na"}" id="reg-${key}"><b>${label}</b><span class="st" id="reg-${key}-st">${must ? "Required" : "Not Provided"}</span>
+     <div class="thumbs" style="justify-content:center" id="reg-${key}-prev"></div>
+     <label class="btn sm ${must ? "pri" : ""}" for="reg-${key}-in">${must ? "Take photo" : "Upload"}</label>
+     <input type="file" id="reg-${key}-in" accept="image/*${must ? "" : ",application/pdf"}" ${must ? 'capture="environment"' : ""} hidden></div>`;
   $("app").innerHTML = `<form id="lf" novalidate>
-   <div class="card"><h3>Truck</h3>
+   <div class="card"><h3>${register ? '<span class="stepno">1</span>Truck and driver details' : "Truck"}</h3>
      <div class="two"><label class="f"><span>Date</span><input class="in" type="date" name="load_date" value="${esc(L.load_date || today())}"></label>
-       <label class="f"><span>Truck no</span><input class="in" name="vehicle_no" autocapitalize="characters" autocomplete="off" placeholder="AP39TA1234" value="${esc(L.vehicle_no || "")}"></label></div>
-     <label class="f"><span>Capacity</span><div class="seg" data-seg="capacity_t">${[30, 35].map(c => `<button type="button" data-v="${c}" aria-pressed="${Number(L.capacity_t) === c}">${c} ton</button>`).join("")}<input class="in" name="capacity_other" type="number" inputmode="decimal" placeholder="Other" style="flex:1;min-width:90px" value="${L.capacity_t && ![30, 35].includes(Number(L.capacity_t)) ? esc(Number(L.capacity_t)) : ""}"></div></label>
-     <label class="f"><span>Kata net weight (T)</span><input class="in" name="net_weight_t" type="number" inputmode="decimal" min="0" step="any" placeholder="From the weighbridge slip, e.g. 34.62" value="${esc(L.net_weight_t ?? "")}"></label>
-     <div class="two"><label class="f"><span>Driver name</span><input class="in" name="driver_name" value="${esc(L.driver_name || "")}"></label>
+       <label class="f"><span class="${register ? "req" : ""}">Truck number</span><input class="in" name="vehicle_no" autocapitalize="characters" autocomplete="off" placeholder="AP39TA1234" value="${esc(L.vehicle_no || "")}"></label></div>
+     <label class="f"><span>Truck capacity</span><div class="seg" data-seg="capacity_t">${[30, 35].map(c => `<button type="button" data-v="${c}" aria-pressed="${Number(L.capacity_t) === c}">${c} ton</button>`).join("")}<input class="in" name="capacity_other" type="number" inputmode="decimal" placeholder="Other T" style="flex:1;min-width:80px" value="${L.capacity_t && ![30, 35].includes(Number(L.capacity_t)) ? esc(Number(L.capacity_t)) : ""}"></div></label>
+     <div class="two"><label class="f"><span>Capacity in CFT (optional)</span><input class="in" name="capacity_cft" type="number" inputmode="decimal" min="0" placeholder="e.g. 1300" value="${esc(L.capacity_cft ?? "")}"></label>
+       ${register ? "" : `<label class="f"><span>Kata net weight (T)</span><input class="in" name="net_weight_t" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 34.62" value="${esc(L.net_weight_t ?? "")}"></label>`}</div>
+     <div class="two"><label class="f"><span class="${register ? "req" : ""}">Driver name</span><input class="in" name="driver_name" value="${esc(L.driver_name || "")}"></label>
        <label class="f"><span>Driver phone</span><input class="in" name="driver_phone" type="tel" inputmode="tel" value="${esc(L.driver_phone || "")}"></label></div>
-     <div class="two"><label class="f"><span>Transporter</span>${sel("transporter_id", trans, L.transporter_id, p => p.name + (p.city ? ", " + p.city : ""))}</label>
-       <label class="f"><span>Freight (₹)</span><input class="in" name="freight_amount" type="number" inputmode="decimal" min="0" value="${esc(L.freight_amount ?? "")}"></label></div></div>
-   <div class="card"><h3>Buyer and destination</h3>
-     <label class="f"><span>Buyer</span>${sel("party_id", buyers, L.party_id, p => p.name + (p.city ? ", " + p.city : ""))}</label>
-     <div class="two"><label class="f"><span>Destination</span><input class="in" name="destination" value="${esc(L.destination || "")}"></label>
-       <label class="f"><span>State</span><input class="in" name="destination_state" list="states" value="${esc(L.destination_state || "")}"><datalist id="states"><option value="Rajasthan"><option value="Haryana"><option value="Punjab"><option value="Uttar Pradesh"><option value="Delhi"><option value="Gujarat"></datalist></label></div>
-     <label class="f"><span>E-way bill no</span><input class="in" name="eway_bill_no" inputmode="numeric" value="${esc(L.eway_bill_no || "")}"></label>
-     <label class="f"><span>Notes</span><textarea class="in" name="notes">${esc(L.notes || "")}</textarea></label>
-     <label class="f"><span class="${id ? "req" : ""}">Reason for this ${id ? "change" : "load"}</span><input class="in" name="change_reason" placeholder="${id ? "e.g. Driver changed, told by transporter" : "e.g. Bharat asked to plan a load for Goel"}"><div class="hint">Everyone sees who did this, when and why.</div></label>
+     <label class="f"><span>Transporter</span>${sel("transporter_id", trans, L.transporter_id, p => p.name + (p.city ? ", " + p.city : ""))}</label>
+     ${register ? `<div class="mustbox hidden" id="regMust">Driver photo with truck is mandatory.<div class="small" style="font-weight:400">Take a clear photo of the driver standing beside this truck.</div></div>
+       <div class="docs">${docPick("driver", "Driver with truck", photoRequired())}${docPick("licence", "Driving licence")}${docPick("cbook", "C-Book / RC")}</div>
+       <p class="small mut">${photoRequired() ? "Driving licence and C-Book are optional. The driver photo is compulsory." : "All three are optional. Add them if you have them."}</p>` : ""}
    </div>
-   ${id ? "" : `<p class="small mut">Add the mills after saving. The truck number is needed before the stage moves past Planning.</p>`}
+   ${register ? "" : `<div class="card"><h3>Party and destination</h3>
+     <label class="f"><span>Party / consignee (buyer)</span>${sel("party_id", buyers, L.party_id, p => p.name + (p.city ? ", " + p.city : ""))}</label>
+     <div class="two"><label class="f"><span>Destination</span><input class="in" name="destination" value="${esc(L.destination || "")}"></label>
+       <label class="f"><span>State</span><input class="in" name="destination_state" list="states" value="${esc(L.destination_state || "")}"><datalist id="states"><option value="Rajasthan"><option value="Haryana"><option value="Punjab"><option value="Uttar Pradesh"><option value="Delhi"><option value="Gujarat"><option value="Odisha"></datalist></label></div>
+     <label class="f"><span>E-way bill no</span><input class="in" name="eway_bill_no" inputmode="numeric" value="${esc(L.eway_bill_no || "")}"></label>
+     <label class="f"><span>Notes</span><textarea class="in" name="notes">${esc(L.notes || "")}</textarea></label></div>`}
+   <div class="card"><label class="f" style="margin:0"><span class="${id ? "req" : ""}">Reason for this ${id ? "change" : register ? "entry" : "load"}</span><input class="in" name="change_reason" placeholder="${id ? "e.g. Driver changed, told by transporter" : register ? "e.g. Truck reached Sawmill A" : "e.g. Goel asked for one load"}"><div class="hint">Everyone sees who did this, when and why.</div></label></div>
+   ${register ? `<p class="small mut">Next: add the sawmills and their wood items on the truck's page.</p>` : id ? "" : `<p class="small mut">This load starts in Planning (owner only). Staff see it from Going to load.</p>`}
   </form>
-  <div class="savebar"><div class="in2"><button class="btn" id="fCancel">Cancel</button><button class="btn pri" id="fSave">${id ? "Save changes" : "Save load"}</button></div></div>`;
+  <div class="savebar"><div class="in2"><button class="btn" id="fCancel">Cancel</button><button class="btn pri" id="fSave">${id ? "Save changes" : register ? "Save and continue" : "Save load"}</button></div></div>`;
   $("nav").classList.add("hidden");
   const form = $("lf"); let cap = L.capacity_t ? Number(L.capacity_t) : null;
+  const picked = {};
+  if (register) [["driver", photoRequired()], ["licence"], ["cbook"]].forEach(([key, must]) => {
+    const inp = $(`reg-${key}-in`);
+    inp.onchange = () => {
+      const f = inp.files[0]; picked[key] = f || null;
+      const box = $(`reg-${key}`), st = $(`reg-${key}-st`), prev = $(`reg-${key}-prev`);
+      box.className = "doc " + (f ? "ok" : must ? "req" : "na"); st.textContent = f ? "Ready to upload" : must ? "Required" : "Not Provided";
+      prev.innerHTML = f && /^image\//.test(f.type) ? `<a><img alt="" src="${URL.createObjectURL(f)}"></a>` : "";
+      if (must && f) $("regMust").classList.add("hidden");
+    };
+  });
   form.querySelectorAll("[data-seg=capacity_t] button").forEach(b => b.onclick = () => { const on = b.getAttribute("aria-pressed") === "true"; form.querySelectorAll("[data-seg=capacity_t] button").forEach(x => x.setAttribute("aria-pressed", "false")); cap = on ? null : Number(b.dataset.v); if (!on) b.setAttribute("aria-pressed", "true"); form.capacity_other.value = ""; draft(); });
   form.capacity_other.oninput = () => { form.querySelectorAll("[data-seg=capacity_t] button").forEach(x => x.setAttribute("aria-pressed", "false")); cap = num(form.capacity_other.value); };
-  const collect = () => { const f = Object.fromEntries(new FormData(form)); return {
-    load_date: f.load_date || today(), vehicle_no: (f.vehicle_no || "").toUpperCase().replace(/\s+/g, "") || null, capacity_t: cap,
-    driver_name: f.driver_name.trim() || null, driver_phone: f.driver_phone.trim() || null,
-    transporter_id: f.transporter_id && f.transporter_id !== "__new" ? Number(f.transporter_id) : null, freight_amount: num(f.freight_amount), net_weight_t: num(f.net_weight_t),
-    party_id: f.party_id && f.party_id !== "__new" ? Number(f.party_id) : null, destination: f.destination.trim() || null, destination_state: f.destination_state.trim() || null,
-    eway_bill_no: (f.eway_bill_no || "").replace(/\s+/g, "") || null, notes: f.notes.trim() || null, change_reason: f.change_reason.trim() || null }; };
-  const draft = () => { if (!id) lsSet("at2_draft", collect()); };
+  const collect = () => { const f = Object.fromEntries(new FormData(form)); const rec = {
+    load_date: f.load_date || today(), vehicle_no: (f.vehicle_no || "").toUpperCase().replace(/\s+/g, "") || null, capacity_t: cap, capacity_cft: num(f.capacity_cft),
+    driver_name: (f.driver_name || "").trim() || null, driver_phone: (f.driver_phone || "").trim() || null,
+    transporter_id: f.transporter_id && f.transporter_id !== "__new" ? Number(f.transporter_id) : null, change_reason: (f.change_reason || "").trim() || null };
+    if (!register) Object.assign(rec, {net_weight_t: num(f.net_weight_t), party_id: f.party_id && f.party_id !== "__new" ? Number(f.party_id) : null, destination: (f.destination || "").trim() || null,
+      destination_state: (f.destination_state || "").trim() || null, eway_bill_no: (f.eway_bill_no || "").replace(/\s+/g, "") || null, notes: (f.notes || "").trim() || null});
+    return rec; };
+  const draft = () => { if (!id) lsSet(register ? "at2_reg" : "at2_draft", collect()); };
   form.addEventListener("input", draft);
   form.querySelectorAll("select").forEach(s => s.onchange = async () => {
     if (s.value !== "__new") return draft();
     const kind = s.name === "party_id" ? "buyer" : "transporter";
     const p = await partyForm(kind, null);
-    if (p) { s.insertAdjacentHTML("afterbegin", ""); s.innerHTML = `<option value="">— choose —</option>${S.parties.filter(x => x.kind === kind).map(x => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name + (x.city ? ", " + x.city : ""))}</option>`).join("")}<option value="__new">+ Add new…</option>`; }
+    if (p) s.innerHTML = `<option value="">— choose —</option>${S.parties.filter(x => x.kind === kind).map(x => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name + (x.city ? ", " + x.city : ""))}</option>`).join("")}<option value="__new">+ Add new…</option>`;
     else s.value = "";
     draft();
   });
-  $("fCancel").onclick = () => { if (!id) lsSet("at2_draft", null); history.back(); };
+  $("fCancel").onclick = () => { if (!id) lsSet(register ? "at2_reg" : "at2_draft", null); history.back(); };
   $("fSave").onclick = async () => {
     const rec = collect();
     if (id && !rec.change_reason) { toast("Write the reason for this change.", true); form.change_reason.focus(); return; }
-    if (rec.freight_amount !== null && (isNaN(rec.freight_amount) || rec.freight_amount < 0)) return toast("Check the freight amount.", true);
-    if (rec.net_weight_t !== null && (isNaN(rec.net_weight_t) || rec.net_weight_t <= 0 || rec.net_weight_t >= 100)) return toast("Check the kata net weight (tons).", true);
+    if (rec.net_weight_t != null && (isNaN(rec.net_weight_t) || rec.net_weight_t <= 0 || rec.net_weight_t >= 100)) return toast("Check the kata net weight (tons).", true);
+    if (rec.capacity_cft != null && (isNaN(rec.capacity_cft) || rec.capacity_cft <= 0)) return toast("Check the capacity in CFT.", true);
+    if (register) {
+      if (!rec.vehicle_no) { form.vehicle_no.focus(); return toast("Enter the truck number.", true); }
+      if (!rec.driver_name) { form.driver_name.focus(); return toast("Enter the driver name.", true); }
+      if (photoRequired() && !picked.driver) {   // compulsory photo (owner setting): red, highlighted, and nothing is saved
+        $("regMust").classList.remove("hidden"); $("reg-driver").scrollIntoView({behavior:"smooth", block:"center"});
+        return toast("Driver photo with truck is mandatory.", true);
+      }
+      rec.truck_stage = "going_to_load"; rec.change_reason = rec.change_reason || "Truck registered";
+    }
     const b = $("fSave"); b.disabled = true; b.textContent = "Saving…";
     try {
       let newId = id;
       if (id) await q(sb.from("loads").update(rec).eq("id", id));
-      else { const r = await q(sb.from("loads").insert(rec).select("id").single()); newId = r.id; lsSet("at2_draft", null); }
+      else { const r = await q(sb.from("loads").insert(rec).select("id").single()); newId = r.id; lsSet(register ? "at2_reg" : "at2_draft", null); }
+      if (register) {
+        b.textContent = "Uploading photos…";
+        if (picked.driver) await uploadFile(newId, picked.driver, "Driver with truck");
+        if (picked.licence) await uploadFile(newId, picked.licence, "Driving licence");
+        if (picked.cbook) await uploadFile(newId, picked.cbook, "C-Book / RC");
+      }
       toast("Saved."); history.replaceState(null, "", "#/load/" + newId); loadLoads(true); renderLoad(newId);
-    } catch(e) { toast(errText(e), true); b.disabled = false; b.textContent = id ? "Save changes" : "Save load"; }
+    } catch(e) { toast(errText(e), true); b.disabled = false; b.textContent = id ? "Save changes" : register ? "Save and continue" : "Save load"; }
   };
 }
 
@@ -961,6 +1319,7 @@ async function renderUpdates(){
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
   try {
     const acts = await q(sb.from("activity").select("*").order("at", {ascending:false}).order("id", {ascending:false}).limit(150));
+    if (here() !== "#/updates") return;
     $("app").innerHTML = `<p class="small mut" style="margin-top:0">Every change and update across all loads: exact time, who, the load's stage, and the reason.</p><div class="card">${acts.length ? acts.map(a => feedItem(a)).join("") : `<p class="mut">No updates yet.</p>`}</div>`;
   } catch(e) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; }
 }
@@ -973,7 +1332,7 @@ async function millForm(m){
     {id:"name", label:"Mill name", type:"text", value:m?.name ?? "", required:true},
     {id:"place", label:"Village / town", type:"text", value:m?.place ?? ""},
     {id:"area", label:"Area", type:"text", value:m?.area ?? "", list:["Rajam","Narsipatnam","Anandapuram","Yelamanchili","Pendurthi","Rajanagaram","Peddapuram","Pithapuram","Rajahmundry"]},
-    {id:"contact_name", label:"Owner / contact", type:"text", value:m?.contact_name ?? ""},
+    {id:"contact_name", label:"Sawmill owner name", type:"text", value:m?.contact_name ?? ""},
     {id:"phone", label:"Phone", type:"tel", value:m?.phone ?? ""},
     {id:"notes", label:"Notes", type:"text", value:m?.notes ?? ""}], ok:"Save"});
   if (!v) return null;
@@ -1019,6 +1378,7 @@ async function renderParties(){
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
   let bal = [];
   try { bal = await q(sb.from("v_balances").select("*")); } catch(e) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
+  if (here() !== "#/parties") return;
   const tab = S.partyTab || "buyer";
   const rows = bal.filter(b => b.party_kind === tab).map(b => ({...b, bal: Number(b.total_due) - Number(b.total_paid)})).sort((a, b) => b.bal - a.bal);
   const total = rows.reduce((a, b) => a + b.bal, 0);
@@ -1032,6 +1392,7 @@ async function renderParties(){
   const ap = $("addParty"); if (ap) ap.onclick = async () => { if (await partyForm(tab, null)) renderParties(); };
 }
 async function renderParty(kind, pid){
+  const h0 = here();
   chrome("Party", {back:true, nav:"parties"});
   $("app").innerHTML = `<div class="empty">Loading…</div>`;
   try {
@@ -1040,6 +1401,7 @@ async function renderParty(kind, pid){
     let loads = [];
     if (kind === "mill") { const ls = await q(sb.from("v_lines").select("*").eq("sawmill_id", pid).order("id", {ascending:false})); loads = ls; }
     else loads = S.loads.filter(l => (kind === "buyer" ? l.party_id : l.transporter_id) === pid);
+    if (here() !== h0) return;
     const P = kind === "mill" ? S.sawmills.find(m => m.id === pid) : S.parties.find(p => p.id === pid);
     if (!P || !bal) { $("app").innerHTML = `<div class="empty">Not found.</div>`; return; }
     chrome(P.name, {back:true, nav:"parties", sub: kind === "buyer" ? "Buyer" : kind === "mill" ? "Mill" : "Transporter"});
@@ -1048,7 +1410,7 @@ async function renderParty(kind, pid){
     const remind = `Namaskaram ${P.name}, from Aditya Traders. Balance as on ${dDay(today())}: ${inr(due)}. Please arrange payment. Thank you.`;
     $("app").innerHTML = `<div class="card"><div class="tiles" style="margin:0"><div class="tile"><div class="n num" style="font-size:20px">${inr(bal.total_due)}</div><div class="l">${kind === "buyer" ? "Billed" : kind === "mill" ? "Purchases" : "Freight"}</div></div><div class="tile"><div class="n num" style="font-size:20px">${inr(bal.total_paid)}</div><div class="l">${kind === "buyer" ? "Received" : "Paid"}</div></div><div class="tile ${due > 0 ? "alert" : ""}"><div class="n num" style="font-size:20px">${inr(due)}</div><div class="l">${kind === "buyer" ? "To collect" : "To pay"}</div></div></div>
       <div class="row" style="margin-top:12px"><button class="btn pri" id="payP">+ Record payment</button>${kind === "buyer" && phone && due > 0 ? `<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/91${phone}?text=${encodeURIComponent(remind)}">Send reminder</a>` : ""}${phone ? `<a class="btn" href="tel:${phone}">Call</a>` : ""}<button class="btn" id="editP">Edit details</button></div></div>
-      <div class="card"><h3>${kind === "mill" ? "Loads from this mill" : "Loads"}</h3>${loads.length ? `<table class="t">${kind === "mill" ? loads.map(l => `<tr><td><a href="#/load/${l.load_id}">${esc((S.loads.find(x => x.id === l.load_id) || {}).load_no || "Load")}</a><div class="tiny mut">${esc(l.wood_type)} · ${esc(qty(l.quantity, l.unit))}${l.rate != null ? " @ " + inr(l.rate) : ""}</div></td><td class="r num">${inr(l.amount)}</td></tr>`).join("") : loads.map(l => `<tr><td><a href="#/load/${l.id}">${esc(l.load_no)}</a> ${billPill(l.bill_stage)}<div class="tiny mut">${esc(dDay(l.load_date))}${l.invoice_no ? " · " + esc(l.invoice_no) : ""}${l.due_date ? " · due " + esc(dDay(l.due_date)) : ""}</div></td><td class="r num">${kind === "buyer" ? inr(l.invoice_total) : inr(l.freight_amount)}</td></tr>`).join("")}</table>` : `<p class="mut small">No loads yet.</p>`}</div>
+      <div class="card"><h3>${kind === "mill" ? "Loads from this mill" : "Loads"}</h3>${loads.length ? `<table class="t">${kind === "mill" ? loads.map(l => `<tr><td><a href="#/load/${l.load_id}">${esc((S.loads.find(x => x.id === l.load_id) || {}).load_no || "Load")}</a><div class="tiny mut">${esc(l.wood_type)} · ${esc(qty(l.quantity, l.unit))}${l.rate != null ? " @ " + inr(l.rate) : ""}</div></td><td class="r num">${inr(l.amount)}</td></tr>`).join("") : loads.map(l => `<tr><td><a href="#/load/${l.id}">${esc(l.load_no)}</a> ${billPill(l.bill_stage)}<div class="tiny mut">${esc(dDay(l.load_date))}${l.invoice_no ? " · " + esc(l.invoice_no) : ""}${l.due_date ? " · due " + esc(dDay(l.due_date)) : ""}</div></td><td class="r num">${kind === "buyer" ? inr(l.invoice_total) : inr(l.freight_total)}</td></tr>`).join("")}</table>` : `<p class="mut small">No loads yet.</p>`}</div>
       <div class="card"><h3>Payments</h3>${pays.length ? `<table class="t">${pays.map(p => `<tr><td>${esc(dDay(p.paid_on))}<div class="tiny mut">${esc(MODES[p.mode])}${p.reference ? " · " + esc(p.reference) : ""}${p.note ? " · " + esc(p.note) : ""}</div></td><td class="r num">${inr(p.amount)}</td></tr>`).join("")}</table>` : `<p class="mut small">No payments yet.</p>`}</div>`;
     $("payP").onclick = () => payForm({kind, partyId: kind === "mill" ? null : pid, sawmillId: kind === "mill" ? pid : null}, null, () => renderParty(kind, pid));
     $("editP").onclick = async () => { const r = kind === "mill" ? await millForm(P) : await partyForm(kind, P); if (r) renderParty(kind, pid); };
@@ -1058,48 +1420,139 @@ async function renderParty(kind, pid){
 /* =====================================================================
    More: team, settings, export, sign out
    ===================================================================== */
+/* =====================================================================
+   Expenses (freight and travel) — expense and finance people only
+   ===================================================================== */
+async function renderExpenses(){
+  chrome("Freight and expenses", {back:true, nav:"home"});
+  $("app").innerHTML = `<div class="empty">Loading…</div>`;
+  let rows = [];
+  try { rows = await q(sb.from("load_costs").select("*").order("paid_on", {ascending:false}).order("id", {ascending:false}).limit(500)); }
+  catch(e) { $("app").innerHTML = `<div class="empty">${esc(errText(e))}</div>`; return; }
+  if (here() !== "#/expenses") return;
+  const month = S.expMonth || today().slice(0, 7);
+  const inMonth = rows.filter(r => String(r.paid_on || r.created_at).slice(0, 7) === month);
+  const byCat = {}; inMonth.forEach(r => byCat[r.cost_type] = (byCat[r.cost_type] || 0) + Number(r.amount));
+  const loadOf = id => S.loads.find(l => l.id === id) || {};
+  let h = `<div class="card"><div class="row"><label class="f grow" style="margin:0"><span>Month</span><input class="in" type="month" id="expMonth" value="${esc(month)}"></label>${can("expenses") ? `<button class="btn pri" id="expAdd" style="align-self:flex-end">+ Add expense</button>` : ""}</div></div>
+    <div class="tiles">${Object.keys(byCat).length ? Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([c, v]) => `<div class="tile money"><div class="n num">${inr(v)}</div><div class="l">${esc(c)}</div></div>`).join("") : `<div class="tile"><div class="n">₹0</div><div class="l">No expenses this month</div></div>`}</div>
+    <div class="sect"><h3>Trip-wise</h3><span class="small mut">${inMonth.length} entries · ${inr(inMonth.reduce((a, r) => a + Number(r.amount), 0))}</span></div>`;
+  const loadsIn = [...new Set(inMonth.map(r => r.load_id))];
+  h += loadsIn.length ? loadsIn.map(lid => { const L = loadOf(lid), its = inMonth.filter(r => r.load_id === lid);
+    return `<div class="card"><div class="row"><a href="#/load/${lid}" class="grow"><b>${esc(L.load_no || "Load " + lid)}</b>${L.vehicle_no ? " · " + esc(L.vehicle_no) : ""}</a><b class="num">${inr(its.reduce((a, r) => a + Number(r.amount), 0))}</b></div>
+      ${its.map(r => `<div class="tot"><span>${esc(r.cost_type)}<span class="mut small"> · ${esc(dDay(r.paid_on))}${r.paid_to ? " · " + esc(r.paid_to) : ""} · ${esc(person(r.created_by))}</span></span><span class="num">${inr(r.amount)}</span></div>`).join("")}</div>`; }).join("") : `<div class="empty">Nothing recorded in this month.</div>`;
+  $("app").innerHTML = h;
+  $("expMonth").onchange = () => { S.expMonth = $("expMonth").value; renderExpenses(); };
+  const add = $("expAdd");
+  if (add) add.onclick = async () => {
+    const open = S.loads.filter(l => l.truck_stage !== "cancelled");
+    const v = await sheet({title:"Which truck?", fields:[{id:"load", label:"Load", type:"select", options:open.map(l => [l.id, l.load_no + (l.vehicle_no ? " · " + l.vehicle_no : "") + " · " + STAGE[l.truck_stage]])}], ok:"Next"});
+    if (!v) return;
+    const L = S.loads.find(l => l.id === Number(v.load));
+    let allocs = []; try { allocs = await q(sb.from("v_allocations").select("*").eq("load_id", L.id)); } catch(e) {}
+    expenseForm(L, allocs, null, () => { loadLoads(true); renderExpenses(); });
+  };
+}
+
+/* =====================================================================
+   Sawmill rate cards (finance): history is kept, never overwritten
+   ===================================================================== */
+async function renderRates(){
+  chrome("Sawmill rates", {back:true, nav:"home"});
+  await loadMasters();   // sawmills may have been added on other phones
+  if (here() !== "#/rates") return;
+  const millId = S.rateMill || (S.sawmills[0] || {}).id;
+  let h = `<div class="card"><label class="f" style="margin:0"><span>Sawmill</span><select class="in" id="rMill">${S.sawmills.map(m => `<option value="${m.id}" ${m.id === millId ? "selected" : ""}>${esc(m.name + (m.place ? ", " + m.place : ""))}</option>`).join("")}</select></label></div>`;
+  if (!millId) { $("app").innerHTML = h + `<div class="empty">Add sawmills first.</div>`; return; }
+  let rates = [], bal = null;
+  try {
+    rates = await q(sb.from("sawmill_rates").select("*").eq("sawmill_id", millId).order("effective_from", {ascending:false}).order("id", {ascending:false}));
+    bal = (await q(sb.from("v_balances").select("*").eq("party_kind", "mill").eq("sawmill_id", millId)))[0];
+  } catch(e) { $("app").innerHTML = h + `<div class="empty">${esc(errText(e))}</div>`; return; }
+  if (here() !== "#/rates") return;
+  const key = r => [r.wood_type, r.size_grade || "", r.unit].join("|"), seen = new Set(), current = [];
+  rates.filter(r => r.effective_from <= today()).forEach(r => { if (!seen.has(key(r))) { seen.add(key(r)); current.push(r); } });
+  if (bal) h += `<div class="tiles"><a class="tile money" href="#/party/mill/${millId}"><div class="n num">${inr(bal.total_due)}</div><div class="l">Purchases from this sawmill</div></a><a class="tile money" href="#/party/mill/${millId}"><div class="n num">${inr(bal.total_paid)}</div><div class="l">Paid</div></a><a class="tile ${Number(bal.total_due) - Number(bal.total_paid) > 0 ? "alert" : ""}" href="#/party/mill/${millId}"><div class="n num">${inr(Number(bal.total_due) - Number(bal.total_paid))}</div><div class="l">Payable</div></a></div>`;
+  h += `<div class="card"><div class="sect"><h3>Current rates</h3>${can("rates") ? `<button class="btn sm pri" id="rAdd">+ New rate</button>` : `<span class="small mut">entered by the owner</span>`}</div>
+    ${current.length ? `<table class="t"><tr><th>Wood</th><th>Size</th><th class="r">Rate</th><th>From</th></tr>${current.map(r => `<tr><td>${esc(r.wood_type)}</td><td>${esc(GRADES[r.size_grade] || "Any")}</td><td class="r num">${inr(r.rate)} / ${esc(r.unit)}</td><td>${esc(dDay(r.effective_from))}</td></tr>`).join("")}</table>` : `<p class="mut small">No rates yet.</p>`}
+    <p class="small mut">A new rate applies from its date. Rates already saved on past loads never change.</p></div>
+    <div class="card"><h3>Rate history</h3>${rates.length ? rates.map(r => `<div class="tl"><div class="when">${avatar(r.created_by)}<b>${esc(dExact(r.created_at))}</b> · ${esc(person(r.created_by))}</div><div class="what">${esc(r.wood_type)} · ${esc(GRADES[r.size_grade] || "Any size")} · <b class="num">${inr(r.rate)} / ${esc(r.unit)}</b> from ${esc(dDay(r.effective_from))}</div>${r.change_reason ? `<div class="why">Reason: ${esc(r.change_reason)}</div>` : ""}</div>`).join("") : `<p class="mut small">No history.</p>`}</div>`;
+  $("app").innerHTML = h;
+  $("rMill").onchange = () => { S.rateMill = Number($("rMill").value); renderRates(); };
+  if ($("rAdd")) $("rAdd").onclick = async () => {
+    const v = await sheet({title:"New rate · " + millName(millId), intro:"The previous rate stays in the history.", fields:[
+      {id:"wood_type", label:"Wood type", type:"select", options:S.woods.map(w => [w, w])},
+      {id:"size_grade", label:"Size", type:"select", options:[["", "Any size"], ...Object.entries(GRADES)]},
+      {id:"unit", label:"Per unit", type:"select", options:UNITS.map(u => [u, u])},
+      {id:"rate", label:"Rate (₹)", type:"number", required:true, min:0},
+      {id:"effective_from", label:"Effective from", type:"date", value:today(), required:true},
+      reasonField(true)], ok:"Save rate"});
+    if (!v) return;
+    try { await q(sb.from("sawmill_rates").insert({sawmill_id:millId, wood_type:v.wood_type, size_grade:v.size_grade || null, unit:v.unit, rate:num(v.rate), effective_from:v.effective_from, change_reason:v.change_reason})); toast("Rate saved."); renderRates(); }
+    catch(e) { toast(errText(e), true); }
+  };
+}
+
+/* =====================================================================
+   More: team, settings, export, sign out
+   ===================================================================== */
 function renderMore(){
   chrome("More", {nav:"more"});
   const item = (href, t, d) => `<a class="loadc" href="${href}"><div class="t1"><span class="no">${t}</span></div><div class="t2">${d}</div></a>`;
-  $("app").innerHTML = `<div class="card row">${avatar(S.me.id, true)}<div class="grow"><b>${esc(S.me.full_name || "")}</b><div class="small mut">${esc(phoneOf(S.user.email) || S.user.email)} · ${esc(S.me.role)}</div></div></div>
-    ${isAdmin() ? item("#/team", "Team", "Add staff logins, approve people, set roles, reset passwords") : ""}
-    ${item("#/mills", "Mills", "Mill list, phone numbers, ask mills about loads")}
-    ${isAdmin() ? item("#/parties", "Parties and balances", "Buyers to collect, mills and transporters to pay") : ""}
-    ${item("#/export", "Excel export", isAdmin() ? "Loads, mill lines, prices, billing, payments, history" : "Loads, mill lines, costs, history")}
-    ${isAdmin() ? item("#/settings", "Settings", "Size grade limits (small / medium / large)") : ""}
+  $("app").innerHTML = `<div class="card row">${avatar(S.me.id, true)}<div class="grow"><b>${esc(S.me.full_name || "")}</b><div class="small mut">${esc(phoneOf(S.user.email) || S.user.email)} · ${esc(ROLE_NAME[S.me.role] || S.me.role)}</div></div></div>
+    ${can("people") ? item("#/team", "Team and permissions", "Add logins, approve people, roles and permissions, reset passwords") : ""}
+    ${canSeeExp() ? item("#/expenses", "Freight and expenses", "Truck freight, fuel, toll, hamali, weighbridge and other travel costs") : ""}
+    ${canSeeRates() ? item("#/rates", "Sawmill rates", "Rates by wood, size and unit, with full history") : ""}
+    ${can("finance") ? item("#/parties", "Parties and balances", "Buyers to collect, sawmills and transporters to pay") : ""}
+    ${item("#/mills", "Sawmills", "Sawmill list, owners, phone numbers, ask about loads")}
+    ${item("#/export", "Excel export", can("finance") ? "Loads, sawmills, items, prices, expenses, billing, payments, history" : canSeeExp() ? "Loads, sawmills, items, expenses, history" : "Loads, sawmills, wood items, history")}
+    ${can("people") ? item("#/settings", "Settings", "Loading rules, size grades, wood types, expense categories") : ""}
     <button class="btn block red" id="signOut" style="margin-top:6px">Sign out</button><footer>Version ${APP_VERSION}</footer>`;
   $("signOut").onclick = async () => { lsSet(cacheKey(), null); history.replaceState(null, "", "#/"); await sb.auth.signOut(); };
 }
+const PERMS = [["perm_finance", "Bills, payments, balances (and view rates and expenses)"], ["perm_rates", "Enter sawmill rates"], ["perm_expenses", "Enter freight and other charges"], ["perm_plan", "Planning and Truck fixed"], ["perm_people", "Logins, permissions and settings"]];
+/* Owner's rule (26 Nov): rates and charges are entered from the owner login only; the accountant views them. */
+const ROLE_DEFAULTS = {accountant:{perm_finance:true}, freight:{perm_expenses:true}, staff:{}, owner:{}};
 async function renderTeam(){
   chrome("Team", {back:true, nav:"more"});
   await loadMasters();
+  if (here() !== "#/team") return;
   const ppl = Object.values(S.people);
-  const roleName = {owner:"Owner", accountant:"Accountant", staff:"Staff"};
+  const roleOpts = [["staff","Staff"],["accountant","Accountant"], ...(isOwner() ? [["owner","Owner"]] : [])];
+  const permText = p => p.role === "owner" ? "Everything" : PERMS.filter(([k]) => p[k]).map(([, l]) => l.split(":")[0]).join(" · ") || "Loading work only (no money)";
   $("app").innerHTML = `<button class="btn pri block" id="addPerson" style="margin-bottom:12px">+ Add a person</button>
-    <p class="small mut">Owner and accountant have full access. Staff never see prices, bills or payments. Staff sign in with their phone number.</p>
-    ${ppl.map(p => `<div class="card"><div class="row">${avatar(p.id, true)}<b class="grow">${esc(p.full_name || "(no name)")}</b><span class="pill">${esc(roleName[p.role])}</span>${p.active ? "" : `<span class="pill b-payment_pending">Not approved</span>`}</div>
-      <div class="small mut">${esc(p.phone || phoneOf(p.email) || p.email || "")}</div>
-      <div class="row" style="margin-top:10px"><button class="btn sm" data-edit="${p.id}">Edit</button>${p.active ? `<button class="btn sm red" data-act="${p.id}">Block</button>` : `<button class="btn sm pri" data-act="${p.id}">Approve</button>`}${p.id !== S.user.id ? `<button class="btn sm" data-pw="${p.id}">Set password</button>` : ""}</div></div>`).join("")}`;
+    <p class="small mut">The owner login is shared by Aditya and Bharat and can do everything. Rates and charges are entered from the owner login. The accountant handles bills and payments and views rates and expenses. Staff never see any money. Permissions can be ticked per person; the database enforces them.</p>
+    ${ppl.map(p => `<div class="card"><div class="row">${avatar(p.id, true)}<b class="grow">${esc(p.full_name || "(no name)")}</b><span class="pill">${esc(ROLE_NAME[p.role] || p.role)}</span>${p.active ? "" : `<span class="pill b-payment_pending">Not approved</span>`}</div>
+      <div class="small mut">${esc(p.phone || phoneOf(p.email) || p.email || "")}</div><div class="small" style="margin-top:4px">${esc(permText(p))}</div>
+      <div class="row" style="margin-top:10px"><button class="btn sm" data-edit="${p.id}">Edit</button>${p.role === "owner" && !isOwner() ? "" : p.active ? `<button class="btn sm red" data-act="${p.id}">Block</button>` : `<button class="btn sm pri" data-act="${p.id}">Approve</button>`}${p.id !== S.user.id ? `<button class="btn sm" data-pw="${p.id}">Set password</button>` : ""}</div></div>`).join("")}`;
+  const permFields = (p, role) => PERMS.filter(([k]) => k !== "perm_people" || isOwner()).map(([k, l]) => ({id:k, label:l, type:"check", value: p ? !!p[k] : !!(ROLE_DEFAULTS[role] || {})[k]}));
   $("addPerson").onclick = async () => {
-    const v = await sheet({title:"Add a person", intro:"Creates their login. Give them the phone number and password; they can sign in straight away.", fields:[
+    const first = await sheet({title:"Add a person", fields:[{id:"role", label:"Role", type:"select", value:"staff", options:roleOpts}], ok:"Next"});
+    if (!first) return;
+    const v = await sheet({title:"Add " + ROLE_NAME[first.role], intro:"Creates their login. Give them the phone number and password; they can sign in straight away.", fields:[
       {id:"full_name", label:"Name", type:"text", required:true},
       {id:"login", label:"Phone number (or email)", type:"tel", required:true, hint:"Staff sign in with this phone number."},
       {id:"password", label:"Password (at least 8 characters)", type:"text", required:true},
-      {id:"role", label:"Role", type:"select", value:"staff", options:[["staff","Staff"],["accountant","Accountant"],["owner","Owner"]]}], ok:"Create login"});
+      ...(first.role === "owner" ? [] : permFields(null, first.role))], ok:"Create login"});
     if (!v) return;
     if (v.password.length < 8) return toast("Password must be at least 8 characters.", true);
     try {
-      const { data, error } = await sb.functions.invoke("team-admin", {body:{action:"create", full_name:v.full_name, email:toLoginEmail(v.login), phone: v.login.includes("@") ? null : v.login.replace(/\D/g, "").slice(-10), password:v.password, role:v.role}});
+      const perms = Object.fromEntries(PERMS.map(([k]) => [k, !!v[k]]));
+      const { data, error } = await sb.functions.invoke("team-admin", {body:{action:"create", full_name:v.full_name, email:toLoginEmail(v.login), phone: v.login.includes("@") ? null : v.login.replace(/\D/g, "").slice(-10), password:v.password, role:first.role, perms}});
       if (error) throw new Error((data && data.error) || (await readFnError(error)));
       toast("Login created for " + v.full_name + "."); renderTeam();
     } catch(e) { toast(errText(e), true); }
   };
   document.querySelectorAll("[data-edit]").forEach(b => b.onclick = async () => {
     const p = S.people[b.dataset.edit];
-    const v = await sheet({title:"Edit " + (p.full_name || "person"), fields:[{id:"full_name", label:"Name", type:"text", value:p.full_name || ""}, {id:"phone", label:"Phone", type:"tel", value:p.phone || phoneOf(p.email) || ""}, {id:"role", label:"Role", type:"select", value:p.role, options:[["staff","Staff"],["accountant","Accountant"],["owner","Owner"]]}], ok:"Save"});
+    const v = await sheet({title:"Edit " + (p.full_name || "person"), fields:[{id:"full_name", label:"Name", type:"text", value:p.full_name || ""}, {id:"phone", label:"Phone", type:"tel", value:p.phone || phoneOf(p.email) || ""},
+      ...(p.role === "owner" && !isOwner() ? [] : [{id:"role", label:"Role", type:"select", value:p.role, options:[...(p.role === "freight" ? [["freight","Freight & expenses"]] : []), ...(p.role === "owner" && isOwner() ? [["owner","Owner"], ...roleOpts.filter(r => r[0] !== "owner")] : roleOpts)]}]),
+      ...(p.role === "owner" ? [] : permFields(p))], ok:"Save"});
     if (!v) return;
-    if (p.id === S.user.id && v.role === "staff" && !confirm("You will lose admin access. Continue?")) return;
-    try { await q(sb.from("profiles").update({full_name:v.full_name, phone:v.phone || null, role:v.role}).eq("id", p.id)); toast("Saved."); renderTeam(); } catch(e) { toast(errText(e), true); }
+    if (p.id === S.user.id && v.role && v.role !== p.role && !confirm("You are changing your own role. Continue?")) return;
+    const rec = {full_name:v.full_name, phone:v.phone || null}; if (v.role) rec.role = v.role;
+    PERMS.forEach(([k]) => { if (k in v) rec[k] = !!v[k]; });
+    try { await q(sb.from("profiles").update(rec).eq("id", p.id)); toast("Saved."); renderTeam(); } catch(e) { toast(errText(e), true); }
   });
   document.querySelectorAll("[data-act]").forEach(b => b.onclick = async () => {
     const p = S.people[b.dataset.act];
@@ -1118,21 +1571,40 @@ async function readFnError(error){ try { const j = await error.context.json(); r
 async function renderSettings(){
   chrome("Settings", {back:true, nav:"more"});
   await loadMasters();
-  $("app").innerHTML = `<div class="card"><h3>Size grades (provisional)</h3><p class="small mut">Used to set Small / Medium / Large from a piece's length. Change these when the owner confirms.</p>
+  if (here() !== "#/settings") return;
+  const auto = Number(S.settings.size_auto || 0) === 1;
+  $("app").innerHTML = `<div class="card"><h3>Size grades</h3><p class="small mut">Staff choose Small / Medium / Large by hand. Switch on automatic grading only after the owner confirms the length limits.</p>
+    <label class="row" style="margin-bottom:12px"><input type="checkbox" id="sAuto" ${auto ? "checked" : ""} style="width:22px;height:22px"> <span>Set the size from the length automatically</span></label>
     <div class="two"><label class="f"><span>Small: shorter than (ft)</span><input class="in" id="sLo" type="number" inputmode="decimal" value="${esc(S.settings.size_small_below_ft ?? 4)}"></label>
     <label class="f"><span>Large: longer than (ft)</span><input class="in" id="sHi" type="number" inputmode="decimal" value="${esc(S.settings.size_large_above_ft ?? 6)}"></label></div>
-    <button class="btn pri block" id="sSave">Save</button></div>`;
+    <button class="btn pri block" id="sSave">Save</button></div>
+    <div class="card"><h3>Loading rules</h3>
+    <label class="row" style="margin-bottom:10px"><input type="checkbox" id="sPhoto" ${photoRequired() ? "checked" : ""} style="width:22px;height:22px"> <span>Driver photo with truck is compulsory</span></label>
+    <label class="row" style="margin-bottom:12px"><input type="checkbox" id="sSlip" ${slipRequired() ? "checked" : ""} style="width:22px;height:22px"> <span>Every sawmill needs a weigh slip before the truck is Loaded</span></label>
+    <button class="btn pri block" id="sRules">Save loading rules</button></div>
+    <div class="card"><h3>Wood types</h3><p class="small">${S.woods.map(esc).join(" · ")}</p>${can("plan") ? `<button class="btn sm" id="addWood">+ Add wood type</button>` : ""}</div>
+    ${can("expenses") ? `<div class="card"><h3>Expense categories</h3><p class="small">${S.expCats.map(esc).join(" · ")}</p><button class="btn sm" id="addCat">+ Add category</button></div>` : ""}`;
   $("sSave").onclick = async () => {
     const lo = num($("sLo").value), hi = num($("sHi").value);
     if (lo === null || hi === null || lo <= 0 || hi < lo) return toast("Large must be at least the small limit.", true);
-    try { await q(sb.from("app_settings").update({value:lo}).eq("key", "size_small_below_ft")); await q(sb.from("app_settings").update({value:hi}).eq("key", "size_large_above_ft")); await loadMasters(); toast("Saved."); } catch(e) { toast(errText(e), true); }
+    try {
+      await q(sb.from("app_settings").update({value:lo}).eq("key", "size_small_below_ft")); await q(sb.from("app_settings").update({value:hi}).eq("key", "size_large_above_ft"));
+      await q(sb.from("app_settings").update({value: $("sAuto").checked ? 1 : 0}).eq("key", "size_auto"));
+      await loadMasters(); toast("Saved.");
+    } catch(e) { toast(errText(e), true); }
   };
+  $("sRules").onclick = async () => {
+    try { await q(sb.from("app_settings").update({value: $("sPhoto").checked ? 1 : 0}).eq("key", "driver_photo_required")); await q(sb.from("app_settings").update({value: $("sSlip").checked ? 1 : 0}).eq("key", "weigh_slip_required")); await loadMasters(); toast("Saved."); }
+    catch(e) { toast(errText(e), true); }
+  };
+  const aw = $("addWood"); if (aw) aw.onclick = async () => { const v = await sheet({title:"Add wood type", fields:[{id:"name", label:"Name", type:"text", required:true}], ok:"Add"}); if (!v) return; try { await q(sb.from("wood_types").insert({name:v.name})); toast("Added."); renderSettings(); } catch(e) { toast(errText(e), true); } };
+  const ac = $("addCat"); if (ac) ac.onclick = async () => { const v = await sheet({title:"Add expense category", fields:[{id:"name", label:"Name", type:"text", required:true}], ok:"Add"}); if (!v) return; try { await q(sb.from("expense_categories").insert({name:v.name})); toast("Added."); renderSettings(); } catch(e) { toast(errText(e), true); } };
 }
 
 /* ---------- Excel ---------- */
 function renderExport(){
   chrome("Excel export", {back:true, nav:"more"});
-  $("app").innerHTML = `<div class="card"><h2>Download Excel</h2><p class="mut small">Sheets: Loads, Mill lines, Costs, History${isAdmin() ? ", Bills, Payments, Balances (prices included)" : ""}.</p>
+  $("app").innerHTML = `<div class="card"><h2>Download Excel</h2><p class="mut small">Sheets: Loads, Sawmill items, Documents, History${canSeeExp() ? ", Expenses" : ""}${can("finance") ? ", Payments, Balances (prices included)" : ""}.</p>
     <div class="two"><label class="f"><span>From</span><input class="in" type="date" id="xFrom" value="${today().slice(0, 7)}-01"></label><label class="f"><span>To</span><input class="in" type="date" id="xTo" value="${today()}"></label></div>
     <button class="btn pri block" id="xGo">Download Excel</button><p class="small mut" id="xMsg"></p></div>`;
   $("xGo").onclick = async () => {
@@ -1142,29 +1614,34 @@ function renderExport(){
     try {
       await loadScript(XLSX_URL);
       const loads = await q(sb.from("v_loads").select("*").gte("load_date", from).lte("load_date", to).order("load_date").order("id"));
-      const ids = loads.map(l => l.id); let lines = [], costs = [], acts = [], pays = [];
+      const ids = loads.map(l => l.id); let lines = [], acts = [], pays = [], exps = [], files = [];
       for (let i = 0; i < ids.length; i += 150) {
         const part = ids.slice(i, i + 150);
         lines = lines.concat(await q(sb.from("v_lines").select("*").in("load_id", part).order("id")));
-        costs = costs.concat(await q(sb.from("load_costs").select("*").in("load_id", part).order("id")));
         acts = acts.concat(await q(sb.from("activity").select("*").in("load_id", part).order("at")));
-        if (isAdmin()) pays = pays.concat(await q(sb.from("payments").select("*").in("load_id", part).order("paid_on")));
+        files = files.concat(await q(sb.from("load_files").select("load_id,allocation_id,kind,created_at,created_by").in("load_id", part).order("id")));
+        if (canSeeExp()) exps = exps.concat(await q(sb.from("load_costs").select("*").in("load_id", part).order("id")));
+        if (can("finance")) pays = pays.concat(await q(sb.from("payments").select("*").in("load_id", part).order("paid_on")));
       }
-      const byId = Object.fromEntries(loads.map(l => [l.id, l])), n = v => v == null ? null : Number(v), A = isAdmin();
-      const s1 = loads.map(l => ({"Load":l.load_no, "Date":l.load_date, "Stage":STAGE[l.truck_stage], "Truck":l.vehicle_no, "Capacity (T)":n(l.capacity_t), "Kata net (T)":n(l.net_weight_t), "Driver":l.driver_name, "Driver phone":l.driver_phone, "Transporter":l.transporter_name, "Freight (₹)":n(l.freight_amount), "Other costs (₹)":n(l.costs_total), "Buyer":l.party_name, "Destination":l.destination, "State":l.destination_state, "E-way bill":l.eway_bill_no, "Mills":n(l.mills_count), "Quantity":l.qty_summary, ...(A ? {"Purchase total (₹)":n(l.purchase_total), "Invoice no":l.invoice_no, "Invoice date":l.invoice_date, "Invoice total (₹)":n(l.invoice_total), "Due date":l.due_date, "Received (₹)":n(l.received), "Bill stage":BILL[l.bill_stage]} : {}), "Last change":dExact(l.last_at), "Last change by":person(l.last_by), "Last reason":l.last_reason}));
-      const s2 = lines.map(x => ({"Load":byId[x.load_id]?.load_no, "Mill":x.sawmill_name, "Place":x.sawmill_place, "Wood":x.wood_type, "Unit":x.unit, "Quantity":n(x.quantity), "Length (ft)":n(x.length_ft), "Size":GRADES[x.size_grade] || "", "Status":LINE_ST[x.line_status], "Loaded on":x.loaded_on, ...(A ? {"Rate (₹)":n(x.rate), "Adjustment (₹)":n(x.adjustment), "Amount (₹)":n(x.amount)} : {})}));
-      const s3 = costs.map(c => ({"Load":byId[c.load_id]?.load_no, "Cost":c.cost_type, "Amount (₹)":n(c.amount), "Paid to":c.paid_to, "Paid on":c.paid_on}));
-      const s4 = acts.map(a => ({"When (exact)":dExact(a.at), "Load":byId[a.load_id]?.load_no, "Who":person(a.actor), "Stage then":STAGE[a.truck_stage] || "", "What":ENTITY[a.entity] + " " + a.action, "Details":a.action === "note" ? a.reason : JSON.stringify(a.changes || {}), "Reason":a.action === "note" ? "" : (a.reason || "")}));
+      const byId = Object.fromEntries(loads.map(l => [l.id, l])), n = v => v == null ? null : Number(v), F = can("finance"), X = canSeeExp();
+      const s1 = loads.map(l => ({"Load":l.load_no, "Date":l.load_date, "Stage":STAGE[l.truck_stage], "Truck":l.vehicle_no, "Capacity (T)":n(l.capacity_t), "Capacity (CFT)":n(l.capacity_cft), "Kata net (T)":n(l.net_weight_t), "Driver":l.driver_name, "Driver phone":l.driver_phone, "Driver photo":l.driver_photo ? "Yes" : "No", "Transporter":l.transporter_name, "Party":l.party_name, "Destination":l.destination, "State":l.destination_state, "E-way bill":l.eway_bill_no, "Sawmills":n(l.mills_count), "Quantity":l.qty_summary,
+        ...(X ? {"Freight (₹)":n(l.freight_total), "All expenses (₹)":n(l.costs_total)} : {}),
+        ...(F ? {"Purchase total (₹)":n(l.purchase_total), "Invoice no":l.invoice_no, "Invoice date":l.invoice_date, "Invoice total (₹)":n(l.invoice_total), "Due date":l.due_date, "Received (₹)":n(l.received), "Bill stage":BILL[l.bill_stage]} : {}),
+        "Last change":dExact(l.last_at), "Last change by":person(l.last_by), "Last reason":l.last_reason}));
+      const s2 = lines.map(x => ({"Load":byId[x.load_id]?.load_no, "Saw Mill Name":x.sawmill_name, "Place":x.sawmill_place, "Sawmill owner":x.owner_name, "Party name":x.party_name, "Wood":x.wood_type, "Dimensions":x.dimensions, "Size":GRADES[x.size_grade] || "", "Quantity":n(x.quantity), "Unit":x.unit, "Pieces":n(x.pieces), "Length (ft)":n(x.length_ft), "Status":LINE_ST[x.line_status], "Loaded on":x.loaded_on, ...(F ? {"Rate (₹)":n(x.rate), "Adjustment (₹)":n(x.adjustment), "Amount (₹)":n(x.amount)} : {})}));
+      const s3 = files.map(f => ({"Load":byId[f.load_id]?.load_no, "Document":f.kind, "Saw Mill Name":f.allocation_id ? (lines.find(x => x.allocation_id === f.allocation_id) || {}).sawmill_name : "", "Uploaded":dExact(f.created_at), "By":person(f.created_by)}));
+      const s4 = acts.map(a => ({"When (exact)":dExact(a.at), "Load":byId[a.load_id]?.load_no, "Who":person(a.actor), "Stage then":STAGE[a.truck_stage] || "", "What":(ENTITY[a.entity] || a.entity) + " " + a.action, "Details":a.action === "note" ? a.reason : JSON.stringify(a.changes || {}), "Reason":a.action === "note" ? "" : (a.reason || "")}));
       const wb = XLSX.utils.book_new();
       const add = (rows, name) => { const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{"Info":"Nothing in these dates"}]); XLSX.utils.book_append_sheet(wb, ws, name); };
-      add(s1, "Loads"); add(s2, "Mill lines"); add(s3, "Costs"); add(s4, "History");
-      if (A) {
+      add(s1, "Loads"); add(s2, "Sawmill items"); add(s3, "Documents"); add(s4, "History");
+      if (X) add(exps.map(c => ({"Date":c.paid_on, "Load":byId[c.load_id]?.load_no, "Category":c.cost_type, "Saw Mill Name":c.allocation_id ? (lines.find(x => x.allocation_id === c.allocation_id) || {}).sawmill_name : "Whole trip", "Amount (₹)":n(c.amount), "Paid to":c.paid_to, "Description":c.note, "Entered by":person(c.created_by)})), "Expenses");
+      if (F) {
         add(pays.map(p => ({"Date":p.paid_on, "Load":byId[p.load_id]?.load_no, "Type":p.party_kind === "buyer" ? "Received" : "Paid", "Party":p.party_kind === "mill" ? millName(p.sawmill_id) : partyName(p.party_id), "Amount (₹)":n(p.amount), "Mode":MODES[p.mode], "Reference":p.reference, "Note":p.note})), "Payments");
         const bal = await q(sb.from("v_balances").select("*"));
         add(bal.map(x => ({"Kind":x.party_kind, "Name":x.name, "Place":x.place, "Total (₹)":n(x.total_due), "Paid (₹)":n(x.total_paid), "Balance (₹)":Number(x.total_due) - Number(x.total_paid)})), "Balances");
       }
       XLSX.writeFile(wb, `Aditya_Traders_${from}_to_${to}.xlsx`);
-      $("xMsg").textContent = `Downloaded: ${s1.length} loads, ${s2.length} mill lines, ${s4.length} history rows.`;
+      $("xMsg").textContent = `Downloaded: ${s1.length} loads, ${s2.length} wood items, ${s4.length} history rows.`;
     } catch(e) { toast(errText(e), true); }
     b.disabled = false; b.textContent = "Download Excel";
   };
