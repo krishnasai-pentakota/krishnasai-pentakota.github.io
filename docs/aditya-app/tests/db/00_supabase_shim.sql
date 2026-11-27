@@ -13,7 +13,8 @@ create table auth.users (
   raw_user_meta_data jsonb default '{}', created_at timestamptz default now(), updated_at timestamptz default now()
 );
 create function auth.uid() returns uuid language sql stable as
-$$ select nullif(current_setting('request.jwt.claims', true)::jsonb ->> 'sub', '')::uuid $$;
+-- Same as Supabase's: an empty or missing login gives null.
+$$ select nullif(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub', '')::uuid $$;
 grant usage on schema auth to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated;
 

@@ -1,7 +1,7 @@
 // Aditya Traders: team-admin
-// Lets the owner or accountant create logins and reset passwords from inside the app.
+// Lets the owner (or anyone given the "people" permission) create logins and reset passwords from inside the app.
 // The service key never leaves the server. Every call is checked: the caller must be
-// signed in AND be an active owner/accountant (public.is_admin(), same rule as the database).
+// signed in AND have the "people" permission (public.has_perm, same rule as the database).
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 const cors = {
@@ -22,12 +22,14 @@ Deno.serve(async (req) => {
   const auth = req.headers.get("Authorization") ?? "";
   if (!auth.startsWith("Bearer ")) return reply(401, { error: "Sign in first." });
 
-  // 1. Who is calling? Run is_admin() as the caller, so RLS rules decide.
+  // 1. Who is calling? Ask the database as the caller, so its rules decide.
   const asCaller = createClient(url, anon, { global: { headers: { Authorization: auth } }, auth: { persistSession: false } });
   const { data: who, error: whoErr } = await asCaller.auth.getUser();
   if (whoErr || !who?.user) return reply(401, { error: "Sign in first." });
-  const { data: admin, error: admErr } = await asCaller.rpc("is_admin");
-  if (admErr || admin !== true) return reply(403, { error: "Only the owner or accountant can manage logins." });
+  // Caller needs the "people" permission (the owner always has it). Same rule as the database.
+  const { data: canPeople, error: permErr } = await asCaller.rpc("has_perm", { p: "people" });
+  if (permErr || canPeople !== true) return reply(403, { error: "You do not have permission to manage logins." });
+  const { data: callerIsOwner } = await asCaller.rpc("is_owner");
 
   let b: Record<string, unknown>;
   try { b = await req.json(); } catch { return reply(400, { error: "Bad request." }); }
@@ -40,12 +42,15 @@ Deno.serve(async (req) => {
     const email = String(b.email ?? "").trim().toLowerCase();
     const role = String(b.role ?? "");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return reply(400, { error: "Enter a valid phone number or email." });
-    if (!["owner", "accountant", "staff"].includes(role)) return reply(400, { error: "Bad role." });
+    if (!["owner", "accountant", "freight", "staff"].includes(role)) return reply(400, { error: "Bad role." });
+    const perms = (b.perms ?? {}) as Record<string, unknown>;
+    const flags = { perm_plan: !!perms.perm_plan, perm_finance: !!perms.perm_finance, perm_expenses: !!perms.perm_expenses, perm_rates: !!perms.perm_rates, perm_people: !!perms.perm_people };
+    if ((role === "owner" || flags.perm_people) && callerIsOwner !== true) return reply(403, { error: "Only the owner can create an owner or give the people permission." });
     const { data, error } = await svc.auth.admin.createUser({ email, password, email_confirm: true });
     if (error) return reply(400, { error: /already|registered|exists/i.test(error.message) ? "A login with this phone/email already exists." : error.message });
     // The database trigger already created the profile (inactive). Approve it with the chosen role.
     const { error: pErr } = await svc.from("profiles").update({
-      full_name: String(b.full_name ?? ""), phone: b.phone ? String(b.phone) : null, role, active: true,
+      full_name: String(b.full_name ?? ""), phone: b.phone ? String(b.phone) : null, role, active: true, ...flags,
     }).eq("id", data.user.id);
     if (pErr) return reply(500, { error: "Login created but profile not updated: " + pErr.message });
     return reply(200, { ok: true, user_id: data.user.id });
@@ -53,6 +58,8 @@ Deno.serve(async (req) => {
 
   if (b.action === "set_password") {
     const id = String(b.user_id ?? "");
+    const { data: target } = await svc.from("profiles").select("role").eq("id", id).maybeSingle();
+    if (target?.role === "owner" && callerIsOwner !== true) return reply(403, { error: "Only the owner can reset an owner's password." });
     const { error } = await svc.auth.admin.updateUserById(id, { password });
     if (error) return reply(400, { error: error.message });
     return reply(200, { ok: true });

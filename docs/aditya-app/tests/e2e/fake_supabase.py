@@ -282,8 +282,9 @@ class H(BaseHTTPRequestHandler):
         claims = token_claims(self.headers)
         if not claims:
             return self.send(401, {"error": "Sign in first."})
-        if not run_as(claims, "select public.is_admin()"):
-            return self.send(403, {"error": "Only the owner or accountant can manage logins."})
+        if not run_as(claims, "select public.has_perm('people')"):
+            return self.send(403, {"error": "You do not have permission to manage logins."})
+        caller_owner = run_as(claims, "select public.is_owner()")
         b = json.loads(self.body() or b"{}")
         pw = b.get("password") or ""
         if len(pw) < 8:
@@ -292,15 +293,19 @@ class H(BaseHTTPRequestHandler):
             email = (b.get("email") or "").lower().strip()
             if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
                 return self.send(400, {"error": "Enter a valid phone number or email."})
-            if b.get("role") not in ("owner", "accountant", "staff"):
+            if b.get("role") not in ("owner", "accountant", "freight", "staff"):
                 return self.send(400, {"error": "Bad role."})
+            perms = b.get("perms") or {}
+            flags = [bool(perms.get(k)) for k in ("perm_plan", "perm_finance", "perm_expenses", "perm_rates", "perm_people")]
+            if (b["role"] == "owner" or flags[4]) and not caller_owner:
+                return self.send(403, {"error": "Only the owner can create an owner or give the people permission."})
             with LOCK:
                 if email in PASSWORDS:
                     return self.send(400, {"error": "A login with this phone/email already exists."})
                 uid = str(uuid.uuid4())
                 with psycopg.connect(DSN, autocommit=True) as conn:
                     conn.execute("insert into auth.users (instance_id, id, aud, role, email) values ('00000000-0000-0000-0000-000000000000', %s, 'authenticated', 'authenticated', %s)", (uid, email))
-                    conn.execute("update public.profiles set full_name = %s, phone = %s, role = %s, active = true where id = %s", (b.get("full_name") or "", b.get("phone"), b["role"], uid))
+                    conn.execute("update public.profiles set full_name = %s, phone = %s, role = %s, active = true, perm_plan = %s, perm_finance = %s, perm_expenses = %s, perm_rates = %s, perm_people = %s where id = %s", (b.get("full_name") or "", b.get("phone"), b["role"], *flags, uid))
                 PASSWORDS[email] = (uid, pw)
             return self.send(200, {"ok": True, "user_id": uid})
         if b.get("action") == "set_password":
@@ -320,9 +325,17 @@ class H(BaseHTTPRequestHandler):
             return self.send(200, f[0], f[1]) if f and dict(qs).get("token") == "ok" else self.send(400, {"message": "bad signature"})
         if not claims or not run_as(claims, "select public.is_member()"):
             return self.send(403, {"statusCode": "403", "error": "Unauthorized", "message": "new row violates row-level security policy"})
+        m = re.match(r"^object/sign/([^/]+)/(.+)$", sub)
+        if m and method == "POST":   # one signed link (createSignedUrl)
+            key = m.group(1) + "/" + unquote(m.group(2))
+            if unquote(m.group(2)).startswith("expenses/") and not run_as(claims, "select public.has_perm('expenses') or public.has_perm('finance')"):
+                return self.send(400, {"statusCode": "404", "error": "not_found", "message": "Object not found"})
+            return self.send(200, {"signedURL": f"/object/sign/{m.group(1)}/{unquote(m.group(2))}?token=ok"}) if key in FILES else self.send(400, {"statusCode": "404", "message": "Object not found"})
         m = re.match(r"^object/sign/([^/]+)$", sub)
         if m and method == "POST":
             b = json.loads(self.body() or b"{}")
+            money = run_as(claims, "select public.has_perm('expenses') or public.has_perm('finance')")
+            b["paths"] = [p for p in b.get("paths", []) if money or not p.startswith("expenses/")]   # same rule as the storage policy
             return self.send(200, [{"path": p, "signedURL": f"/object/sign/{m.group(1)}/{p}?token=ok" if (m.group(1) + "/" + p) in FILES else None, "error": None if (m.group(1) + "/" + p) in FILES else "not found"} for p in b.get("paths", [])])
         m = re.match(r"^object/([^/]+)$", sub)
         if m and method == "DELETE":
