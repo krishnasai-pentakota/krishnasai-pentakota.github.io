@@ -1,48 +1,116 @@
-title: TimberTrack — timber dispatch and quality app
+title: TimberTrack — timber trucking operations app
 kind: client
-status: in_progress   # change to delivered once the owner is using it
+also_in: [lab]
+status: delivered
 order: 1
-client: A timber trader in Andhra Pradesh
-updated: 2026-10-15
+client: Aditya Traders, a timber trader in Andhra Pradesh
+period: Nov 2026
+updated: 2026-11-27
 why: >-
-  Loads travel more than 1,500 km. A dispute over a log's size or quality after it arrives
-  is the trader's word against the buyer's, unless the record was made before it left.
+  One truck loads at several sawmills, pieces are counted on paper and typed into Excel later,
+  and money must stay with the owner. One shared record replaces the phone calls between staff,
+  owner and accountant.
 summary: >-
-  A trader trucks mango and teak logs from Andhra Pradesh to buyers in Rajasthan.
-  TimberTrack measures and prices each log, records the load before it leaves, alerts
-  the buyer on WhatsApp, and keeps one ledger per consignment.
+  A phone-first app for a trader who trucks wood from Andhra Pradesh sawmills to buyers in
+  Rajasthan. Staff register trucks, sawmills, piece tallies and weigh slips; the owner enters
+  rates and freight; the accountant bills and tracks payments.
 highlights:
-  - Log measurement and pricing at loading
-  - Photo and video quality check before every dispatch
-  - WhatsApp alert to the buyer when a truck leaves
-  - One ledger per consignment, from loading to payment
-my_role: Discovery, design and build
-# TODO: add the tools once chosen (e.g. FastAPI, PostgreSQL, WhatsApp Cloud API).
-stack: []
-tags: [client work, logistics, quality control, WhatsApp]
+  - One truck, several sawmills, several wood items each; units never mixed
+  - Piece tally works out CFT exactly as the owner's Excel workbook (1,350.00 CFT to the cent)
+  - Compulsory driver photo, and a weigh slip for every sawmill before a truck is Loaded
+  - Loading PDF for staff with no rates, amounts, GST or freight in it
+  - Money rules enforced in Postgres, so a staff phone never receives a rate or a payment
+  - Every change keeps who, when, why and the stage, with red flags per person
+my_role: Discovery, design, build and tests
+stack: [Supabase (Postgres, Auth, Storage, Edge Functions), JavaScript, jsPDF, SheetJS, Python, Playwright]
+tags: [client work, logistics, operations, Supabase, row-level security]
+metrics:
+  - value: "1,350.00 CFT"
+    label: Same total as the owner's Excel workbook
+    evidence: tests/db/test_db_tally.py in github.com/krishnasai-pentakota/timbertrack types the workbook's counts and compares every total
+  - value: "181"
+    label: Database checks, run as each person
+    evidence: tests/db/test_db_v3.py (130) and tests/db/test_db_tally.py (51) in the timbertrack repository
+  - value: "92"
+    label: Browser checks on a phone-sized screen
+    evidence: tests/e2e/test_app_v3.py (59) and tests/e2e/test_app_tally.py (33) in the timbertrack repository
+cover: img/timbertrack/cover.webp
+screenshots:
+  - src: img/timbertrack/cover.webp
+    alt: Four phone screens showing the owner's home, truck registration with the red driver-photo warning, the piece-tally grid and the weigh slips per sawmill
+    caption: Owner home, compulsory driver photo, piece tally and weigh slips
+  - src: img/timbertrack/staff.webp
+    alt: Three staff screens showing a home screen without money, a truck with two sawmills and three wood items, and the history
+    caption: Staff. Trucks, sawmills and wood items, with no money anywhere
+  - src: img/timbertrack/tally.webp
+    alt: Piece tally grid with lengths down and widths across, the totals by size, and the Small, Medium and Large items it makes
+    caption: Piece tally. The paper grid on a phone; CFT worked out in the database
+  - src: img/timbertrack/money.webp
+    alt: Owner's freight and charges on a truck, a sawmill rate card, and the accountant's view of changes in red
+    caption: Owner enters rates and freight; the accountant sees every change in red
+  - src: img/timbertrack/pdf.webp
+    alt: Loading PDF titled Truck loading and dispatch details with serial number, saw mill name, product, size, quantity and unit columns
+    caption: Loading PDF for staff. Quantities and sizes, never money
+flow:
+  - Staff register truck and driver photo
+  - Truck reaches a sawmill, loading starts
+  - Piece tally or wood items per sawmill
+  - Weigh slip per sawmill, then Loaded
+  - Owner enters rates, freight and charges
+  - Accountant bills and records payments
+links:
+  - label: Try the demo
+    url: https://krishnasai-pentakota.github.io/aditya/demo/
+    type: live
+  - label: Code and tests on GitHub
+    url: https://github.com/krishnasai-pentakota/timbertrack
+    type: code
+  - label: Walkthrough of every stage
+    url: https://krishnasai-pentakota.github.io/aditya/demo/guide.html
+    type: doc
 
 case_study:
   problem: >-
-    The trader sends mango and teak logs more than 1,500 km, to buyers in Rajasthan. When a
-    buyer disputes a log's size or quality after it arrives, it is the trader's word against
-    the buyer's, because nothing was recorded before the truck left.
+    The trader sends 30 and 35-ton trucks from sawmills in Andhra Pradesh to buyers in
+    Rajasthan. One truck often loads at two or three sawmills. Staff counted pieces on paper,
+    someone typed the counts into an Excel workbook for the CFT, and freight, rates and payments
+    lived with the owner. Staff, owner and accountant phoned each other for every detail, and a
+    change made in the morning was easy to miss by the evening.
   steps:
     - >-
-      Measured and priced each log at loading, so its size and price are on record before the
-      truck moves.
+      Interviewed the owner and staff about how wood is counted, tallied, weighed, loaded and paid
+      for, and wrote it down as a calculation and process spec before building anything.
     - >-
-      Added a photo and video quality check before every dispatch.
+      Modelled one truck trip with several sawmills, each with its own wood items, weigh slips and
+      charges, and the stages from Planning to Delivered.
     - >-
-      Sent the buyer a WhatsApp alert when the truck leaves.
+      Put every rule in Supabase Postgres: row-level security, per-person permission flags,
+      triggers for stage rules and history, and views that return blank money columns to staff.
     - >-
-      Kept one ledger per consignment, from loading to payment.
+      Built the app as one phone-first HTML file, with a compulsory driver photo, arrival at the
+      sawmill before Under loading, a weigh slip per sawmill, and a loading PDF without money.
+    - >-
+      Took the CFT formula from the owner's Excel workbook and moved it into the database, then
+      typed the workbook's own counts in to prove the totals match to the cent.
+    - >-
+      Tested it as each person: 181 database checks and 92 browser checks on a phone-sized screen,
+      plus a public demo whose sample data was made through the real rules.
   decisions:
-    - choice: Record at loading, not after arrival
+    - choice: Rules in the database, not only on the screen
       why: >-
-        A dispute is settled by the record made before the truck left. Measuring at the yard
-        means both sides check the same numbers.
-    - choice: The alert goes through WhatsApp
+        Hiding a button is not security. Staff phones never receive a rate, freight or payment,
+        even if someone calls the API directly.
+    - choice: Piece tally computed in Postgres
       why: >-
-        The buyer reads WhatsApp already, so the alert reaches them without a new app to install.
+        The CFT can't drift between phones, and it matches the workbook the owner already trusts,
+        without copying the workbook's two formula mistakes.
+    - choice: One shared owner login
+      why: >-
+        Aditya and Bharat run the business together and asked for one owner profile. Permission
+        flags make it easy to give rates or freight to someone else later.
+  outcome: >-
+    Live since 27 Nov 2026 on a shared database, with trial logins for the owner, the accountant
+    and staff.
   next: >-
-    Move the status to delivered once the owner uses it on every consignment.
+    Confirm the PDF fields, the weigh-slip weights and the rate basis with the owner, then move
+    from trial logins to daily use.
